@@ -97,7 +97,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 
 
-        /* Go forward to build the map */
+        // Go forward to build the map 
         final_cmd_vel.linear.x = 0.02;
         final_cmd_vel.linear.y = 0;
         final_cmd_vel.angular.z = 0;
@@ -105,7 +105,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
         usleep(5000000);
 
-        /* Go backward to build the map */
+        // Go backward to build the map 
         final_cmd_vel.linear.x = -0.02;
         final_cmd_vel.linear.y = 0;
         final_cmd_vel.angular.z = 0;
@@ -115,7 +115,16 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 
 
-	/* Turn on himself to build the map */
+        // Turn on himself to build the map 
+        final_cmd_vel.linear.x = 0;
+        final_cmd_vel.linear.y = 0;
+        final_cmd_vel.angular.z = 0.15;
+        cmd_vel_pub.publish(final_cmd_vel);
+
+	usleep(6500000);
+
+
+	// Turn on himself to build the map 
 	final_cmd_vel.linear.x = 0;
 	final_cmd_vel.linear.y = 0;
 	final_cmd_vel.angular.z = 0.15;
@@ -123,7 +132,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
         usleep(15000000);
 
-        /* Turn on himself to build the map */
+        // Turn on himself to build the map 
         final_cmd_vel.linear.x = 0;
         final_cmd_vel.linear.y = 0;
         final_cmd_vel.angular.z = -0.15;
@@ -131,7 +140,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 	usleep(15000000);
 
-	/* Go forward to build the map */
+	// Go forward to build the map 
 	final_cmd_vel.linear.x = -0.02;
 	final_cmd_vel.linear.y = 0;
 	final_cmd_vel.angular.z = 0;
@@ -139,7 +148,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 	usleep(5000000);
 
-	/* Go backward to build the map */
+	// Go backward to build the map 
 	final_cmd_vel.linear.x = 0.02;
 	final_cmd_vel.linear.y = 0;
 	final_cmd_vel.angular.z = 0;
@@ -148,13 +157,13 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	usleep(15000000);
 
 	if(color_name == "Yellow") {
-		/* Go on the left to join the starting zone */
+		// Go on the left to join the starting zone 
 		final_cmd_vel.linear.x = 0;
 		final_cmd_vel.linear.y = -0.02;
 		final_cmd_vel.angular.z = 0;
 	}
 	else {
-		/* Go on the right to join the starting zone */
+		// Go on the right to join the starting zone 
 		final_cmd_vel.linear.x = 0;
 		final_cmd_vel.linear.y = 0.02;
 		final_cmd_vel.angular.z = 0;
@@ -163,7 +172,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 	usleep(7000000);
 
-        /* Go backward to join the starting zone */
+        // Go backward to join the starting zone 
         final_cmd_vel.linear.x = 0.02;
         final_cmd_vel.linear.y = 0;
         final_cmd_vel.angular.z = 0;
@@ -171,7 +180,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
         usleep(7000000);
 
-	/* Stop and wait the init pose signal */
+	// Stop and wait the init pose signal 
 	final_cmd_vel.linear.x = 0;
 	final_cmd_vel.linear.y = 0;
 	final_cmd_vel.angular.z = 0;

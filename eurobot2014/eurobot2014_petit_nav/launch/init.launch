@@ -36,7 +36,7 @@
   </node>
 -->
   <!-- Path planner / Costmap -->
-  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
+<!--  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
     <param name="costmap_name" type="str" value="PETIT_costmap" />
     <param name="planner_name" type="str" value="PETIT_planner" />
     <param name="map_name" type="str" value="petit_map" />
@@ -54,9 +54,9 @@
         <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
         <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
   </node>
-
+-->
   <!-- Path wrapper = Path follower -->
-  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
+<!--  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
     <param name="map_name" type="str" value="petit_map" />
     <param name="base_name" type="str" value="petit_base_link" /> 
 
@@ -67,7 +67,7 @@
         <remap from="/pause_nav" to="/GLOBAL/stop" />
         <remap from="path_done" to="/PETIT/path_done" />
   </node>
-
+-->
   <!-- Low level motor driver => RoboClaw -->
 <!--
   <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
@@ -75,13 +75,13 @@
   </node>
 -->
   <!-- Init pose -->
- <!-- <node pkg="eurobot2014_petit_nav" type="petit_init_pose" respawn="false" name="PETIT_initial_pose" output="screen">
+  <node pkg="eurobot2014_petit_nav" type="petit_init_pose" respawn="false" name="PETIT_initial_pose" output="screen">
         <param name="color_name" type="str" value="Yellow" />
 
         <remap from="/ROBOT/init_pose" to="/PETIT/init_pose" />
         <remap from="/ROBOT/cmd_vel" to="/PETIT/cmd_vel" />
         <remap from="/ROBOT/resume_pathwrapper" to="/PETIT/resume_pathwrapper" />
   </node>
--->
+
   
 </launch>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Laser driver => Neato XV11-->
+  <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
+    <param name="firmware_version" value="2" />
+    <param name="port" type="str" value="/dev/ttyUSB1" />
+    <param name="frame_id" type="str" value="petit_neato_link" />
+    
+    <remap from="/scan" to="/PETIT/neato" />
+  </node>
+
+  <!-- Low level motor driver => RoboClaw -->
+  <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
+        <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
+  </node>
+
+  
+</launch>

@@ -80,6 +80,7 @@ class TrajectoryManager {
 		ros::Subscriber resume_sub_;
 
 		ros::Publisher path_pub;
+		ros::Publisher pose_pub;
 		ros::Publisher pathimpossible_pub;
 
 		ros::ServiceServer pose_service;
@@ -155,6 +156,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	sem = 1;
 	// Goal suscriber
 	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/goal", 2, &TrajectoryManager::goalCallback, this);
+	pose_pub = nh.advertise < geometry_msgs::PoseStamped > ("/ROBOT/poseStamped", 2);
 
 	path_pub = nh.advertise < nav_msgs::Path > ("/ROBOT/plan", 5);
 
@@ -589,6 +591,7 @@ void TrajectoryManager::planThread(void)
 				current_pose = start;
 				action_feedback_.base_position = current_pose;
 				as_.publishFeedback(action_feedback_);
+				pose_pub.publish(current_pose);
 
 				break;
 			case RUN:
