@@ -35,7 +35,7 @@
 #define theta1 (3.14159265359 - 2.09439510239)
 #define theta2 (3.14159265359)
 #define theta3 (3.14159265359 + 2.09439510239)
-#define R (0.3)//(0.09)
+#define R (0.09)//(0.09)
 #define RAYON (0.03)
 
 
@@ -89,7 +89,7 @@ DriveRoboClaw::DriveRoboClaw()
 {
 
 #ifdef USE_BOOST
-	port_="/dev/ttyUSB0";
+	port_="/dev/ttyNEATO";
 	baud_rate_=38400;
 
     	try {
@@ -101,6 +101,7 @@ DriveRoboClaw::DriveRoboClaw()
 		serial_->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
 		serial_->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
 		serial_->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+		printf("port is open.\n");
 	}
     	catch(boost::system::system_error ex) {
         	ROS_ERROR("Error instantiating laser object. Are you sure you have the correct port and baud rate? Error was %s", ex.what());
