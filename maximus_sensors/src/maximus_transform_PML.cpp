@@ -34,7 +34,7 @@ class TransformPML
 
 
 	private:
-		void joyCallback(const maximus_sensors::AvrLaserVector::ConstPtr& pml);
+		void pmlCallback(const maximus_sensors::AvrLaserVector::ConstPtr& pml);
 		ros::NodeHandle nh;
 
 		sensor_msgs::LaserScan my_laser_scan;
@@ -44,7 +44,7 @@ TransformPML::TransformPML()
 {
 
 	// Joystick suscriber
-	avrpml_sub_ = nh.subscribe<maximus_sensors::AvrLaserVector>("responseavrlaservector", 10, &TransformPML::joyCallback, this);
+	avrpml_sub_ = nh.subscribe<maximus_sensors::AvrLaserVector>("responseavrlaservector", 10, &TransformPML::pmlCallback, this);
 	// Set a Laser scan sensor for the robot
 	laser_sensor_pub = nh.advertise<sensor_msgs::LaserScan>("avr_PML_sensor", 50);
 
@@ -87,7 +87,7 @@ TransformPML::TransformPML()
 }
 
 
-void TransformPML::joyCallback(const maximus_sensors::AvrLaserVector::ConstPtr& pml)
+void TransformPML::pmlCallback(const maximus_sensors::AvrLaserVector::ConstPtr& pml)
 {
 	float tmp = 0.0;
 

@@ -1,0 +1,12 @@
+<launch>
+
+ <!-- avr bridge node-->
+  <node pkg="avr_bridge" type="bridge_node.py" name="avrpose_node" args="$(find maximus_position)/motionControlROS.yaml">
+    <!-- <remap from="imu" to="imu/imu_raw"/> -->
+  </node>
+ <!-- position Node-->
+  <node pkg="maximus_position" type="maximus_transform_pose" name="transform_pose"/>
+  <node pkg="maximus_position" type="maximus_position" name="maximus_position"/>
+
+</launch>
+

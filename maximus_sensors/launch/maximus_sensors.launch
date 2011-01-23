@@ -1,0 +1,8 @@
+<launch>
+
+ <!-- sensors Node-->
+  <node pkg="maximus_sensors" type="maximus_transform_PML" name="transform_PML"/>
+  <node pkg="maximus_sensors" type="maximus_sensors" name="maximus_sensors"/>
+
+</launch>
+
