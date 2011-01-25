@@ -19,6 +19,7 @@
   <depend package="joy"/>
   <depend package="move_base_msgs"/>
   <depend package="actionlib"/>
+  <depend package="laser_geometry"/>
 
 </package>
 

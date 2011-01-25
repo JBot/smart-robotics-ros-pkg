@@ -31,3 +31,4 @@ rosbuild_genmsg()
 
 rosbuild_add_executable(maximus_sensors src/maximus_sensors.cpp)
 rosbuild_add_executable(maximus_transform_PML src/maximus_transform_PML.cpp)
+rosbuild_add_executable(LaserScanToPointCloud src/LaserScanToPointCloud.cpp)
