@@ -18,13 +18,13 @@ public:
 
   LaserScanToPointCloud(ros::NodeHandle n) : 
     n_(n),
-    laser_sub_(n_, "avr_PML_sensor", 10),
-    laser_notifier_(laser_sub_,listener_, "map", 10)
+    laser_sub_(n_, "avr_PML_sensor", 30),
+    laser_notifier_(laser_sub_,listener_, "map", 30)
   {
     laser_notifier_.registerCallback(
       boost::bind(&LaserScanToPointCloud::scanCallback, this, _1));
-    laser_notifier_.setTolerance(ros::Duration(0.01));
-    scan_pub_ = n_.advertise<sensor_msgs::PointCloud>("/my_avr_cloud",1);
+    laser_notifier_.setTolerance(ros::Duration(0.8));
+    scan_pub_ = n_.advertise<sensor_msgs::PointCloud>("/my_avr_cloud",5);
   }
 
   void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in)
@@ -32,12 +32,19 @@ public:
     sensor_msgs::PointCloud cloud;
     try
     {
+	listener_.waitForTransform("/elevator", "/map",
+                              ros::Time::now(), ros::Duration(3.0));
+
         projector_.transformLaserScanToPointCloud(
           "map",*scan_in, cloud,listener_);
+
+	//listener_.waitForTransform("/elevator", "/map", ros::Time::now(), ros::Duration(3.0));
+    	//listener_.lookupTransform("/elevator", "/map", now, transform);
+
     }
     catch (tf::TransformException& e)
     {
-        std::cout << e.what();
+        std::cout << "exeption " << e.what();
         return;
     }
     

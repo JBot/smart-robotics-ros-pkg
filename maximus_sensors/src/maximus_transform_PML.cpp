@@ -48,7 +48,7 @@ TransformPML::TransformPML()
 	// Set a Laser scan sensor for the robot
 	laser_sensor_pub = nh.advertise<sensor_msgs::LaserScan>("avr_PML_sensor", 50);
 
-	my_laser_scan.header.frame_id = "/map";
+	my_laser_scan.header.frame_id = "/elevator";
 	my_laser_scan.header.stamp = ros::Time::now();
 
 	my_laser_scan.angle_min = (75 * 3.14159265 / 180) - (3.14159265 / 2);

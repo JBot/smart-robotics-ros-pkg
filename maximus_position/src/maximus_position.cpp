@@ -65,7 +65,7 @@ class TeleopMaximus
 		tf::TransformBroadcaster br;
 		tf::Transform transform;
 		nav_msgs::Path my_maximus_path;
-
+		geometry_msgs::PoseStamped temp_pose;
 
 };
 
@@ -102,6 +102,7 @@ TeleopMaximus::TeleopMaximus():
 	transform.setRotation( tf::Quaternion(0, 0, 0) );
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "/map", "/between_wheels"));
 
+	
 
 	my_maximus_path.header.frame_id = "/map";
 	my_maximus_path.header.stamp = ros::Time::now();
@@ -158,35 +159,19 @@ void TeleopMaximus::goalCallback(const geometry_msgs::PoseStamped::ConstPtr& goa
 	x = abs(goal->pose.position.x*1000*2/10);
 	y = abs(goal->pose.position.y*1000*2/10);
 
-/*
-	if(ser_fd != -1) {
-
-
-		byte1 = (char)(((long)abs(y)) % 10)+48;
-		byte2 = (char)((((long)abs(y)) /10) % 10)+48;
-		byte3 = (char)((((long)abs(y)) /100) % 10)+48;
-		byte4 = (char)((((long)abs(x))) % 10)+48;
-		byte5 = (char)((((long)abs(x)) /10) % 10)+48;
-		byte6 = (char)((((long)abs(x)) /100) % 10)+48;
-
-		sprintf(Serout, "G%c", byte6);
-		sprintf(Serout, "%s%c", Serout, byte5);
-		sprintf(Serout, "%s%c", Serout, byte4);
-		sprintf(Serout, "%s%c", Serout, byte3);
-		sprintf(Serout, "%s%c", Serout, byte2);
-		sprintf(Serout, "%s%c", Serout, byte1);
-
-		//sprintf(Serout, "l05000");
-		write(ser_fd, &Serout, 7);
-		ROS_INFO("GOAL : %s", Serout);
-	}
-*/
 }
 
 void TeleopMaximus::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& pose)
 {
 
-// Actualize Robot's path
+temp_pose.pose.position.x = pose->pose.position.x;
+temp_pose.pose.position.y = pose->pose.position.y;
+temp_pose.pose.orientation.x = pose->pose.orientation.x;
+temp_pose.pose.orientation.y = pose->pose.orientation.y;
+temp_pose.pose.orientation.z = pose->pose.orientation.z;
+temp_pose.pose.orientation.w = pose->pose.orientation.w;
+
+
         my_maximus_path.header.stamp = ros::Time::now();
         if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::size() > (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::max_size()-2)) {
                 my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::pop_back();
@@ -195,7 +180,8 @@ void TeleopMaximus::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& pos
 
         transform.setOrigin( tf::Vector3(pose->pose.position.x, pose->pose.position.y, 0.0) );
 	transform.setRotation( tf::Quaternion(pose->pose.orientation.x, pose->pose.orientation.y, pose->pose.orientation.z, pose->pose.orientation.w) );
-        br.sendTransform(tf::StampedTransform(transform, pose->header.stamp, "/map", "/between_wheels"));
+        //br.sendTransform(tf::StampedTransform(transform, pose->header.stamp, "/map", "/between_wheels"));
+        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "/map", "/between_wheels"));
 
         i = i + 5;
         if( i > 180)
@@ -208,54 +194,19 @@ void TeleopMaximus::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& pos
 
 
 void TeleopMaximus::get_value_and_do_computation(void) {
-	float rotation = 0.0;
 
-	/*if(ser_fd != -1) {
-		my_maximus_pose.pose.position.x = ((float)TeleopMaximus::read_serial_port('x')) / 10000.0;
-		my_maximus_pose.pose.position.y = ((float)TeleopMaximus::read_serial_port('y')) / 10000.0;
-		rotation =  TeleopMaximus::read_serial_port('t');
-		TeleopMaximus::rotate(0, (( (float)rotation) / 10000.0 ), 0, &my_maximus_pose);
-
-
-	}
-	else {
-		//TeleopMaximus::rotate(0, ((i)*3.1415/180), 0, &my_maximus_pose);
-		//rotation = -((i)*3.1415/180) *10000;
-		//my_maximus_pose.pose.position.y = ((float)i)/40;
-		heading -= (angular_value / 120000 );
-		rotation = heading *10000;
-		TeleopMaximus::rotate(0, -(heading), 0, &my_maximus_pose);
-
-		my_maximus_pose.pose.position.x += (linear_value * cos(-heading) / 100000);
-		my_maximus_pose.pose.position.y += (linear_value * sin(-heading) / 100000);
-
-	}*/
-
-	// Actualize Robot's position
-	/*my_maximus_pose.header.stamp = ros::Time::now();
-
-	// Actualize Robot's path
-	my_maximus_path.header.stamp = ros::Time::now();
-	if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::size() > (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::max_size()-2)) {
-		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::pop_back();
-	}
-	my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped>::push_back(my_maximus_pose);
-
-	transform.setOrigin( tf::Vector3(my_maximus_pose.pose.position.x, my_maximus_pose.pose.position.y, 0.0) );
-	transform.setRotation( tf::Quaternion((( (float)rotation) / 10000.0 ), 0, 0) );
-	br.sendTransform(tf::StampedTransform(transform, my_maximus_pose.header.stamp, "/map", "/maximus_robot_tf"));
-
-	i = i + 5;
-	if( i > 180)
-		i = -180;
-	ROS_INFO("X=%f /Y=%f /T=%f /L=%f", my_maximus_pose.pose.position.x, my_maximus_pose.pose.position.y, my_maximus_pose.pose.orientation.z*180/3.1415, linear_value);
-*/
 }
 
 
 void TeleopMaximus::publish_all(void) {
 	// Publish Path of the robot
-	TeleopMaximus::path_in_map_pub.publish(my_maximus_path);
+	//TeleopMaximus::path_in_map_pub.publish(my_maximus_path);
+
+TeleopMaximus::transform.setOrigin( tf::Vector3(TeleopMaximus::temp_pose.pose.position.x, TeleopMaximus::temp_pose.pose.position.y, 0.0) );
+TeleopMaximus::transform.setRotation( tf::Quaternion(TeleopMaximus::temp_pose.pose.orientation.x, TeleopMaximus::temp_pose.pose.orientation.y, TeleopMaximus::temp_pose.pose.orientation.z, TeleopMaximus::temp_pose.pose.orientation.w) );
+TeleopMaximus::br.sendTransform(tf::StampedTransform(TeleopMaximus::transform, ros::Time::now(), "/map", "/between_wheels"));
+
+
 
 }
 
@@ -280,14 +231,21 @@ int main(int argc, char **argv)
 		ros::init(argc, argv, "maximus_position");
 		TeleopMaximus maximus_talker;
 		// Refresh rate
-		ros::Rate loop_rate(10); // 35 with bluetooth
+		ros::Rate loop_rate(30); // 35 with bluetooth
 		float rotation = 0.0;
 		while (ros::ok())
 		{
 			// Get the values and do the computation
 			//maximus_talker.get_value_and_do_computation();
 			// Publish all the values and messages
-			//maximus_talker.publish_all();
+			maximus_talker.publish_all();
+
+
+//			TeleopMaximus::transform.setOrigin( tf::Vector3(TeleopMaximus::temp_pose.pose.position.x, TeleopMaximus::temp_pose.pose.position.y, 0.0) );
+//		        TeleopMaximus::transform.setRotation( tf::Quaternion(TeleopMaximus::temp_pose.pose.orientation.x, TeleopMaximus::temp_pose.pose.orientation.y, TeleopMaximus::temp_pose.pose.orientation.z, TeleopMaximus::temp_pose.pose.orientation.w) );
+//        		TeleopMaximus::br.sendTransform(tf::StampedTransform(TeleopMaximus::transform, ros::Time::now(), "/map", "/between_wheels"));
+
+
 			ros::spinOnce();
 			loop_rate.sleep();
 		}
