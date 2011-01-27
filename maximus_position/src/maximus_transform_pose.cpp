@@ -2,7 +2,8 @@
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
 #include <maximus_position/AvrPose.h>
-
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -18,7 +19,6 @@
 
 #include <sstream>
 #include <math.h>
-
 #include <vector>
 
 
@@ -28,18 +28,20 @@ class TransformPose
 		TransformPose();
 		void publish_all(void);
 
-		// Joystick suscriber
 		ros::Subscriber avrpose_sub_;
-		// Set a Laser scan sensor for the robot
 		ros::Publisher pose_pub;
+		//ros::Subscriber avrodom_sub_;
+		ros::Publisher odom_pub;
 
 
 	private:
 		void poseCallback(const maximus_position::AvrPose::ConstPtr& pose);
+		//void odomCallback(const maximus_position::AvrOdom::ConstPtr& odom);
 		void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped *pose);
 		ros::NodeHandle nh;
 
 		geometry_msgs::PoseStamped my_maximus_pose;
+		nav_msgs::Odometry my_maximus_odom;
 };
 
 TransformPose::TransformPose()
@@ -59,6 +61,25 @@ TransformPose::TransformPose()
         my_maximus_pose.pose.orientation.x = 0;
         my_maximus_pose.pose.orientation.y = 0;
         my_maximus_pose.pose.orientation.z = 0;
+        my_maximus_pose.pose.orientation.w = 0;
+
+	my_maximus_odom.header.frame_id = "/map";
+	my_maximus_odom.header.stamp = ros::Time::now();
+
+	my_maximus_odom.pose.pose.position.x = 0;
+	my_maximus_odom.pose.pose.position.y = 0;
+	my_maximus_odom.pose.pose.position.z = 0;
+	my_maximus_odom.pose.pose.orientation.x = 0;
+	my_maximus_odom.pose.pose.orientation.y = 0;
+	my_maximus_odom.pose.pose.orientation.z = 0;
+	my_maximus_odom.pose.pose.orientation.w = 0;
+
+	my_maximus_odom.child_frame_id = "/between_wheels";
+    	my_maximus_odom.twist.twist.linear.x = 0;
+    	my_maximus_odom.twist.twist.linear.y = 0;
+    	my_maximus_odom.twist.twist.angular.z = 0;
+
+
 
 }
 
@@ -85,14 +106,28 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 {
 	float tmp = 0.0;
 
+	my_maximus_pose.header.stamp = ros::Time::now();
+	
 	my_maximus_pose.pose.position.x = pose->x/1000;
         my_maximus_pose.pose.position.y = pose->y/1000;
         my_maximus_pose.pose.position.z = 0;
 
-	TransformPose::rotate(0, (pose->theta), 0, &my_maximus_pose);
+	//TransformPose::rotate(0, (pose->theta), 0, &my_maximus_pose);
+	geometry_msgs::Quaternion quat = tf::createQuaternionMsgFromYaw(pose->theta);
+	my_maximus_pose.pose.orientation = quat;
 
-	my_maximus_pose.header.stamp = ros::Time::now();
+	my_maximus_odom.pose.pose.position.x = pose->x/1000;
+        my_maximus_odom.pose.pose.position.y = pose->y/1000;
+        my_maximus_odom.pose.pose.position.z = 0;
+	my_maximus_odom.pose.pose.orientation = quat;
+
+	my_maximus_odom.twist.twist.linear.x = pose->vx;
+        my_maximus_odom.twist.twist.linear.y = pose->vy;
+        my_maximus_odom.twist.twist.angular.z = pose->vth;
+
+
 	pose_pub.publish(my_maximus_pose);
+	odom_pub.publish(my_maximus_odom);
 
 }
 
