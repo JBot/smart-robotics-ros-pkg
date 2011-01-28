@@ -2,6 +2,7 @@
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
 #include <maximus_position/AvrPose.h>
+#include <maximus_position/AvrVel.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 
@@ -30,18 +31,20 @@ class TransformPose
 
 		ros::Subscriber avrpose_sub_;
 		ros::Publisher pose_pub;
-		//ros::Subscriber avrodom_sub_;
+		ros::Subscriber cmd_vel_sub_;
 		ros::Publisher odom_pub;
+		ros::Publisher avrvel_pub;
 
 
 	private:
 		void poseCallback(const maximus_position::AvrPose::ConstPtr& pose);
-		//void odomCallback(const maximus_position::AvrOdom::ConstPtr& odom);
+		void velCallback(const geometry_msgs::Twist::ConstPtr& vel);
 		void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped *pose);
 		ros::NodeHandle nh;
 
 		geometry_msgs::PoseStamped my_maximus_pose;
 		nav_msgs::Odometry my_maximus_odom;
+		maximus_position::AvrVel my_maximus_vel;
 };
 
 TransformPose::TransformPose()
@@ -51,6 +54,12 @@ TransformPose::TransformPose()
 	avrpose_sub_ = nh.subscribe<maximus_position::AvrPose>("avrpose", 10, &TransformPose::poseCallback, this);
 	// Set a Laser scan sensor for the robot
 	pose_pub = nh.advertise<geometry_msgs::PoseStamped>("avr_maximus_pose", 20);
+
+	cmd_vel_sub_ = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &TransformPose::velCallback, this);
+	
+	odom_pub = nh.advertise<nav_msgs::Odometry>("avr_maximus_odom", 20);
+
+	avrvel_pub = nh.advertise<maximus_position::AvrVel>("avrvel", 10);
 
 	my_maximus_pose.header.frame_id = "/map";
 	my_maximus_pose.header.stamp = ros::Time::now();
@@ -79,7 +88,10 @@ TransformPose::TransformPose()
     	my_maximus_odom.twist.twist.linear.y = 0;
     	my_maximus_odom.twist.twist.angular.z = 0;
 
-
+	my_maximus_vel.vx = 0;
+	my_maximus_vel.vy = 0;
+	my_maximus_vel.vth = 0;
+	
 
 }
 
@@ -108,21 +120,21 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 
 	my_maximus_pose.header.stamp = ros::Time::now();
 	
-	my_maximus_pose.pose.position.x = pose->x/1000;
-        my_maximus_pose.pose.position.y = pose->y/1000;
+	my_maximus_pose.pose.position.x = pose->x / 1000;
+        my_maximus_pose.pose.position.y = pose->y / 1000;
         my_maximus_pose.pose.position.z = 0;
 
 	//TransformPose::rotate(0, (pose->theta), 0, &my_maximus_pose);
 	geometry_msgs::Quaternion quat = tf::createQuaternionMsgFromYaw(pose->theta);
 	my_maximus_pose.pose.orientation = quat;
 
-	my_maximus_odom.pose.pose.position.x = pose->x/1000;
-        my_maximus_odom.pose.pose.position.y = pose->y/1000;
+	my_maximus_odom.pose.pose.position.x = pose->x / 1000;
+        my_maximus_odom.pose.pose.position.y = pose->y / 1000;
         my_maximus_odom.pose.pose.position.z = 0;
 	my_maximus_odom.pose.pose.orientation = quat;
 
-	my_maximus_odom.twist.twist.linear.x = pose->vx;
-        my_maximus_odom.twist.twist.linear.y = pose->vy;
+	my_maximus_odom.twist.twist.linear.x = pose->vx / 1000;
+        my_maximus_odom.twist.twist.linear.y = pose->vy / 1000;
         my_maximus_odom.twist.twist.angular.z = pose->vth;
 
 
@@ -131,6 +143,17 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 
 }
 
+void TransformPose::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
+{
+
+
+	my_maximus_vel.vx = vel->linear.x;
+	my_maximus_vel.vy = vel->linear.y;
+	my_maximus_vel.vth = vel->angular.z;
+
+	avrvel_pub.publish(my_maximus_vel);
+
+}
 
 void TransformPose::publish_all(void) {
 

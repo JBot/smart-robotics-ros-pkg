@@ -6,3 +6,5 @@ publish: #list of published topics
 subscribe:
  callmotion:
   type: std_msgs/String
+ avrvel:
+  type: maximus_position/AvrVel

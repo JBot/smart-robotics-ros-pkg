@@ -1,0 +1,10 @@
+<launch>
+  <node pkg="maximus_sensors" type="maximus_transform_PML" name="maximus_transform_PML_node" output="screen">
+  </node>
+
+  <node pkg="maximus_position" type="maximus_transform_pose" name="maximus_transform_pose_node" output="screen">
+  </node>
+
+  <node pkg="maximus_position" type="maximus_position" name="maximus_position_node" output="screen">
+  </node>
+</launch>

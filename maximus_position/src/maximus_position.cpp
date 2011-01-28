@@ -231,14 +231,14 @@ int main(int argc, char **argv)
 		ros::init(argc, argv, "maximus_position");
 		TeleopMaximus maximus_talker;
 		// Refresh rate
-		ros::Rate loop_rate(30); // 35 with bluetooth
+		ros::Rate loop_rate(5); // 35 with bluetooth
 		float rotation = 0.0;
 		while (ros::ok())
 		{
 			// Get the values and do the computation
 			//maximus_talker.get_value_and_do_computation();
 			// Publish all the values and messages
-			maximus_talker.publish_all();
+			//maximus_talker.publish_all();
 
 
 //			TeleopMaximus::transform.setOrigin( tf::Vector3(TeleopMaximus::temp_pose.pose.position.x, TeleopMaximus::temp_pose.pose.position.y, 0.0) );

@@ -1,0 +1,17 @@
+<package>
+  <description brief="maximus_2dnav">
+
+     maximus_2dnav
+
+  </description>
+  <author>Joffrey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/maximus_2dnav</url>
+  <depend package="move_base"/>
+  <depend package="maximus_position"/>
+  <depend package="maximus_sensors"/>
+
+</package>
+
+
