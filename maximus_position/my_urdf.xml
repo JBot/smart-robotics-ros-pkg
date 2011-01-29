@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<robot name="Maximus_urdf">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.1 .28 .005"/>
+      </geometry>
+	<origin rpy="0 0 0" xyz="0 0 0.0075"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="between_wheels">
+    <visual>
+      <geometry>
+        <box size="0.085 .16 .005"/>
+      </geometry>
+	<origin rpy="0 0 0" xyz="0 0 0.0075"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_to_bet_wheels" type="fixed">
+    <parent link="between_wheels"/>
+    <child link="base_link"/>
+    <origin xyz="0.0925 0 0"/>
+  </joint>
+
+  <link name="right_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.005" radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0 0.035"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_to_right_wheel" type="fixed">
+    <parent link="between_wheels"/>
+    <child link="right_wheel"/>
+    <origin xyz="0 0.0975 0"/>
+  </joint>
+
+  <link name="left_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.005" radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0 0.035"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_to_left_wheel" type="fixed">
+    <parent link="between_wheels"/>
+    <child link="left_wheel"/>
+    <origin xyz="0 -0.0975 0"/>
+  </joint>
+
+
+
+  <link name="elevator">
+    <visual>
+      <geometry>
+        <box size="0.085 .16 .005"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="elevator_joint" type="prismatic">
+    <parent link="base_link"/>
+    <child link="elevator"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="1000.0" lower="0" upper="0.38" velocity="100"/>
+    <origin rpy="0 0 0" xyz="0.05 0 0.005"/>
+  </joint>
+
+
+  <link name="left_panel">
+    <visual>
+      <geometry>
+        <box size="0.01 .002 .38"/>
+      </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0.1975"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_to_left_panel" type="fixed">
+    <parent link="between_wheels"/>
+    <child link="left_panel"/>
+    <origin xyz="0.05 0.14 0"/>
+  </joint>
+
+  <link name="right_panel">
+    <visual>
+      <geometry>
+        <box size="0.01 .002 .38"/>
+      </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0.1975"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_to_right_panel" type="fixed">
+    <parent link="between_wheels"/>
+    <child link="right_panel"/>
+    <origin xyz="0.05 -0.14 0"/>
+  </joint>
+
+
+  <link name="roof">
+    <visual>
+      <geometry>
+        <box size="0.185 .28 .002"/>
+      </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0.0075"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_to_roof" type="fixed">
+    <parent link="between_wheels"/>
+    <child link="roof"/>
+    <origin xyz="0.05 0 .38"/>
+  </joint>
+
+
+</robot>
+

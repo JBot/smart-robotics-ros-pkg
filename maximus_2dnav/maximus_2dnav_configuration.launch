@@ -5,6 +5,13 @@
   <node pkg="maximus_position" type="maximus_transform_pose" name="maximus_transform_pose_node" output="screen">
   </node>
 
+  <arg name="model" />
+  <arg name="gui" default="False" />
+  <param name="robot_description" textfile="$(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
   <node pkg="maximus_position" type="maximus_position" name="maximus_position_node" output="screen">
   </node>
 </launch>

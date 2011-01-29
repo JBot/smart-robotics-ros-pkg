@@ -1,1 +1,3 @@
 ROS packages repository of the association SMART (autonomouS Multi Application Robot Team) 
+
+roslaunch maximus_2dnav maximus_2dnav_configuration.launch model:=my_urdf.xml gui:=True
