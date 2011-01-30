@@ -3,6 +3,12 @@ name: motionControlROS
 publish: #list of published topics
  avrpose:
   type: maximus_position/AvrPose
+ rightscan:
+  type: std_msgs/Int32
+ leftscan:
+  type: std_msgs/Int32
+ responseavrlaservector:
+  type: maximus_sensors/AvrLaserVector
 subscribe:
  callmotion:
   type: std_msgs/String

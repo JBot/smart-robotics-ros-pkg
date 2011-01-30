@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/LaserScan.h"
 #include <maximus_sensors/AvrLaserVector.h>
+#include <std_msgs/Int32.h>
 
 
 #include <sys/time.h>
@@ -27,17 +28,30 @@ class TransformPML
 		TransformPML();
 		void publish_all(void);
 
-		// Joystick suscriber
+		// avr suscriber
 		ros::Subscriber avrpml_sub_;
 		// Set a Laser scan sensor for the robot
 		ros::Publisher laser_sensor_pub;
 
+		// avr right suscriber
+		ros::Subscriber avrpmlright_sub_;
+		// Set a Laser scan sensor for the robot
+		ros::Publisher laser_sensor_right_pub;
+
+		// avr left suscriber
+		ros::Subscriber avrpmlleft_sub_;
+		// Set a Laser scan sensor for the robot
+		ros::Publisher laser_sensor_left_pub;
 
 	private:
 		void pmlCallback(const maximus_sensors::AvrLaserVector::ConstPtr& pml);
+		void rightpmlCallback(const std_msgs::Int32::ConstPtr& pml);
+		void leftpmlCallback(const std_msgs::Int32::ConstPtr& pml);
 		ros::NodeHandle nh;
 
 		sensor_msgs::LaserScan my_laser_scan;
+		sensor_msgs::LaserScan my_laser_scan_right;
+		sensor_msgs::LaserScan my_laser_scan_left;
 };
 
 TransformPML::TransformPML()
@@ -46,7 +60,17 @@ TransformPML::TransformPML()
 	// Joystick suscriber
 	avrpml_sub_ = nh.subscribe<maximus_sensors::AvrLaserVector>("responseavrlaservector", 10, &TransformPML::pmlCallback, this);
 	// Set a Laser scan sensor for the robot
-	laser_sensor_pub = nh.advertise<sensor_msgs::LaserScan>("avr_PML_sensor", 50);
+	laser_sensor_pub = nh.advertise<sensor_msgs::LaserScan>("avr_PML_sensor", 10);
+
+	// Joystick suscriber
+	avrpmlright_sub_ = nh.subscribe<std_msgs::Int32>("rightscan", 10, &TransformPML::rightpmlCallback, this);
+	// Set a Laser scan sensor for the robot
+	laser_sensor_right_pub = nh.advertise<sensor_msgs::LaserScan>("avr_PML_sensor_right", 10);
+
+	// Joystick suscriber
+	avrpmlleft_sub_ = nh.subscribe<std_msgs::Int32>("leftscan", 10, &TransformPML::leftpmlCallback, this);
+	// Set a Laser scan sensor for the robot
+	laser_sensor_left_pub = nh.advertise<sensor_msgs::LaserScan>("avr_PML_sensor_left", 10);
 
 	my_laser_scan.header.frame_id = "/elevator";
 	my_laser_scan.header.stamp = ros::Time::now();
@@ -83,6 +107,65 @@ TransformPML::TransformPML()
 	my_laser_scan.ranges.std::vector<float>::push_back((float) 0.15);
 	my_laser_scan.ranges.std::vector<float>::push_back((float) 0.35);
 	my_laser_scan.ranges.std::vector<float>::push_back((float) 0.15);
+
+
+	my_laser_scan_left.header.frame_id = "/elevator";
+        my_laser_scan_left.header.stamp = ros::Time::now();
+
+        my_laser_scan_left.angle_min = (179 * 3.14159265 / 180) - (3.14159265 / 2);
+        my_laser_scan_left.angle_max = (180 * 3.14159265 / 180) - (3.14159265 / 2);
+        my_laser_scan_left.angle_increment = (1 * 3.14159265 / 180);
+        // time between measurements [seconds]
+        my_laser_scan_left.time_increment = 0.001;
+        // time between scans [seconds]
+        my_laser_scan_left.scan_time = 0.1;
+        my_laser_scan_left.range_min = 0.20;
+        my_laser_scan_left.range_max = 0.70;
+
+        // range data [m] (Note: values < range_min or > range_max should be discarded)
+        my_laser_scan_left.ranges = std::vector<float>();
+        my_laser_scan_left.ranges.std::vector<float>::push_back((float) 0.15);
+        my_laser_scan_left.ranges.std::vector<float>::push_back((float) 0.35);
+
+        my_laser_scan_right.header.frame_id = "/elevator";
+        my_laser_scan_right.header.stamp = ros::Time::now();
+
+        my_laser_scan_right.angle_min = (0 * 3.14159265 / 180) - (3.14159265 / 2);
+        my_laser_scan_right.angle_max = (1 * 3.14159265 / 180) - (3.14159265 / 2);
+        my_laser_scan_right.angle_increment = (1 * 3.14159265 / 180);
+        // time between measurements [seconds]
+        my_laser_scan_right.time_increment = 0.001;
+        // time between scans [seconds]
+        my_laser_scan_right.scan_time = 0.1;
+        my_laser_scan_right.range_min = 0.20;
+        my_laser_scan_right.range_max = 0.70;
+
+        // range data [m] (Note: values < range_min or > range_max should be discarded)
+        my_laser_scan_right.ranges = std::vector<float>();
+        my_laser_scan_right.ranges.std::vector<float>::push_back((float) 0.15);
+        my_laser_scan_right.ranges.std::vector<float>::push_back((float) 0.35);
+
+}
+
+
+void TransformPML::rightpmlCallback(const std_msgs::Int32::ConstPtr& pml)
+{
+	my_laser_scan_right.ranges.std::vector<float>::clear();
+	my_laser_scan_right.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
+	my_laser_scan_right.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
+
+	my_laser_scan_right.header.stamp = ros::Time::now();
+	laser_sensor_right_pub.publish(my_laser_scan_right);
+}
+
+void TransformPML::leftpmlCallback(const std_msgs::Int32::ConstPtr& pml)
+{
+        my_laser_scan_left.ranges.std::vector<float>::clear();
+        my_laser_scan_left.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
+        my_laser_scan_left.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
+
+        my_laser_scan_left.header.stamp = ros::Time::now();
+        laser_sensor_left_pub.publish(my_laser_scan_left);
 
 }
 

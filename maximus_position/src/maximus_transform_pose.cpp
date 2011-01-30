@@ -57,7 +57,7 @@ TransformPose::TransformPose()
 
 	cmd_vel_sub_ = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &TransformPose::velCallback, this);
 	
-	odom_pub = nh.advertise<nav_msgs::Odometry>("avr_maximus_odom", 20);
+	odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 20);
 
 	avrvel_pub = nh.advertise<maximus_position::AvrVel>("avrvel", 10);
 
