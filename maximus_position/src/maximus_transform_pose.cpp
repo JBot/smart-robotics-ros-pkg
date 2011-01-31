@@ -45,6 +45,9 @@ class TransformPose
 		geometry_msgs::PoseStamped my_maximus_pose;
 		nav_msgs::Odometry my_maximus_odom;
 		maximus_position::AvrVel my_maximus_vel;
+
+		tf::TransformBroadcaster odom_broadcaster;
+
 };
 
 TransformPose::TransformPose()
@@ -72,7 +75,7 @@ TransformPose::TransformPose()
         my_maximus_pose.pose.orientation.z = 0;
         my_maximus_pose.pose.orientation.w = 0;
 
-	my_maximus_odom.header.frame_id = "/map";
+	my_maximus_odom.header.frame_id = "odom";
 	my_maximus_odom.header.stamp = ros::Time::now();
 
 	my_maximus_odom.pose.pose.position.x = 0;
@@ -128,6 +131,22 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 	geometry_msgs::Quaternion quat = tf::createQuaternionMsgFromYaw(pose->theta);
 	my_maximus_pose.pose.orientation = quat;
 
+	//first, we'll publish the transform over tf
+	geometry_msgs::TransformStamped odom_trans;
+	odom_trans.header.stamp = my_maximus_pose.header.stamp;
+	odom_trans.header.frame_id = "odom";
+	odom_trans.child_frame_id = "between_wheels";
+
+	odom_trans.transform.translation.x = pose->x / 1000;
+	odom_trans.transform.translation.y = pose->y / 1000;
+	odom_trans.transform.translation.z = 0.0;
+	odom_trans.transform.rotation = quat;
+
+	//send the transform
+	odom_broadcaster.sendTransform(odom_trans);
+
+
+	my_maximus_odom.header.stamp = my_maximus_pose.header.stamp;
 	my_maximus_odom.pose.pose.position.x = pose->x / 1000;
         my_maximus_odom.pose.pose.position.y = pose->y / 1000;
         my_maximus_odom.pose.pose.position.z = 0;
