@@ -5,6 +5,8 @@
   <node pkg="maximus_position" type="maximus_transform_pose" name="maximus_transform_pose_node" output="screen">
   </node>
 
+  <node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+
   <arg name="model" />
   <arg name="gui" default="False" />
   <param name="robot_description" textfile="$(find maximus_position)/my_urdf.xml" />

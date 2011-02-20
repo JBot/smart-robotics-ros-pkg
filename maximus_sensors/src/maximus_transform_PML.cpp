@@ -119,8 +119,8 @@ TransformPML::TransformPML()
         my_laser_scan_left.time_increment = 0.001;
         // time between scans [seconds]
         my_laser_scan_left.scan_time = 0.1;
-        my_laser_scan_left.range_min = 0.20;
-        my_laser_scan_left.range_max = 0.70;
+        my_laser_scan_left.range_min = 0.15;
+        my_laser_scan_left.range_max = 0.80;
 
         // range data [m] (Note: values < range_min or > range_max should be discarded)
         my_laser_scan_left.ranges = std::vector<float>();
@@ -137,8 +137,8 @@ TransformPML::TransformPML()
         my_laser_scan_right.time_increment = 0.001;
         // time between scans [seconds]
         my_laser_scan_right.scan_time = 0.1;
-        my_laser_scan_right.range_min = 0.20;
-        my_laser_scan_right.range_max = 0.70;
+        my_laser_scan_right.range_min = 0.15;
+        my_laser_scan_right.range_max = 0.80;
 
         // range data [m] (Note: values < range_min or > range_max should be discarded)
         my_laser_scan_right.ranges = std::vector<float>();
@@ -151,8 +151,8 @@ TransformPML::TransformPML()
 void TransformPML::rightpmlCallback(const std_msgs::Int32::ConstPtr& pml)
 {
 	my_laser_scan_right.ranges.std::vector<float>::clear();
-	my_laser_scan_right.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
-	my_laser_scan_right.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
+	my_laser_scan_right.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.15));
+	my_laser_scan_right.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.15));
 
 	my_laser_scan_right.header.stamp = ros::Time::now();
 	laser_sensor_right_pub.publish(my_laser_scan_right);
@@ -161,8 +161,8 @@ void TransformPML::rightpmlCallback(const std_msgs::Int32::ConstPtr& pml)
 void TransformPML::leftpmlCallback(const std_msgs::Int32::ConstPtr& pml)
 {
         my_laser_scan_left.ranges.std::vector<float>::clear();
-        my_laser_scan_left.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
-        my_laser_scan_left.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.015));
+        my_laser_scan_left.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.15));
+        my_laser_scan_left.ranges.std::vector<float>::push_back((float) (((float)pml->data)/100.0 + 0.15));
 
         my_laser_scan_left.header.stamp = ros::Time::now();
         laser_sensor_left_pub.publish(my_laser_scan_left);
