@@ -1,6 +1,12 @@
 <launch>
   <master auto="start"/>
+	
+  <param name="/use_sim_time" value="False" />
 
+  <!-- Run the map server with a blank map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find maximus_2dnav)/maps/blank_map.yaml"/>
+
+ 
   <!--- Run AMCL -->
   <include file="$(find amcl)/examples/amcl_diff.launch" />
 
@@ -11,4 +17,15 @@
     <rosparam file="$(find maximus_2dnav)/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find maximus_2dnav)/base_local_planner_params.yaml" command="load" />
   </node>
+
+   <node name="gmapping" pkg="gmapping" type="slam_gmapping" args="scan:=avr_PML_sensor" output="screen"> 
+ 	<param name="linearUpdate" value="0.1" /> 
+ 	<param name="angularUpdate" value="0.05" /> 	
+ 	<param name="xmin" value="-20" />	
+ 	<param name="ymin" value="-20" /> 
+ 	<param name="xmax" value="20" /> 	
+ 	<param name="ymax" value="20" /> 
+ 	<param name="maxUrange" value="6" /> 		
+ 	</node> 
+
 </launch>
