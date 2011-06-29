@@ -95,7 +95,11 @@ int main(int argc, char **argv)
             uint8_t flag1 = (byte1 & 0x80) >> 7;  // No return/max range/too low of reflectivity
             uint8_t flag2 = (byte1 & 0x40) >> 6;  // Object too close, possible poor reading due to proximity kicks in at < 0.6m
             // Remaining bits are the range in mm
-            uint16_t range = ((byte1 & 0x3F)<< 8) + byte0;
+            uint16_t range = 0;
+	    if(flag1 == 0)
+		range = ((byte1 & 0x3F)<< 8) + byte0;
+	    else 
+		range = 0;
             // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
             uint16_t intensity = (byte3 << 8) + byte2;
 
@@ -110,7 +114,10 @@ int main(int argc, char **argv)
             flag1 = (byte1 & 0x80) >> 7;  // No return/max range/too low of reflectivity
             flag2 = (byte1 & 0x40) >> 6;  // Object too close, possible poor reading due to proximity kicks in at < 0.6m
             // Remaining bits are the range in mm
-            range = ((byte1 & 0x3F)<< 8) + byte0;
+	    if(flag1 == 0)
+		range = ((byte1 & 0x3F)<< 8) + byte0;
+	    else 
+		range = 0;
             // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
             intensity = (byte3 << 8) + byte2;
 
@@ -125,7 +132,10 @@ int main(int argc, char **argv)
             flag1 = (byte1 & 0x80) >> 7;  // No return/max range/too low of reflectivity
             flag2 = (byte1 & 0x40) >> 6;  // Object too close, possible poor reading due to proximity kicks in at < 0.6m
             // Remaining bits are the range in mm
-            range = ((byte1 & 0x3F)<< 8) + byte0;
+	    if(flag1 == 0)
+		range = ((byte1 & 0x3F)<< 8) + byte0;
+	    else 
+		range = 0;
             // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
             intensity = (byte3 << 8) + byte2;
 
@@ -140,7 +150,10 @@ int main(int argc, char **argv)
             flag1 = (byte1 & 0x80) >> 7;  // No return/max range/too low of reflectivity
             flag2 = (byte1 & 0x40) >> 6;  // Object too close, possible poor reading due to proximity kicks in at < 0.6m
             // Remaining bits are the range in mm
-            range = ((byte1 & 0x3F)<< 8) + byte0;
+	    if(flag1 == 0)
+		range = ((byte1 & 0x3F)<< 8) + byte0;
+	    else 
+		range = 0;
             // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
             intensity = (byte3 << 8) + byte2;
 
