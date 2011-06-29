@@ -123,8 +123,8 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 
 	my_maximus_pose.header.stamp = ros::Time::now();
 	
-	my_maximus_pose.pose.position.x = pose->x / 1000;
-        my_maximus_pose.pose.position.y = pose->y / 1000;
+	my_maximus_pose.pose.position.x = pose->x;
+        my_maximus_pose.pose.position.y = pose->y;
         my_maximus_pose.pose.position.z = 0;
 
 	//TransformPose::rotate(0, (pose->theta), 0, &my_maximus_pose);
@@ -137,8 +137,8 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 	odom_trans.header.frame_id = "odom";
 	odom_trans.child_frame_id = "between_wheels";
 
-	odom_trans.transform.translation.x = pose->x / 1000;
-	odom_trans.transform.translation.y = pose->y / 1000;
+	odom_trans.transform.translation.x = pose->x;
+	odom_trans.transform.translation.y = pose->y;
 	odom_trans.transform.translation.z = 0.0;
 	odom_trans.transform.rotation = quat;
 
@@ -147,13 +147,16 @@ void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr& pose
 
 
 	my_maximus_odom.header.stamp = my_maximus_pose.header.stamp;
-	my_maximus_odom.pose.pose.position.x = pose->x / 1000;
-        my_maximus_odom.pose.pose.position.y = pose->y / 1000;
+	my_maximus_odom.pose.pose.position.x = pose->x;
+        my_maximus_odom.pose.pose.position.y = pose->y;
         my_maximus_odom.pose.pose.position.z = 0;
 	my_maximus_odom.pose.pose.orientation = quat;
 
-	my_maximus_odom.twist.twist.linear.x = pose->vx / 1000;
-        my_maximus_odom.twist.twist.linear.y = pose->vy / 1000;
+	my_maximus_odom.twist.twist.linear.x = pose->vx;
+        my_maximus_odom.twist.twist.linear.y = pose->vy;
+        my_maximus_odom.twist.twist.linear.z = 0;
+        my_maximus_odom.twist.twist.angular.x = 0;
+        my_maximus_odom.twist.twist.angular.y = 0;
         my_maximus_odom.twist.twist.angular.z = pose->vth;
 
 

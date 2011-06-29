@@ -1,0 +1,17 @@
+<package>
+  <description brief="neato_xv11_lds">
+
+     neato_xv11_lds
+
+  </description>
+  <author>Joffrey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/neato_xv11_lds</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+
+  <rosdep name="boost" />
+</package>
+
+
