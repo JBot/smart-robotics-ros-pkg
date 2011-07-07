@@ -1,4 +1,4 @@
-port: /dev/ttyS0
+port: /dev/ttyUSB0
 name: motionControlROS
 publish: #list of published topics
  avrpose:
@@ -7,8 +7,6 @@ publish: #list of published topics
   type: std_msgs/Int32
  leftscan:
   type: std_msgs/Int32
- responseavrlaservector:
-  type: maximus_sensors/AvrLaserVector
 subscribe:
  callmotion:
   type: std_msgs/String

@@ -165,8 +165,8 @@ int main(int argc, char **argv)
 
 	      init_level = 0;
       }
-
-      laser_pub.publish(scan);
+	if(index == 89)
+      		laser_pub.publish(scan);
     }
 
 

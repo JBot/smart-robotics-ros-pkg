@@ -1,0 +1,17 @@
+<package>
+  <description brief="maximus_setup_tf">
+
+     maximus_setup_tf
+
+  </description>
+  <author>Joffrey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/maximus_setup_tf</url>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+
