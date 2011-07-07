@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+  </node>
+
+  <node pkg="maximus_position" type="maximus_joy" name="maximus_joy" output="screen">
+  </node>
+
+</launch>

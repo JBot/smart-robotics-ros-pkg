@@ -31,3 +31,4 @@ rosbuild_genmsg()
 
 rosbuild_add_executable(maximus_position src/maximus_position.cpp)
 rosbuild_add_executable(maximus_transform_pose src/maximus_transform_pose.cpp)
+rosbuild_add_executable(maximus_joy src/maximus_joy.cpp)

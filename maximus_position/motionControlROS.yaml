@@ -1,4 +1,4 @@
-port: /dev/ttyUSB0
+port: /dev/ttyUSB1
 name: motionControlROS
 publish: #list of published topics
  avrpose:
