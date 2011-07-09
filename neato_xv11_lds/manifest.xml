@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/neato_xv11_lds</url>
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
+  <depend package="tf"/>
 
   <rosdep name="boost" />
 </package>

@@ -6,7 +6,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "maximus_tf_publisher");
     ros::NodeHandle n;
 
-    ros::Rate r(100);
+    ros::Rate r(50);
 
     tf::TransformBroadcaster broadcaster;
 
