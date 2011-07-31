@@ -87,7 +87,7 @@ int main(int argc, char **argv)
         ros::Publisher laser_pub = n.advertise < sensor_msgs::LaserScan > ("scan", 50);
         sensor_msgs::LaserScan scan;
 
-        scan.header.frame_id = "/base_link";
+        scan.header.frame_id = "/neato_laser";
         scan.header.stamp = ros::Time::now();
         scan.angle_min = 0.0;
         scan.angle_max = 2.0 * M_PI;

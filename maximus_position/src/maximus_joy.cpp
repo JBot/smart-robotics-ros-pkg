@@ -117,7 +117,7 @@ void TeleopMaximus::joyCallback(const joy::Joy::ConstPtr & joy)
     angular_value = a_scale_ * joy->axes[angular_port];
     linear_value = l_scale_ * joy->axes[linear_port];
 
-    velocity.linear.x = joy->axes[linear_port];
+    velocity.linear.x = joy->axes[linear_port] / 4;
     velocity.angular.z = joy->axes[angular_port];
 
     velocity_pub.publish(velocity);
