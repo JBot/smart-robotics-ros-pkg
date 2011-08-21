@@ -1,0 +1,17 @@
+<package>
+  <description brief="maximus_nav">
+
+     maximus_nav
+
+  </description>
+  <author>Jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/maximus_nav</url>
+  <depend package="move_base"/>
+  <depend package="maximus_position"/>
+  <depend package="maximus_sensors"/>
+
+</package>
+
+
