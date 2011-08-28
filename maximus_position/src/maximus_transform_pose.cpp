@@ -6,6 +6,7 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <nav_msgs/Odometry.h>
+#include <std_msgs/Float32.h>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -32,10 +33,14 @@ class TransformPose {
 //     ros::Subscriber tf_sub_;
 //     ros::Publisher pose_pub;
      ros::Publisher odom_pub;
+     ros::Subscriber xspeed_sub_;
+     ros::Subscriber tspeed_sub_;
 
 
   private:
 //    void tfCallback(const tf::tfMessage::ConstPtr & mytf);
+    void xspeedCallback(const std_msgs::Float32::ConstPtr & pose);
+    void tspeedCallback(const std_msgs::Float32::ConstPtr & pose);
     void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
      ros::NodeHandle nh;
 
@@ -44,7 +49,8 @@ class TransformPose {
      double old_y;
      double old_theta;
      ros::Time old_time;
-
+     std_msgs::Float32 xspeed;
+     std_msgs::Float32 tspeed;
 
 };
 
@@ -59,6 +65,8 @@ TransformPose::TransformPose()
     cmd_vel_sub_ = nh.subscribe < geometry_msgs::Twist > ("cmd_vel", 30, &TransformPose::velCallback, this);
 */
     odom_pub = nh.advertise < nav_msgs::Odometry > ("odom", 50);
+    xspeed_sub_ = nh.subscribe < std_msgs::Float32 > ("/xspeed", 30, &TransformPose::xspeedCallback, this);
+    tspeed_sub_ = nh.subscribe < std_msgs::Float32 > ("/tspeed", 30, &TransformPose::tspeedCallback, this);
 
 //    avrvel_pub = nh.advertise < maximus_position::AvrVel > ("avrvel", 30);
 /*
@@ -94,6 +102,9 @@ TransformPose::TransformPose()
     old_theta = 0;
     old_time = my_maximus_odom.header.stamp;
 
+    xspeed.data = 0.0;
+    tspeed.data = 0.0;
+
 /*
     my_maximus_vel.vx = 0;
     my_maximus_vel.vy = 0;
@@ -121,6 +132,15 @@ void TransformPose::rotate(double heading, double attitude, double bank, geometr
     pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
 }
 
+void TransformPose::xspeedCallback(const std_msgs::Float32::ConstPtr & pose)
+{
+	xspeed.data = pose->data;
+}
+
+void TransformPose::tspeedCallback(const std_msgs::Float32::ConstPtr & pose)
+{
+	tspeed.data = pose->data;
+}
 /*
 void TransformPose::poseCallback(const maximus_position::AvrPose::ConstPtr & pose)
 {
@@ -214,12 +234,14 @@ void TransformPose::publish_all(tf::TransformListener& listener)
 		my_maximus_odom.pose.pose.position.z = base_pose.pose.position.z;
 		my_maximus_odom.pose.pose.orientation = base_pose.pose.orientation;
 
-		my_maximus_odom.twist.twist.linear.x = sqrt(pow(base_pose.pose.position.x - old_x, 2) + pow(base_pose.pose.position.y - old_y, 2)) / (my_maximus_odom.header.stamp.toSec() - old_time.toSec());
+		//my_maximus_odom.twist.twist.linear.x = sqrt(pow(base_pose.pose.position.x - old_x, 2) + pow(base_pose.pose.position.y - old_y, 2)) / (my_maximus_odom.header.stamp.toSec() - old_time.toSec());
+		my_maximus_odom.twist.twist.linear.x = xspeed.data;
 		my_maximus_odom.twist.twist.linear.y = 0;
 		my_maximus_odom.twist.twist.linear.z = 0;
 		my_maximus_odom.twist.twist.angular.x = 0;
 		my_maximus_odom.twist.twist.angular.y = 0;
-		my_maximus_odom.twist.twist.angular.z = (tf::getYaw (my_maximus_odom.pose.pose.orientation) - old_theta) / (my_maximus_odom.header.stamp.toSec() - old_time.toSec());
+		my_maximus_odom.twist.twist.angular.z = tspeed.data;
+		//my_maximus_odom.twist.twist.angular.z = 1.1 * (tf::getYaw (my_maximus_odom.pose.pose.orientation) - old_theta) / (my_maximus_odom.header.stamp.toSec() - old_time.toSec());
 
 		odom_pub.publish(my_maximus_odom);
 
