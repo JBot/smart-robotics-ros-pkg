@@ -59,7 +59,8 @@ MaximusPath::MaximusPath()
     // Goal suscriber
     goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_simple/goal", 20, &MaximusPath::goalCallback, this);
     // Path suscriber
-    path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/TrajectoryPlannerROS/global_plan", 20, &MaximusPath::pathCallback, this);
+    //path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/TrajectoryPlannerROS/global_plan", 20, &MaximusPath::pathCallback, this);
+    path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/NavfnROS/plan", 20, &MaximusPath::pathCallback, this);
 
     pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/maximus_goal", 50);
 
@@ -98,7 +99,16 @@ void MaximusPath::rotate(double heading, double attitude, double bank, geometry_
 
 void MaximusPath::pathCallback(const nav_msgs::Path::ConstPtr & path)
 {
-    ROS_INFO("X=");
+    ROS_INFO("Path begin.");
+   my_maximus_path = *path;
+    ROS_INFO("Path next.");
+
+   while( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
+	ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.position.x, my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.position.y);
+	my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::pop_back();
+   } 
+
+    ROS_INFO("Path sent.");
 }
 
 void MaximusPath::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
@@ -106,7 +116,7 @@ void MaximusPath::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose
     final_pose.x = pose->pose.position.x;
     final_pose.y = pose->pose.position.y;
     MaximusPath::pose2D_pub.publish(final_pose);
-    ROS_INFO("X=");
+    ROS_INFO("Goal sent.");
 }
 
 

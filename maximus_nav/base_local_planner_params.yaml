@@ -15,6 +15,8 @@ TrajectoryPlannerROS:
   sim_time: 1.5
   heading_lookahead: 0.325
 
+  controller_frequency: 10
+
   vx_samples: 6
   vtheta_samples: 20
   dwa: false
