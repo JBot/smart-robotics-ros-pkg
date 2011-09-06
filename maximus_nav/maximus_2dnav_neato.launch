@@ -1,0 +1,11 @@
+<launch>
+  <node pkg="neato_xv11_lds" type="neato_xv11_lds_publisher" name="lds_publisher" output="screen">
+  </node>
+
+  <node pkg="maximus_position" type="maximus_transform_pose" name="maximus_pose_node" output="screen">
+  </node>
+
+  <node pkg="maximus_setup_tf" type="tf_broadcaster" name="maximus_tf_broadcaster" output="screen">
+  </node>
+
+</launch>

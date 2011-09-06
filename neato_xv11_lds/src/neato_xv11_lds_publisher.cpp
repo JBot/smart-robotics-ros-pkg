@@ -92,8 +92,8 @@ int main(int argc, char **argv)
         scan.angle_min = 0.0;
         scan.angle_max = 2.0 * M_PI;
         scan.angle_increment = (2.0 * M_PI / 360.0);
-        scan.time_increment = (1 / 6) / 360;
-	scan.scan_time = 1 / 6;
+        scan.time_increment = (1 / 5) / 360;
+	scan.scan_time = 1 / 5;
         scan.range_min = 0.015;
         scan.range_max = 5.0;
 
@@ -102,14 +102,13 @@ int main(int argc, char **argv)
 
 
         uint8_t init_level = 0;
+	uint8_t index;
+	uint8_t temp_char;
 
         while (ros::ok()) {
 
-            uint8_t index;
-            uint8_t temp_char;
 
             //scan.header.frame_id = frame_id;
-            scan.header.stamp = ros::Time::now();
 
             if (init_level == 0) {
                 boost::asio::read(serial_, boost::asio::buffer(&temp_char, 1));
@@ -138,7 +137,7 @@ int main(int argc, char **argv)
 
                 //ROS_ERROR("Speed 1 : %d", (((speed_[1]<<8) + speed_[0]) >> 6));
                 //ROS_ERROR("Speed 2 : %d", ((((speed_[1]<<8) + speed_[0]) >> 6) / 60));
-                ROS_ERROR("Speed 3 : %f", scan.time_increment);
+                //ROS_ERROR("Speed 3 : %f", scan.time_increment);
 
                 // data
                 boost::asio::read(serial_, boost::asio::buffer(&raw_bytes_, 16));
@@ -155,7 +154,7 @@ int main(int argc, char **argv)
                 if (flag1 == 0)
                     range = ((byte1 & 0x3F) << 8) + byte0;
                 else
-                    range = 0;
+                    range = 2600;
                 // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
                 uint16_t intensity = (byte3 << 8) + byte2;
 
@@ -173,7 +172,7 @@ int main(int argc, char **argv)
                 if (flag1 == 0)
                     range = ((byte1 & 0x3F) << 8) + byte0;
                 else
-                    range = 0;
+                    range = 2600;
                 // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
                 intensity = (byte3 << 8) + byte2;
 
@@ -191,7 +190,7 @@ int main(int argc, char **argv)
                 if (flag1 == 0)
                     range = ((byte1 & 0x3F) << 8) + byte0;
                 else
-                    range = 0;
+                    range = 2600;
                 // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
                 intensity = (byte3 << 8) + byte2;
 
@@ -209,7 +208,7 @@ int main(int argc, char **argv)
                 if (flag1 == 0)
                     range = ((byte1 & 0x3F) << 8) + byte0;
                 else
-                    range = 0;
+                    range = 2600;
                 // Last two bytes represent the uncertanty or intensity, might also be pixel area of target...
                 intensity = (byte3 << 8) + byte2;
 
@@ -222,6 +221,7 @@ int main(int argc, char **argv)
                 init_level = 0;
             }
             if (index == 89){
+		scan.header.stamp = ros::Time::now() - ros::Duration(0.08);
                 laser_pub.publish(scan);
 		//broadcaster.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.0, 0.0, 0.1)),
                 //                                       scan.header.stamp, "base_link", "neato_laser"));
