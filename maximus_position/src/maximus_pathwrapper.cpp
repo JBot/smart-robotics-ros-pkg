@@ -155,7 +155,7 @@ else {
    } 
 */
 
-
+/*
 		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 
@@ -192,16 +192,16 @@ else {
 		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 	}
     //ros::Duration(1.0).sleep();
-   } 
+   } */
 /*
    while(my_pose_array.poses.std::vector<geometry_msgs::Pose>::size() > 9) {
 	my_pose_array.poses.std::vector<geometry_msgs::Pose>::pop_back();
    }
 */
 
-   MaximusPath::poseArray_pub.publish(my_pose_array);
-    ros::Duration(0.5).sleep();
-    ROS_INFO("Path sent.");
+//   MaximusPath::poseArray_pub.publish(my_pose_array);
+//    ros::Duration(0.5).sleep();
+//    ROS_INFO("Path sent.");
 
    cpt_send = 0;
 }
@@ -218,11 +218,11 @@ void MaximusPath::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose
 }
 
 void MaximusPath::compute_next_pathpoint(void) {
-/*
+
    if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
-        if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 3) {
-                //my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                //my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+        if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 5) {
+                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
                 my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
                 my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
                 ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
@@ -249,7 +249,7 @@ void MaximusPath::compute_next_pathpoint(void) {
     ros::Duration(0.2).sleep();
     ROS_INFO("Path sent.");
    }
-*/
+
 }
 
         /**

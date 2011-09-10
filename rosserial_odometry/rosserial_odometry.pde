@@ -174,6 +174,9 @@ volatile char transmit_status = 1;                         // 1 if OK / 0 if not
 
 struct Point prev_position;
 
+int global_cpt = 0;
+
+
 double ticks_per_m = TOTAL_TICKS / WHEEL_PERIMETER;
 double m_per_tick = WHEEL_PERIMETER / TOTAL_TICKS;
 
@@ -253,33 +256,40 @@ ROS_CALLBACK(messageCb, geometry_msgs::Twist, toggle_msg)
 
 }
 
-ROS_CALLBACK(goalCb, geometry_msgs::Pose2D, goal_msg)
 #ifndef PATH_FOLLOWING
+ROS_CALLBACK(goalCb, geometry_msgs::Pose2D, goal_msg)
+
         toggle();   // blink the led
         goal.x = goal_msg.x;
         goal.y = goal_msg.y;
         
         goto_xy(goal_msg.x, goal_msg.y);  	
-#endif
+
 }
+#endif
 
-
-ROS_CALLBACK(goalposesCb, geometry_msgs::PoseArray, posesfromros)
 #ifdef PATH_FOLLOWING
+ROS_CALLBACK(goalposesCb, geometry_msgs::PoseArray, posesfromros)
+
+  toggle();   // blink the led
   goals = posesfromros;
   goals_index = 1;
 
   goal.x = goals.poses[goals.poses_length].position.x;
   goal.y = goals.poses[goals.poses_length].position.y;
         
-  goto_xy(goal.x, goal.y);
-#endif
+  goto_xy(goals.poses[goals.poses_length].position.x, goals.poses[goals.poses_length].position.y);
+
 }
+#endif
 
 ros::Subscriber sub("cmd_vel", &toggle_msg, messageCb );
+#ifndef PATH_FOLLOWING
 ros::Subscriber sub_goal("maximus_goal", &goal_msg, goalCb );
+#endif
+#ifdef PATH_FOLLOWING
 ros::Subscriber sub_poses("poses", &posesfromros, &goalposesCb);
-
+#endif
 
 void toggle(){
 	static char t=0;
@@ -495,8 +505,12 @@ void setup()
     sei();
 
     nh.initNode();
+#ifndef PATH_FOLLOWING
     nh.subscribe(sub_goal);
+#endif
+#ifdef PATH_FOLLOWING
     nh.subscribe(sub_poses);
+#endif
     nh.advertise(pub_xspeed);
     nh.advertise(pub_tspeed);
 
@@ -575,7 +589,14 @@ void loop()
     }  
   */
     
-
+/*
+  if(global_cpt > 1000) {
+    goto_next_goal();
+    global_cpt = 0;
+  } else {
+    global_cpt++;
+  }
+*/
   
 }
 
