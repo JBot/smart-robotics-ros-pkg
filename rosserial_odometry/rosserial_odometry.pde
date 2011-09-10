@@ -63,13 +63,13 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         12000//20000
-#define ALPHA_MAX_ACCEL         120//300
+#define ALPHA_MAX_SPEED         15000//20000
+#define ALPHA_MAX_ACCEL         170//300
 #define ALPHA_MAX_DECEL         3500                       //2500
-#define DELTA_MAX_SPEED         35000//51000 
+#define DELTA_MAX_SPEED         40000//51000 
 #define DELTA_MAX_SPEED_BACK    35000 
 #define DELTA_MAX_SPEED_BACK_PAWN    45000
-#define DELTA_MAX_ACCEL         500//1000     
+#define DELTA_MAX_ACCEL         1000//1000     
 #define DELTA_MAX_DECEL         10000 
 
 //#define PATH_FOLLOWING          1

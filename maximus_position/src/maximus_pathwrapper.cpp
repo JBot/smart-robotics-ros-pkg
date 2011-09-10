@@ -246,7 +246,7 @@ void MaximusPath::compute_next_pathpoint(void) {
 		
 		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
         }
-    ros::Duration(0.2).sleep();
+    ros::Duration(0.3).sleep();
     ROS_INFO("Path sent.");
    }
 
@@ -272,7 +272,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "maximus_pathwrapper");
     MaximusPath maximus_path;
     // Refresh rate
-    ros::Rate loop_rate(2); 
+    ros::Rate loop_rate(50); 
     float rotation = 0.0;
     while (ros::ok()) {
 
