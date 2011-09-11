@@ -220,7 +220,9 @@ void MaximusPath::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose
 void MaximusPath::compute_next_pathpoint(void) {
 
    if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
-        if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 5) {
+        if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 7) {
+                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
                 my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
                 my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
                 my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());

@@ -1035,7 +1035,7 @@ void do_motion_control(void)
         
         double dist = distance_coord(&maximus, goal.x, goal.y);
         //double max_possible_speed = 1050000 * dist / ang;
-        double max_possible_speed = 700000 * dist / ang;
+        double max_possible_speed = 1350000 * dist / ang;
         if(max_possible_speed < 200)
           max_possible_speed = 0;
         delta_motor.max_speed = min(max_possible_speed, DELTA_MAX_SPEED-10000);       
