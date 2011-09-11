@@ -8,6 +8,7 @@
 #include "sensor_msgs/LaserScan.h"
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 #include <joy/Joy.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
@@ -38,7 +39,7 @@ class MaximusPath {
   public:
     MaximusPath();
     void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
-    void compute_next_pathpoint(void);
+    void compute_next_pathpoint(tf::TransformListener& listener);
 
     // Goal suscriber
     ros::Subscriber goal_sub_;
@@ -116,6 +117,15 @@ else {
     ROS_INFO("Path begin.");
     my_maximus_path = *path;
     ROS_INFO("Path next.");
+
+
+// TEST
+
+    final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+    final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+
+// TEST
+
 
     geometry_msgs::PoseArray my_pose_array;
     int i = 0;
@@ -217,74 +227,112 @@ void MaximusPath::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose
 */
 }
 
-void MaximusPath::compute_next_pathpoint(void) {
+void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 
-   if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
-        if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 7) {
-                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
-                
-		final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-		final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-    		MaximusPath::pose2D_pub.publish(final_pose);
+        geometry_msgs::PoseStamped odom_pose;
+        odom_pose.header.frame_id = "/base_link";
 
-		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-        }
-        else {
-                while(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 1) {
-                        my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-                }
-                ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
-                
-                final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-                final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-                MaximusPath::pose2D_pub.publish(final_pose);
+        //we'll just use the most recent transform available for our simple example
+        odom_pose.header.stamp = ros::Time();
 
-		
-		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-        }
-    ros::Duration(0.3).sleep();
-    ROS_INFO("Path sent.");
-   }
+        //just an arbitrary point in space
+        odom_pose.pose.position.x = 0.0;
+        odom_pose.pose.position.y = 0.0;
+        odom_pose.pose.position.z = 0.0;
+
+        odom_pose.pose.orientation.x = 0.0;
+        odom_pose.pose.orientation.y = 0.0;
+        odom_pose.pose.orientation.z = 0.0;
+	odom_pose.pose.orientation.w = 1.0;
+
+
+	try{
+		ros::Time now = ros::Time::now();
+		listener.waitForTransform("/odom", "/base_link", now, ros::Duration(5.0));
+		geometry_msgs::PoseStamped base_pose;
+		listener.transformPose("/odom", odom_pose, base_pose);
+
+		//ROS_INFO("%f %f %f %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y);
+
+		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < 0.09 ) {
+
+			if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
+				if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 7) {
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
+							my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+
+					final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+					final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+					MaximusPath::pose2D_pub.publish(final_pose);
+
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+				}
+				else {
+					while(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 1) {
+						my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+					}
+					ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
+							my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+
+					final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+					final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+					MaximusPath::pose2D_pub.publish(final_pose);
+
+
+					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+				}
+				ros::Duration(0.2).sleep();
+				ROS_INFO("Path sent.");
+			}
+
+		}
+	}
+	catch(tf::TransformException& ex){
+		ROS_ERROR("Received an exception trying to transform a point from \"odom\" to \"base_link\": %s", ex.what());
+	}
+
 
 }
 
-        /**
-	 * This tutorial demonstrates simple sending of messages over the ROS system.
-	 */
+/**
+ * This tutorial demonstrates simple sending of messages over the ROS system.
+ */
 int main(int argc, char **argv)
 {
 
 
-                /**
-		 * The ros::init() function needs to see argc and argv so that it can perform
-		 * any ROS arguments and name remapping that were provided at the command line. For programmatic
-		 * remappings you can use a different version of init() which takes remappings
-		 * directly, but for most command-line programs, passing argc and argv is the easiest
-		 * way to do it.  The third argument to init() is the name of the node.
-		 *
-		 * You must call one of the versions of ros::init() before using any other
-		 * part of the ROS system.
-		 */
-    ros::init(argc, argv, "maximus_pathwrapper");
-    MaximusPath maximus_path;
-    // Refresh rate
-    ros::Rate loop_rate(50); 
-    float rotation = 0.0;
-    while (ros::ok()) {
+	/**
+	 * The ros::init() function needs to see argc and argv so that it can perform
+	 * any ROS arguments and name remapping that were provided at the command line. For programmatic
+	 * remappings you can use a different version of init() which takes remappings
+	 * directly, but for most command-line programs, passing argc and argv is the easiest
+	 * way to do it.  The third argument to init() is the name of the node.
+	 *
+	 * You must call one of the versions of ros::init() before using any other
+	 * part of the ROS system.
+	 */
+	ros::init(argc, argv, "maximus_pathwrapper");
+	MaximusPath maximus_path;
+	tf::TransformListener listener(ros::Duration(10));
 
-        ros::spinOnce();
-        loop_rate.sleep();
-	maximus_path.compute_next_pathpoint();
+	// Refresh rate
+	ros::Rate loop_rate(50); 
+	float rotation = 0.0;
+	while (ros::ok()) {
 
-    }
+		ros::spinOnce();
+		loop_rate.sleep();
+		maximus_path.compute_next_pathpoint(boost::ref(listener));
 
-    ros::Duration(2.0).sleep();
+	}
 
-    ros::shutdown();
+	ros::Duration(2.0).sleep();
+
+	ros::shutdown();
 }

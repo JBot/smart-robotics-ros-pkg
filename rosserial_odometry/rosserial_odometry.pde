@@ -1038,7 +1038,7 @@ void do_motion_control(void)
         double max_possible_speed = 1350000 * dist / ang;
         if(max_possible_speed < 200)
           max_possible_speed = 0;
-        delta_motor.max_speed = min(max_possible_speed, DELTA_MAX_SPEED-10000);       
+        delta_motor.max_speed = min(max_possible_speed, DELTA_MAX_SPEED-0);       
         set_new_command(&bot_command_delta, dist);
         prev_bot_command_delta.state = WAITING_BEGIN;
     } else {
