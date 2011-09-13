@@ -245,17 +245,17 @@ ros::Publisher pub_tspeed("/tspeed", &tspeed);
 geometry_msgs::Pose2D goal;
 geometry_msgs::PoseArray goals;
 int goals_index = 0;
-
+/*
 ROS_CALLBACK(messageCb, geometry_msgs::Twist, toggle_msg)
         //toggle();   // blink the led
-//  	delta_motor.des_speed = (signed long) (toggle_msg.linear.x * ticks_per_m);
+  	delta_motor.des_speed = (signed long) (toggle_msg.linear.x * ticks_per_m);
 
-//	alpha_motor.des_speed = (signed long) (toggle_msg.angular.z * ticks_per_rad);
+	alpha_motor.des_speed = (signed long) (toggle_msg.angular.z * ticks_per_rad);
 
-//	write_RoboClaw_speed_M1M2(128, delta_motor.des_speed - alpha_motor.des_speed, delta_motor.des_speed + alpha_motor.des_speed);
+	write_RoboClaw_speed_M1M2(128, delta_motor.des_speed - alpha_motor.des_speed, delta_motor.des_speed + alpha_motor.des_speed);
 
 }
-
+*/
 #ifndef PATH_FOLLOWING
 ROS_CALLBACK(goalCb, geometry_msgs::Pose2D, goal_msg)
 
@@ -283,7 +283,7 @@ ROS_CALLBACK(goalposesCb, geometry_msgs::PoseArray, posesfromros)
 }
 #endif
 
-ros::Subscriber sub("cmd_vel", &toggle_msg, messageCb );
+//ros::Subscriber sub("cmd_vel", &toggle_msg, messageCb );
 #ifndef PATH_FOLLOWING
 ros::Subscriber sub_goal("maximus_goal", &goal_msg, goalCb );
 #endif
@@ -505,6 +505,7 @@ void setup()
     sei();
 
     nh.initNode();
+//    nh.subscribe(sub);
 #ifndef PATH_FOLLOWING
     nh.subscribe(sub_goal);
 #endif

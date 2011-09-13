@@ -254,7 +254,7 @@ void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 
 		//ROS_INFO("%f %f %f %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y);
 
-		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < 0.09 ) {
+		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < 0.12 ) {
 
 			if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
 				if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 7) {

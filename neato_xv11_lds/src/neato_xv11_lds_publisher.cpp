@@ -221,7 +221,7 @@ int main(int argc, char **argv)
                 init_level = 0;
             }
             if (index == 89){
-		scan.header.stamp = ros::Time::now() - ros::Duration(0.09); // 0.2 for laser print ; 0.1 for obstacle detection
+		scan.header.stamp = ros::Time::now() - ros::Duration(0.06); // 0.2 for laser print ; 0.1 for obstacle detection
                 laser_pub.publish(scan);
 		//broadcaster.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.0, 0.0, 0.1)),
                 //                                       scan.header.stamp, "base_link", "neato_laser"));
