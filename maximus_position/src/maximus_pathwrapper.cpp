@@ -118,6 +118,9 @@ else {
     my_maximus_path = *path;
     ROS_INFO("Path next.");
 
+if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
+	my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+}
 
 // TEST
 
@@ -254,7 +257,7 @@ void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 
 		//ROS_INFO("%f %f %f %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y);
 
-		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < 0.12 ) {
+		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < 0.13 ) {
 
 			if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
 				if(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 7) {
@@ -264,11 +267,12 @@ void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
-							my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+					//ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
+					//		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
 
 					final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
 					final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+					ROS_INFO("%f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
 					MaximusPath::pose2D_pub.publish(final_pose);
 
 					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
@@ -277,8 +281,8 @@ void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 					while(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 1) {
 						my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 					}
-					ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
-							my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+					//ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
+					//		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
 
 					final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
 					final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
@@ -287,8 +291,8 @@ void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 
 					my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 				}
-				ros::Duration(0.2).sleep();
-				ROS_INFO("Path sent.");
+				//ros::Duration(0.02).sleep();
+				//ROS_INFO("Path sent.");
 			}
 
 		}
