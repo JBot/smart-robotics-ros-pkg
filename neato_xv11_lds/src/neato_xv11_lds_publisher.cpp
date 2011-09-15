@@ -92,8 +92,8 @@ int main(int argc, char **argv)
         scan.angle_min = 0.0;
         scan.angle_max = 2.0 * M_PI;
         scan.angle_increment = (2.0 * M_PI / 360.0);
-        scan.time_increment = (1 / 5) / 360;
-	scan.scan_time = 1 / 5;
+        scan.time_increment = (1 / 6) / 360;
+	scan.scan_time = 1 / 6;
         scan.range_min = 0.015;
         scan.range_max = 5;
 
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
                 init_level = 0;
             }
             if (index == 89){
-		scan.header.stamp = ros::Time::now() - ros::Duration(0.06); // 0.2 for laser print ; 0.1 for obstacle detection
+		scan.header.stamp = ros::Time::now() - ros::Duration(0.137); // 0.2 for laser print ; 0.1 for obstacle detection
                 laser_pub.publish(scan);
 		//broadcaster.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.0, 0.0, 0.1)),
                 //                                       scan.header.stamp, "base_link", "neato_laser"));

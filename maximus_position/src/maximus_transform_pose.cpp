@@ -270,7 +270,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "transformPose");
     TransformPose transform_Pose;
     // Refresh rate
-    ros::Rate loop_rate(10);                                // 35 with bluetooth
+    ros::Rate loop_rate(30);                                // 35 with bluetooth
 
     tf::TransformListener listener(ros::Duration(10));
 

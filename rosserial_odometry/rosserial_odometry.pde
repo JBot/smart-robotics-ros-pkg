@@ -63,10 +63,10 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         25000//20000
-#define ALPHA_MAX_ACCEL         220//300
-#define ALPHA_MAX_DECEL         3500                       //2500
-#define DELTA_MAX_SPEED         30000//51000 
+#define ALPHA_MAX_SPEED         20000//20000
+#define ALPHA_MAX_ACCEL         400//300
+#define ALPHA_MAX_DECEL         6500                       //2500
+#define DELTA_MAX_SPEED         25000//51000 
 #define DELTA_MAX_SPEED_BACK    35000 
 #define DELTA_MAX_SPEED_BACK_PAWN    45000
 #define DELTA_MAX_ACCEL         1000//1000     
@@ -545,8 +545,8 @@ void loop()
 
       if(cpt_output == 20)
     {
-      xspeed.data = (total_distance - prev_total_distance) / 0.125;
-      tspeed.data = (total_theta - prev_theta) / 0.125;
+      xspeed.data = (total_distance - prev_total_distance) / 0.07;
+      tspeed.data = (total_theta - prev_theta) / 0.07;
     
       prev_total_distance = total_distance;
       prev_theta = total_theta; 
@@ -1036,7 +1036,7 @@ void do_motion_control(void)
         
         double dist = distance_coord(&maximus, goal.x, goal.y);
         //double max_possible_speed = 1050000 * dist / ang;
-        double max_possible_speed = 4000000 * abs(dist) / abs(ang);
+        double max_possible_speed = 2500000 * abs(dist) / abs(ang);
         if(max_possible_speed < 200)
           max_possible_speed = 0;
         delta_motor.max_speed = min(max_possible_speed, DELTA_MAX_SPEED);       

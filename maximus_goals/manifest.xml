@@ -1,0 +1,18 @@
+<package>
+  <description brief="maximus_goals">
+
+     maximus_goals
+
+  </description>
+  <author>Jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/maximus_goals</url>
+  <depend package="tf"/>
+  <depend package="move_base_msgs"/>
+  <depend package="actionlib"/>
+  <depend package="roscpp"/>
+
+</package>
+
+
