@@ -35,6 +35,7 @@ int main(int argc, char** argv){
   goal.target_pose.pose.position.y = 0.0;
   goal.target_pose.pose.orientation.w = 1.0;
 
+  ros::Duration(2.0).sleep();
   ROS_INFO("Sending goal");
   ac.sendGoal(goal);
 
@@ -67,8 +68,9 @@ int main(int argc, char** argv){
   catch(tf::TransformException& ex){
           ROS_ERROR("Received an exception trying to transform a point from \"odom\" to \"base_link\": %s", ex.what());
   }       
+  ros::Duration(1.5).sleep();
 
-while( sqrt( pow(goal.target_pose.pose.position.x - base_pose.pose.position.x, 2) + pow(goal.target_pose.pose.position.y - base_pose.pose.position.y, 2) ) > 0.05 ) {
+while( sqrt( pow(goal.target_pose.pose.position.x - base_pose.pose.position.x, 2) + pow(goal.target_pose.pose.position.y - base_pose.pose.position.y, 2) ) > 0.15 ) {
   //we'll just use the most recent transform available for our simple example
   odom_pose.header.stamp = ros::Time();
 
@@ -92,12 +94,59 @@ while( sqrt( pow(goal.target_pose.pose.position.x - base_pose.pose.position.x, 2
 	  ROS_ERROR("Received an exception trying to transform a point from \"odom\" to \"base_link\": %s", ex.what());
 	  break;
   }
-  ros::Duration(1.0).sleep();
   ac.sendGoal(goal);
+  ros::Duration(1.0).sleep();
 }
 
 
     ROS_INFO("Hooray, I have reach my goal !");
+  
+  system("espeak -a 200 \"I have reach the first Goal !\" ");
+  ros::Duration(2.0).sleep();
+  
+  goal.target_pose.pose.position.x = 0.0;
+  goal.target_pose.pose.position.y = 0.0;
+  goal.target_pose.pose.orientation.w = 1.0;
+
+
+  ac.sendGoal(goal);
+  ros::Duration(3.0).sleep();
+
+
+while( sqrt( pow(goal.target_pose.pose.position.x - base_pose.pose.position.x, 2) + pow(goal.target_pose.pose.position.y - base_pose.pose.position.y, 2) ) > 0.15 ) {
+  //we'll just use the most recent transform available for our simple example
+  odom_pose.header.stamp = ros::Time();
+
+  //just an arbitrary point in space
+  odom_pose.pose.position.x = 0.0;
+  odom_pose.pose.position.y = 0.0;
+  odom_pose.pose.position.z = 0.0;
+
+  odom_pose.pose.orientation.x = 0.0;
+  odom_pose.pose.orientation.y = 0.0;
+  odom_pose.pose.orientation.z = 0.0;
+  odom_pose.pose.orientation.w = 1.0;
+
+  try{
+          ros::Time now = ros::Time::now();
+          listener.waitForTransform("/odom", "/base_link", now, ros::Duration(5.0));
+          listener.transformPose("/odom", odom_pose, base_pose);
+
+  }
+  catch(tf::TransformException& ex){
+          ROS_ERROR("Received an exception trying to transform a point from \"odom\" to \"base_link\": %s", ex.what());
+          break;
+  }
+  ac.sendGoal(goal);
+  ros::Duration(1.0).sleep();
+}
+
+    ac.cancelAllGoals();
+    ROS_INFO("Hooray, I have reach my goal !");
+  system("espeak -a 200 \"I have reach the final Goal !\" ");
+
+
+
 /*
   ac.waitForResult();
 
