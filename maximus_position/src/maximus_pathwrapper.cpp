@@ -80,7 +80,7 @@ MaximusPath::MaximusPath()
     }
 
     final_pose.x = 0.0;
-    final_pose.y = 0.0;
+    final_pose.y = 0.14;
     final_pose.theta = 0.0;
 
     cpt_send = 0;
@@ -223,11 +223,11 @@ if( !(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) )
 
 void MaximusPath::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
-/*    final_pose.x = pose->pose.position.x;
+    final_pose.x = pose->pose.position.x;
     final_pose.y = pose->pose.position.y;
     MaximusPath::pose2D_pub.publish(final_pose);
     ROS_INFO("Goal sent.");
-*/
+
 }
 
 void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
@@ -271,6 +271,11 @@ void MaximusPath::compute_next_pathpoint(tf::TransformListener& listener) {
 					//ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
 					//		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
 
+					while( (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 1) && (sqrt( pow(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x - base_pose.pose.position.x, 2) + pow(my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y - base_pose.pose.position.y, 2) ) < 0.12) ) {
+					
+						my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+
+					}
 					final_pose.x = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
 					final_pose.y = my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
 					ROS_INFO("%f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));

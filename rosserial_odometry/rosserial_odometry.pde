@@ -65,7 +65,7 @@ void delay_ms(uint16_t millis)
 
 #define ALPHA_MAX_SPEED         20000//20000
 #define ALPHA_MAX_ACCEL         400//300
-#define ALPHA_MAX_DECEL         6000                       //2500
+#define ALPHA_MAX_DECEL         5000                       //2500
 #define DELTA_MAX_SPEED         25000//51000 
 #define DELTA_MAX_SPEED_BACK    35000 
 #define DELTA_MAX_SPEED_BACK_PAWN    45000
@@ -545,8 +545,8 @@ void loop()
 
       if(cpt_output == 20)
     {
-      xspeed.data = (total_distance - prev_total_distance) / 0.07;
-      tspeed.data = (total_theta - prev_theta) / 0.07;
+      xspeed.data = (total_distance - prev_total_distance) / 0.047;
+      tspeed.data = (total_theta - prev_theta) / 0.047;
     
       prev_total_distance = total_distance;
       prev_theta = total_theta; 
@@ -608,11 +608,11 @@ void loop()
 void init_Robot(struct robot *my_robot)
 {
     my_robot->pos_X = 0;                               // -700
-    my_robot->pos_Y = 0;                                 // 700
-    my_robot->theta = 0;                                   // PI/2
+    my_robot->pos_Y = 0.14;                                 // 700
+    my_robot->theta = PI/2;                                   // PI/2
     my_robot->desX = 0;
     my_robot->desY = 0;
-    my_robot->desTheta = 0.0;
+    my_robot->desTheta = PI/2;
 }
 
 void init_blue_Robot(struct robot *my_robot)

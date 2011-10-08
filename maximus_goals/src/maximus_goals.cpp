@@ -31,8 +31,8 @@ int main(int argc, char** argv){
   goal.target_pose.header.frame_id = "map";
   goal.target_pose.header.stamp = ros::Time::now();
 
-  goal.target_pose.pose.position.x = 2.0;
-  goal.target_pose.pose.position.y = 0.0;
+  goal.target_pose.pose.position.x = 0.0;
+  goal.target_pose.pose.position.y = 1.7;
   goal.target_pose.pose.orientation.w = 1.0;
 
   ros::Duration(2.0).sleep();
@@ -105,12 +105,12 @@ while( sqrt( pow(goal.target_pose.pose.position.x - base_pose.pose.position.x, 2
   ros::Duration(2.0).sleep();
   
   goal.target_pose.pose.position.x = 0.0;
-  goal.target_pose.pose.position.y = 0.0;
+  goal.target_pose.pose.position.y = 0.3;
   goal.target_pose.pose.orientation.w = 1.0;
 
 
   ac.sendGoal(goal);
-  ros::Duration(3.0).sleep();
+  ros::Duration(2.0).sleep();
 
 
 while( sqrt( pow(goal.target_pose.pose.position.x - base_pose.pose.position.x, 2) + pow(goal.target_pose.pose.position.y - base_pose.pose.position.y, 2) ) > 0.15 ) {
