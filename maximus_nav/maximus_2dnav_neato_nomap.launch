@@ -8,9 +8,6 @@
   <node pkg="maximus_setup_tf" type="tf_broadcaster" name="maximus_tf_broadcaster" output="screen">
   </node>
 
-  <node pkg="maximus_position" type="maximus_pathwrapper" name="maximus_pathwrapper" output="screen">
-  </node>
-
   <node pkg="rosserial_python" type="serial_node.py" name="arduino_serial_odometry" output="screen">
     <param name="baud" value="115200" />
     <param name="port" value="/dev/ttyUSB1" />

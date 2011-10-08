@@ -1,8 +1,11 @@
 ROS packages repository of the association SMART (autonomouS Multi Application Robot Team) 
 
-rosmake maximus_position maximus_setup_tf neato_xv11_lds
+rosmake maximus_position maximus_setup_tf neato_xv11_lds maximus_goals eurobot_obstacles
 
-rosrun avr_bridge bridge_node.py motionControlROS.yaml __name:=position_node
-roslaunch maximus_2dnav maximus_joy.launch
-roslaunch maximus_2dnav maximus_2dnav_configuration.launch gui:=True
-roslaunch maximus_2dnav move_base.launch
+roslaunch maximus_nav maximus_2dnav_neato.launch
+roslaunch maximus_nav move_base_map.launch
+
+roslaunch maximus_nav maximus_2dnav_neato_nomap.launch
+roslaunch maximus_nav mapping_maximus.launch
+roslaunch maximus_nav move_base_map_onlylds.launch
+

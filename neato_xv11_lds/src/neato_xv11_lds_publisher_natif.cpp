@@ -5,23 +5,13 @@
 #include <tf/transform_broadcaster.h>
 #include <std_msgs/Float32.h>
 
-std_msgs::Float32 tspeed;
-
-#define UNSEEN_VALUE  2600
-
-void tspeedCallback(const std_msgs::Float32::ConstPtr & pose)
-{
-        tspeed.data = pose->data;
-}
+#define UNSEEN_VALUE 0 // 2600
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "neato_xv11_lds_publisher");
     ros::NodeHandle n;
     ros::NodeHandle priv_nh("~");
-
-    ros::Subscriber tspeed_sub_;
-    tspeed_sub_ = n.subscribe < std_msgs::Float32 > ("/tspeed", 30, tspeedCallback);
 
     std::string port;
     int baud_rate;
@@ -180,14 +170,8 @@ int main(int argc, char **argv)
                 init_level = 0;
             }
             if (index == 89){
-		scan.header.stamp = ros::Time::now() - ros::Duration(0.137); // 0.2 for laser print ; 0.1 for obstacle detection
-                if(abs(tspeed.data) < 2.0) {
-			laser_pub.publish(scan);
-		//	ROS_ERROR("        Publishing");
-		}
-		else {
-		//	ROS_ERROR("! NOT ! Publishing");
-		}
+		scan.header.stamp = ros::Time::now();// - ros::Duration(0.137); // 0.2 for laser print ; 0.1 for obstacle detection
+		laser_pub.publish(scan);
 		//broadcaster.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.0, 0.0, 0.1)),
                 //                                       scan.header.stamp, "base_link", "neato_laser"));
 	    }
