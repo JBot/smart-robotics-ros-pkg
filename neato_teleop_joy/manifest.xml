@@ -1,0 +1,16 @@
+<package>
+  <description brief="neato_teleop_joy">
+
+     neato_teleop_joy
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/neato_teleop_joy</url>
+  <depend package="roscpp"/>
+  <depend package="joy"/>
+
+</package>
+
+

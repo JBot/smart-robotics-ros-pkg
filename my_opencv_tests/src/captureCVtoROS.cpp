@@ -69,10 +69,10 @@ public:
       //out = Mat::zeros(frame.rows, frame.cols, CV_8UC3);
       cvtColor(frame, gray, CV_BGR2GRAY);
       // smooth it, otherwise a lot of false circles may be detected
-      //GaussianBlur( gray, gray, Size(9, 9), 2, 2 );
-      //vector<Vec3f> circles;
-      //HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, 20, 200, 100 );
-      /*for( size_t i = 0; i < circles.size(); i++ )
+      GaussianBlur( gray, gray, Size(9, 9), 2, 2 );
+      vector<Vec3f> circles;
+      HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, 200, 200, 100, 50 );
+      for( size_t i = 0; i < circles.size(); i++ )
       {
          Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
          int radius = cvRound(circles[i][2]);
@@ -80,7 +80,7 @@ public:
          circle( frame, center, 3, Scalar(0,255,0), -1, 8, 0 );
          // draw the circle outline
          circle( frame, center, radius, Scalar(0,0,255), 3, 8, 0 );
-      }*/
+      }
       namedWindow( "circles", 1 );
       imshow( "circles", gray );
 
@@ -102,10 +102,10 @@ public:
       }
 */
 
-      Mat src, dst, color_dst;
-      src=imread("Screenshot.png", 0);
+      //Mat src, dst, color_dst;
+      //src=imread("Screenshot.png", 0);
 
-      Canny( src, dst, 50, 200, 3 );
+      //Canny( src, dst, 50, 200, 3 );
 
       namedWindow("video", 1);
       imshow("video", frame);
