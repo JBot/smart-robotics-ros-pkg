@@ -1,0 +1,24 @@
+<package>
+  <description brief="indomptable_nav">
+
+     indomptable_nav
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/indomptable_nav</url>
+  <depend package="move_base"/>
+  <depend package="roscpp"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="visualization_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="move_base_msgs"/>
+  <depend package="actionlib"/>
+
+</package>
+
+

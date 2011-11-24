@@ -1,0 +1,20 @@
+<package>
+  <description brief="indomptable_vision">
+
+     indomptable_vision
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/indomptable_vision</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+  <depend package="std_msgs"/>
+  <depend package="image_transport"/>
+
+</package>
+
+
