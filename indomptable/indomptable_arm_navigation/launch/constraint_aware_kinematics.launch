@@ -1,0 +1,9 @@
+<launch>
+    <include file="$(find indomptable_arm_navigation)/launch/indomptable_planning_environment.launch" />
+    <node pkg="arm_kinematics_constraint_aware" type="arm_kinematics_constraint_aware" name="indomptable_left_arm_kinematics">
+        <param name="group" type="string" value="left_arm" />
+        <param name="left_arm/root_name" type="string" value="left_arm_panel" />
+        <param name="left_arm/tip_name" type="string" value="left_hand_link" />
+        <param name="kinematics_solver" type="string" value="arm_kinematics_constraint_aware/KDLArmKinematicsPlugin" />
+    </node>
+</launch>

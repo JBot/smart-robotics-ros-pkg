@@ -62,6 +62,7 @@
 #define SERVO_OFFSET8   194
 #define SERVO_OFFSET12   101
 
+#define STOCK_HEIGHT	80
 
 class indomptableARM {
   public:
@@ -71,10 +72,11 @@ class indomptableARM {
 
   private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
-    void GetSinCos (float AngleDeg);
-    void GetBoogTan(float BoogTanX, float BoogTanY);
     void LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed int IKFeetPosZ);
-
+    void ServoDriver();
+    void FreeServos();
+    void takeCDinTotem(signed int height);
+    void takeBARinTotem(void);
 
     ros::NodeHandle nh;
 
@@ -89,6 +91,7 @@ float CoxaAngle;   //Actual Angle of the Right Front Leg
 float FemurAngle;
 float TibiaAngle;
 float AnkleAngle;
+float RollAngle;
 //--------------------------------------------------------------------
 //[POSITIONS]
 signed int RFPosX;      //Actual Position of the Right Front Leg
@@ -96,55 +99,17 @@ signed int RFPosY;
 signed int RFPosZ;
 //--------------------------------------------------------------------
 //[VARIABLES]
-char Index;      //Index used for freeing the servos
-char SSCDone;    //Char to check if SSC is done
+int ActualGaitSpeed;
 
-float ABSAngleDeg;      //Absolute value of the Angle in Degrees
-float AngleRad;     //Angle in Radian
-float SinA;      //Output Sinus of the given Angle
-float CosA;      //Output Cosinus of the given Angle
-
-float BoogTan;      //Output BOOGTAN2(X/Y)
-float SinB;             //Sin buffer for BodyRotX calculations
-float CosB;             //Cos buffer for BodyRotX calculations
-float SinG;             //Sin buffer for BodyRotZ calculations
-float CosG;             //Cos buffer for BodyRotZ calculations
-signed int TotalX;             //Total X distance between the center of the body and the feet
-signed int TotalZ;             //Total Z distance between the center of the body and the feet
-float DistCenterBodyFeet; //Total distance between the center of the body and the feet
-float AngleCenterBodyFeetX; //Angle between the center of the body and the feet
-signed int BodyIKPosX;         //Output Position X of feet with Rotation
-signed int BodyIKPosY;         //Output Position Y of feet with Rotation
-signed int BodyIKPosZ;         //Output Position Z of feet with Rotation
-
-//Leg Inverse Kinematics
-signed int IKFeetPosXZ;        //Length between the coxa and feet
-float IKSW;             //Length between shoulder and wrist
-float IKA1;             //Angle between SW line and the ground in rad
-float IKA2;             //?
-char IKSolution;         //Output true if the solution is possible
-char IKSolutionWarning;      //Output true if the solution is NEARLY possible
-char IKSolutionError;      //Output true if the solution is NOT possible
+float DesAnkleAngle;
 float IKFemurAngle;       //Output Angle of Femur in degrees
 float IKTibiaAngle;       //Output Angle of Tibia in degrees
 float IKCoxaAngle;        //Output Angle of Coxa in degrees
 
-int ActualGaitSpeed;
 
-signed int RFGaitPosX;   //Relative position corresponding to the Gait
-signed int RFGaitPosY;
-signed int RFGaitPosZ;
-signed int RFGaitRotY;   //Relative rotation corresponding to the Gait
-
-//Body position
-signed int BodyPosX;      //Global Input for the position of the body
-signed int BodyPosY;
-signed int BodyPosZ;
-
-signed int DesAnkleAngle;
-
-
-
+// Serial
+int ser_fd_ssc;
+struct termios oldtio_ssc, newtio_ssc;
 
 
 };
@@ -166,166 +131,103 @@ RFPosZ = 0;
 //--------------------------------------------------------------------
 //[VARIABLES]
 
-ABSAngleDeg = 0;      //Absolute value of the Angle in Degrees
-AngleRad = 0;     //Angle in Radian
-SinA = 0;      //Output Sinus of the given Angle
-CosA = 0;      //Output Cosinus of the given Angle
-
-TotalX = 0;             //Total X distance between the center of the body and the feet
-TotalZ = 0;             //Total Z distance between the center of the body and the feet
-DistCenterBodyFeet = 0; //Total distance between the center of the body and the feet
-AngleCenterBodyFeetX = 0; //Angle between the center of the body and the feet
-BodyIKPosX = 0;         //Output Position X of feet with Rotation
-BodyIKPosY = 0;         //Output Position Y of feet with Rotation
-BodyIKPosZ = 0;         //Output Position Z of feet with Rotation
-
-//Leg Inverse Kinematics
-IKFeetPosXZ = 0;        //Length between the coxa and feet
-IKSW = 0;             //Length between shoulder and wrist
-IKA1 = 0;             //Angle between SW line and the ground in rad
-IKA2 = 0;             //?
 IKFemurAngle = 0;       //Output Angle of Femur in degrees
 IKTibiaAngle= 0;       //Output Angle of Tibia in degrees
 IKCoxaAngle = 0;        //Output Angle of Coxa in degrees
 
 ActualGaitSpeed = 200;
 
-RFGaitPosX = 0;   //Relative position corresponding to the Gait
-RFGaitPosY = 0;
-RFGaitPosZ = 0;
-RFGaitRotY = 0;   //Relative rotation corresponding to the Gait
-
-//Body position
-BodyPosX = 0;      //Global Input for the position of the body
-BodyPosY = 0;
-BodyPosZ = 0;
-
 DesAnkleAngle = 0;
+RollAngle = 0;
 
+        ser_fd_ssc = open(SSCDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+        if( ser_fd_ssc == -1)
+        {
+                printf( " SSC Serial Not Open \n" );
+        }
+        else
+        {
+                printf( " SSC Serial Open \n" );
+                tcgetattr(ser_fd_ssc, &oldtio_ssc);                             // Backup old port settings
+                memset(&newtio_ssc, 0, sizeof(newtio_ssc));
 
+                newtio_ssc.c_iflag = IGNBRK | IGNPAR;
+                newtio_ssc.c_oflag = 0;
+                newtio_ssc.c_cflag = BAUDRATE | CREAD | CS8 | CLOCAL;
+                newtio_ssc.c_lflag = 0;
 
+                tcflush(ser_fd_ssc, TCIFLUSH);
+                tcsetattr(ser_fd_ssc, TCSANOW, &newtio_ssc);
 
+                memset(&newtio_ssc, 0, sizeof(newtio_ssc));
+                tcgetattr(ser_fd_ssc, &newtio_ssc);
 
+                fcntl(ser_fd_ssc, F_SETFL, FNDELAY);
 
+        }
 
 }
 
 void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
+	if( ((int)(pose->pose.position.y * 1000)) != 0 ) {
 
+	}
+	else {
+		if( ((int)(pose->pose.position.z * 1000)) == 0 ) {
+			takeBARinTotem();
+		}
+		else {
+	 		takeCDinTotem((int)(pose->pose.position.z * 1000));
+		}
+	}
+	
+
+/*
 	LegIK((int)(pose->pose.position.x * 1000), (int)(pose->pose.position.z * 1000), (int)(pose->pose.position.y * 1000));
-	CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+	DesAnkleAngle = pose->pose.orientation.x;
+    	CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
 	FemurAngle = IKFemurAngle;
 	TibiaAngle = -(90 - IKTibiaAngle);
 	AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
 	printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
-	//ServoDriver();
-
-	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	ServoDriver();
+*/
+	//usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
 }
 
 /****** Inverse Kinematics functions *******/
 
-/**--------------------------------------------------------------------
-  [GETSINCOS] Get the sinus and cosinus from the angle +/- multiple circles
-  AngleDeg    - Input Angle in degrees
-  SinA        - Output Sinus of AngleDeg
-  CosA        - Output Cosinus of AngleDeg*/
-void indomptableARM::GetSinCos (float AngleDeg) {
-
-        //Get the absolute value of AngleDeg
-
-        ABSAngleDeg = fabs(AngleDeg);
-
-
-
-        //Shift rotation to a full circle of 360 deg -> AngleDeg // 360
-        if (AngleDeg < 0.0) {   //Negative values
-                AngleDeg = 360.0-(ABSAngleDeg-((360*((int)(ABSAngleDeg/360.0)))));
-        }
-        else {            //Positive values
-                AngleDeg = ABSAngleDeg-((360*((int)(ABSAngleDeg/360.0))));
-        }
-
-        if (AngleDeg < 180.0) {   //Angle between 0 and 180
-                //Subtract 90 to shift range
-                AngleDeg = AngleDeg -90.0;
-                //Convert degree to radials
-                AngleRad = (AngleDeg*3.141592)/180.0;
-
-                CosA = -sin(AngleRad);   //Cos 0 to 180 deg = -sin(Angle Rad - 90deg)
-                SinA = cos(AngleRad);      //Sin o to 180 deg = cos(Angle Rad - 90deg)
-        }
-        else {   //Angle between 180 and 360
-                //Subtract 270 to shift range
-                AngleDeg = AngleDeg -270.0;
-                //Convert degree to radials
-                AngleRad = (AngleDeg*3.141592)/180.0;
-
-                SinA = -cos(AngleRad);      //Sin 180 to 360 deg = -cos(Angle Rad - 270deg)
-                CosA = sin(AngleRad);   //Cos 180 to 360 deg = sin(Angle Rad - 270deg)
-        }
-
-
-        return;
-}
-
-/*--------------------------------------------------------------------
-  ;[BOOGTAN2] Gets the Inverse Tangus from X/Y with the where Y can be zero or negative
-  ;BoogTanX       - Input X
-  ;BoogTanY       - Input Y
-  ;BoogTan        - Output BOOGTAN2(X/Y)*/
-void indomptableARM::GetBoogTan(float BoogTanX, float BoogTanY){
-
-
-        if(BoogTanX == 0) {   // X=0 -> 0 or PI
-                if(BoogTanY >= 0) {
-                        BoogTan = 0.0;
-                        //putchar('P');
-                }else {
-                        BoogTan = 3.141592;
-                }
-        }else {
-
-                if(BoogTanY == 0) {   // Y=0 -> +/- Pi/2
-                        if(BoogTanX > 0) {
-                                BoogTan = 3.141592 / 2.0;
-                        }else {
-                                BoogTan = -3.141592 / 2.0;
-                        }
-                }else {
-
-                        if(BoogTanY > 0) {   //BOOGTAN(X/Y)
-                                BoogTan = atan((BoogTanX) / (BoogTanY));
-                                //putchar('M');
-                        }else  {
-                                if(BoogTanX > 0) {   //BOOGTAN(X/Y) + PI   
-                                        BoogTan = atan((BoogTanX) / (BoogTanY)) + 3.141592;
-                                }else {              //BOOGTAN(X/Y) - PI   
-                                        BoogTan = atan((BoogTanX) / (BoogTanY)) - 3.141592;
-                                }
-                        }
-                }
-        }
-
-
-
-        return;
-}
-
 void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed int IKFeetPosZ){
 
+//--------------------------------------------------------------------
+//[VARIABLES]
+float ABSAngleDeg;      //Absolute value of the Angle in Degrees
+float AngleRad;     //Angle in Radian
+
+
+//Leg Inverse Kinematics
+float IKFeetPosXZ;        //Length between the coxa and feet
+float IKSW;             //Length between shoulder and wrist
+float IKA1;             //Angle between SW line and the ground in rad
+float IKA2;             //?
+char IKSolution;         //Output true if the solution is possible
+char IKSolutionWarning;      //Output true if the solution is NEARLY possible
+char IKSolutionError;      //Output true if the solution is NOT possible
+
+
         //Length between the Coxa and Feet
-        IKFeetPosXZ = (int) sqrt((float)((IKFeetPosX*IKFeetPosX)+(IKFeetPosZ*IKFeetPosZ)));
+        IKFeetPosXZ =  sqrt((float)((IKFeetPosX*IKFeetPosX)+(IKFeetPosZ*IKFeetPosZ)));
 
         //IKSW - Length between shoulder and wrist
         IKSW = sqrt((float)(((IKFeetPosXZ-CoxaLength)*(IKFeetPosXZ-CoxaLength))+(IKFeetPosY*IKFeetPosY)));
         //IKSW2 = sqrt((float)(((IKFeetPosXZ-CoxaLength)*(IKFeetPosXZ-CoxaLength))+(IKFeetPosY*IKFeetPosY)));
-
-        //IKA1 - Angle between SW line and the ground in rad
-        GetBoogTan(IKFeetPosXZ-CoxaLength, IKFeetPosY);
-        IKA1 = BoogTan;
+	
+	printf("%i %f %f\n", IKFeetPosX, IKFeetPosXZ, IKSW);
+        
+	//IKA1 - Angle between SW line and the ground in rad
+        IKA1 = atan2(IKFeetPosXZ-CoxaLength, IKFeetPosY);
 
         //IKA2 - ?
         IKA2 = acos( ((float)((FemurLength*FemurLength) - (TibiaLength*TibiaLength)) + (IKSW*IKSW)) / ((float)(2*FemurLength) * IKSW) );
@@ -337,8 +239,8 @@ void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed 
         IKTibiaAngle = -( 90-(acos( ( (float)(FemurLength*FemurLength) + (TibiaLength*TibiaLength) - (IKSW*IKSW) ) / ((float)(2*FemurLength*TibiaLength)) )*180.0 / 3.141592) );
 
         //IKCoxaAngle
-        GetBoogTan(IKFeetPosZ, IKFeetPosX);
-        IKCoxaAngle = ((BoogTan*180.0) / 3.141592);
+        //GetBoogTan(IKFeetPosZ, IKFeetPosX);
+        IKCoxaAngle = ((atan2(IKFeetPosZ, IKFeetPosX)*180.0) / 3.141592);
 
         //Set the Solution quality   
         if(IKSW < (float)(FemurLength+TibiaLength-30)) {
@@ -359,15 +261,193 @@ void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed 
 }
 
 
+void indomptableARM::takeCDinTotem(signed int height){
+
+        LegIK((int)(50), (int)(height), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+	RollAngle = 0;
+	ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(150), (int)(height), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+	RollAngle = 0;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+	// GRIP
+
+	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(50), (int)(height), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 0;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(100), (int)(STOCK_HEIGHT), (int)(0));
+        DesAnkleAngle = 180;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 0;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(0), (int)(STOCK_HEIGHT), (int)(0));
+        DesAnkleAngle = 180;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 0;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+	// RELEASE
+
+	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(110), (int)(0), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 0;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+
+}
+
+void indomptableARM::takeBARinTotem(void){
+
+        LegIK((int)(150), (int)(0), (int)(50));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 90;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(150), (int)(0), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 90;
+        ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        // PUMP
+
+	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(80), (int)(0), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 90;
+        ActualGaitSpeed = 400;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(100), (int)(STOCK_HEIGHT), (int)(0));
+        DesAnkleAngle = 180;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 90;
+        ActualGaitSpeed = 400;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(0), (int)(STOCK_HEIGHT), (int)(0));
+        DesAnkleAngle = 180;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 90;
+        ActualGaitSpeed = 400;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+	// UNPUMP
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(110), (int)(0), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(90 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 0;
+	ActualGaitSpeed = 200;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+
+}
 
 
 
 
 
 
-
-
-/*
 //--------------------------------------------------------------------
 
 //  ;[SERVO DRIVER] Updates the positions of the servos    
@@ -394,9 +474,10 @@ void indomptableARM::ServoDriver(void){
         sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
 
         // write to serial if connected
-        if ( ser_fd_ssc )
+        if ( ser_fd_ssc ) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
-
+		printf("%s \n",Serout);
+ 	}
         //printf("%s \n",Serout);
         return;
 }
@@ -417,7 +498,7 @@ void indomptableARM::FreeServos()
         if ( ser_fd_ssc )
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
 }
-*/
+
 
 int main(int argc, char **argv)
 {

@@ -1,0 +1,4 @@
+<launch>
+    <param name="robot_description" textfile="$(find indomptable_model)/urdf/tmp.urdf" />
+    <rosparam command="load" ns="robot_description_planning" file="$(find indomptable_arm_navigation)/config/indomptable_planning_description.yaml" />
+</launch>

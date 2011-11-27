@@ -1,0 +1,283 @@
+multi_dof_joints:
+  - name: world_joint
+    type: Floating
+    parent_frame_id: base_link
+    child_frame_id: base_link
+groups:
+  - name: left_arm
+    base_link: left_arm_panel
+    tip_link: left_hand_link
+default_collision_operations:
+  - object1: base_link
+    object2: back_arm_panel
+    operation: disable  # Adjacent in collision
+  - object1: base_link
+    object2: base_laser_bottom
+    operation: disable  # Adjacent in collision
+  - object1: base_laser_bottom
+    object2: base_laser
+    operation: disable  # Adjacent in collision
+  - object1: base_link
+    object2: left_arm_panel
+    operation: disable  # Adjacent in collision
+  - object1: left_arm_panel
+    object2: left_shoulder_roll_link
+    operation: disable  # Adjacent in collision
+  - object1: left_shoulder_roll_link
+    object2: left_shoulder_link
+    operation: disable  # Adjacent in collision
+  - object1: left_shoulder_link
+    object2: left_shoulder_lift_link
+    operation: disable  # Adjacent in collision
+  - object1: left_shoulder_lift_link
+    object2: left_shoulder_link2
+    operation: disable  # Adjacent in collision
+  - object1: left_shoulder_link2
+    object2: left_elbow_servo_link
+    operation: disable  # Adjacent in collision
+  - object1: left_elbow_servo_link
+    object2: left_elbow_link
+    operation: disable  # Adjacent in collision
+  - object1: left_elbow_link
+    object2: left_wrist_lift_link
+    operation: disable  # Adjacent in collision
+  - object1: left_wrist_lift_link
+    object2: left_wrist_link
+    operation: disable  # Adjacent in collision
+  - object1: left_wrist_link
+    object2: left_wrist_roll_link
+    operation: disable  # Adjacent in collision
+  - object1: left_wrist_roll_link
+    object2: left_hand_link
+    operation: disable  # Adjacent in collision
+  - object1: base_link
+    object2: left_panel
+    operation: disable  # Adjacent in collision
+  - object1: base_link
+    object2: netbook_level
+    operation: disable  # Adjacent in collision
+  - object1: base_link
+    object2: right_arm_panel
+    operation: disable  # Adjacent in collision
+  - object1: base_link
+    object2: right_panel
+    operation: disable  # Adjacent in collision
+  - object1: back_arm_panel
+    object2: left_arm_panel
+    operation: disable  # Always in collision
+  - object1: back_arm_panel
+    object2: right_arm_panel
+    operation: disable  # Always in collision
+  - object1: left_panel
+    object2: netbook_level
+    operation: disable  # Always in collision
+  - object1: netbook_level
+    object2: right_panel
+    operation: disable  # Always in collision
+  - object1: left_arm_panel
+    object2: left_shoulder_link
+    operation: disable  # Often in collision
+  - object1: back_arm_panel
+    object2: base_laser
+    operation: disable  # Never in collision
+  - object1: back_arm_panel
+    object2: base_laser_bottom
+    operation: disable  # Never in collision
+  - object1: back_arm_panel
+    object2: left_panel
+    operation: disable  # Never in collision
+  - object1: back_arm_panel
+    object2: left_shoulder_link
+    operation: disable  # Never in collision
+  - object1: back_arm_panel
+    object2: left_shoulder_roll_link
+    operation: disable  # Never in collision
+  - object1: back_arm_panel
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: back_arm_panel
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: base_link
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: left_arm_panel
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: left_panel
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: left_shoulder_lift_link
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: left_shoulder_link
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: left_shoulder_link2
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: left_shoulder_roll_link
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: base_laser
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_arm_panel
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_elbow_servo_link
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_panel
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_shoulder_lift_link
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_shoulder_link
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_shoulder_link2
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: left_shoulder_roll_link
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: base_laser_bottom
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: base_link
+    object2: left_elbow_link
+    operation: disable  # Never in collision
+  - object1: base_link
+    object2: left_elbow_servo_link
+    operation: disable  # Never in collision
+  - object1: base_link
+    object2: left_shoulder_lift_link
+    operation: disable  # Never in collision
+  - object1: base_link
+    object2: left_shoulder_link
+    operation: disable  # Never in collision
+  - object1: base_link
+    object2: left_shoulder_link2
+    operation: disable  # Never in collision
+  - object1: base_link
+    object2: left_shoulder_roll_link
+    operation: disable  # Never in collision
+  - object1: left_arm_panel
+    object2: left_panel
+    operation: disable  # Never in collision
+  - object1: left_arm_panel
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_arm_panel
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_arm_panel
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_elbow_link
+    object2: left_hand_link
+    operation: disable  # Never in collision
+  - object1: left_elbow_link
+    object2: left_shoulder_link2
+    operation: disable  # Never in collision
+  - object1: left_elbow_link
+    object2: left_wrist_link
+    operation: disable  # Never in collision
+  - object1: left_elbow_link
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_elbow_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_elbow_servo_link
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_elbow_servo_link
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_elbow_servo_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_hand_link
+    object2: left_wrist_lift_link
+    operation: disable  # Never in collision
+  - object1: left_hand_link
+    object2: left_wrist_link
+    operation: disable  # Never in collision
+  - object1: left_panel
+    object2: left_shoulder_link
+    operation: disable  # Never in collision
+  - object1: left_panel
+    object2: left_shoulder_roll_link
+    operation: disable  # Never in collision
+  - object1: left_panel
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_panel
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_lift_link
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_shoulder_lift_link
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_lift_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link
+    object2: left_shoulder_link2
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link2
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link2
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_link2
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_roll_link
+    object2: netbook_level
+    operation: disable  # Never in collision
+  - object1: left_shoulder_roll_link
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: left_shoulder_roll_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_wrist_lift_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: left_wrist_link
+    object2: right_panel
+    operation: disable  # Never in collision
+  - object1: netbook_level
+    object2: right_arm_panel
+    operation: disable  # Never in collision
+  - object1: right_arm_panel
+    object2: right_panel
+    operation: disable  # Never in collision

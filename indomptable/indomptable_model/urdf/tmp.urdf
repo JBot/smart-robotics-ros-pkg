@@ -455,6 +455,58 @@
     <selfCollide>false</selfCollide>
     <turnGravityOff>true</turnGravityOff>
   </gazebo>
+  <link name="left_wrist_roll_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0.015 0"/>
+      <geometry>
+        <box size="0.03 0.05 0.03"/>
+      </geometry>
+      <material name="ax12_color">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0.015 0"/>
+      <geometry>
+        <box size="0.03 0.05 0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.055"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <gazebo reference="left_wrist_roll_link">
+    <material>Gazebo/FlatBlack</material>
+    <selfCollide>false</selfCollide>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <link name="left_hand_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.03 0.03"/>
+      </geometry>
+      <material name="ax12_color">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.03 0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.055"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <gazebo reference="left_hand_link">
+    <material>Gazebo/FlatBlack</material>
+    <selfCollide>false</selfCollide>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
   <!--
 	<xacro:arm side="right" reflect="-1" />
 	-->
@@ -562,6 +614,20 @@
     <origin rpy="0 0 0" xyz="0.01 0 0"/>
     <limit effort="10" lower="-2.53" upper="2.53" velocity="3"/>
     <axis xyz="0 1 0"/>
+    <dynamics damping="0.0"/>
+  </joint>
+  <joint name="left_wrist_roll_joint" type="fixed">
+    <parent link="left_wrist_link"/>
+    <child link="left_wrist_roll_link"/>
+    <origin rpy="0 0 0" xyz="0.041 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  <joint name="left_hand_joint" type="revolute">
+    <parent link="left_wrist_roll_link"/>
+    <child link="left_hand_link"/>
+    <origin rpy="0 0 0" xyz="0.042 0 0"/>
+    <limit effort="10" lower="-2.53" upper="2.53" velocity="3"/>
+    <axis xyz="1 0 0"/>
     <dynamics damping="0.0"/>
   </joint>
   <!--        
