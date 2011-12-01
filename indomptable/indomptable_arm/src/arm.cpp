@@ -81,7 +81,8 @@ class indomptableARM {
     ros::NodeHandle nh;
 
     int input_y;
-    //string input_name;
+    std::string input_name;
+    std::string default_param;
 
 
 
@@ -114,14 +115,16 @@ struct termios oldtio_ssc, newtio_ssc;
 
 };
 
-indomptableARM::indomptableARM():
-input_y(-60)//, input_name("left_to_take")
+indomptableARM::indomptableARM()
 {
 
-    nh.param("input_y", input_y, input_y);
-    //nh.param("input_name", input_name, input_name);
+    nh.param<std::string>("arm_pose_name", input_name, "input_arm_pose");
+    nh.param("arm_pose_y", input_y, 0);
+    //printf("%s\n", input_name.c_str());
+    //printf("%i\n", input_y);
+    pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > (input_name, 5, &indomptableARM::poseCallback, this);
 
-    pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("arm_input", 5, &indomptableARM::poseCallback, this);
+
 
 //--------------------------------------------------------------------
 //[POSITIONS]
@@ -181,20 +184,6 @@ void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & p
 	 		takeCDinTotem((int)(pose->pose.position.z * 1000));
 		}
 	}
-	
-
-/*
-	LegIK((int)(pose->pose.position.x * 1000), (int)(pose->pose.position.z * 1000), (int)(pose->pose.position.y * 1000));
-	DesAnkleAngle = pose->pose.orientation.x;
-    	CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-	FemurAngle = IKFemurAngle;
-	TibiaAngle = -(90 - IKTibiaAngle);
-	AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-	printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
-	ServoDriver();
-*/
-	//usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
 }
 
 /****** Inverse Kinematics functions *******/
@@ -203,9 +192,6 @@ void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed 
 
 //--------------------------------------------------------------------
 //[VARIABLES]
-float ABSAngleDeg;      //Absolute value of the Angle in Degrees
-float AngleRad;     //Angle in Radian
-
 
 //Leg Inverse Kinematics
 float IKFeetPosXZ;        //Length between the coxa and feet
@@ -449,9 +435,7 @@ void indomptableARM::takeBARinTotem(void){
 
 
 //--------------------------------------------------------------------
-
 //  ;[SERVO DRIVER] Updates the positions of the servos    
-
 void indomptableARM::ServoDriver(void){
 
         char Serout[260]={0};

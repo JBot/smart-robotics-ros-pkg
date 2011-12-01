@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="indomptable_vision" type="video_processing" name="video_processing" output="screen"/>
+</launch>

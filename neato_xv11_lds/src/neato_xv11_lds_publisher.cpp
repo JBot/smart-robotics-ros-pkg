@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 
     priv_nh.param("port", port, std::string("/dev/ttyUSB0"));
     priv_nh.param("baud_rate", baud_rate, 115200);
-    priv_nh.param("frame_id", frame_id, std::string("neato_laser"));
+    priv_nh.param("frame_id", frame_id, std::string("base_laser"));
 
     boost::asio::io_service io;
     boost::array < uint8_t, 16 > raw_bytes_;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         ros::Publisher laser_pub = n.advertise < sensor_msgs::LaserScan > ("scan", 50);
         sensor_msgs::LaserScan scan;
 
-        scan.header.frame_id = "/laser_link";
+        scan.header.frame_id = "/base_laser";
         scan.header.stamp = ros::Time::now();
         scan.angle_min = 0.0;
         scan.angle_max = 2.0 * M_PI;

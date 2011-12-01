@@ -1,0 +1,8 @@
+<launch>
+
+    <node pkg="indomptable_arm" type="arm" name="left_arm" output="screen"/>
+    <!-- Init params -->
+    <param name="arm_pose_name" value="left_arm_pose" type="string"/>
+    <param name="arm_pose_y" value="-60" type="int"/>
+
+  </launch>
