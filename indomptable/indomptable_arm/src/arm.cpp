@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Float64.h"
+#include "std_msgs/Int32.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
 
@@ -47,9 +48,9 @@
 #define FALSE 0
 #define TRUE  1
 
-#define SLEEP_COEFF 2000 //2000
+#define SLEEP_COEFF 1500 //2000
 
-#define SSCDEVICE "/dev/ttyUSB0"
+#define SSCDEVICE "/dev/ttyS0"
 #define BAUDRATE B115200
 
 #define CoxaLength 43      //Length of the Coxa [mm]
@@ -70,15 +71,18 @@ class indomptableARM {
     indomptableARM();
 
     ros::Subscriber pose_sub_;
+    ros::Subscriber pump_sub_;
     ros::Publisher coxa_pub;
     ros::Publisher femur_pub;
     ros::Publisher tibia_pub;
     ros::Publisher ankle_pub;
     ros::Publisher roll_pub;
     ros::Publisher hand_pub;
+    ros::Publisher pump_pub;
 
   private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+    void pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback);
     void LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed int IKFeetPosZ);
     void ServoDriver();
     void FreeServos();
@@ -91,6 +95,12 @@ class indomptableARM {
     int input_y;
     std::string input_name;
     std::string default_param;
+
+    std_msgs::Int32 des_pump;
+    int pump_ok;
+
+
+
 
 //====================================================================
 //[ANGLES]
@@ -130,13 +140,15 @@ indomptableARM::indomptableARM()
     //printf("%i\n", input_y);
     pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > (input_name, 5, &indomptableARM::poseCallback, this);
 
-    coxa_pub = nh.advertise < std_msgs::Float64 > ("coxa", 5);
-    femur_pub = nh.advertise < std_msgs::Float64 > ("femur", 5);
-    tibia_pub = nh.advertise < std_msgs::Float64 > ("tibia", 5);
-    ankle_pub = nh.advertise < std_msgs::Float64 > ("ankle", 5);
-    roll_pub = nh.advertise < std_msgs::Float64 > ("roll", 5);
+    coxa_pub = nh.advertise < std_msgs::Float64 > ("left_soulder_roll_joint", 5);
+    femur_pub = nh.advertise < std_msgs::Float64 > ("left_soulder_lift_joint", 5);
+    tibia_pub = nh.advertise < std_msgs::Float64 > ("left_elbow_joint", 5);
+    ankle_pub = nh.advertise < std_msgs::Float64 > ("left_wrist_joint", 5);
+    roll_pub = nh.advertise < std_msgs::Float64 > ("left_hand_joint", 5);
     hand_pub = nh.advertise < std_msgs::Float64 > ("hand", 5);
 
+    pump_pub = nh.advertise < std_msgs::Int32 > ("pump", 5);
+    pump_sub_ = nh.subscribe < std_msgs::Int32 > ("pump_feedback", 5, &indomptableARM::pumpCallback, this);
 
 //--------------------------------------------------------------------
 //[POSITIONS]
@@ -155,6 +167,10 @@ ActualGaitSpeed = 200;
 DesAnkleAngle = 0;
 RollAngle = 0;
 HandAngle = 0;
+
+    des_pump.data = 0;
+    pump_ok = 0;
+
 
         ser_fd_ssc = open(SSCDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if( ser_fd_ssc == -1)
@@ -197,6 +213,15 @@ void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & p
 	 		takeCDinTotem((int)(pose->pose.position.z * 1000));
 		}
 	}
+}
+
+void indomptableARM::pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback)
+{
+    if(pumpfeedback->data == des_pump.data)
+	pump_ok = 1;
+    else 
+    	pump_ok = 0;
+
 }
 
 /****** Inverse Kinematics functions *******/
@@ -282,7 +307,20 @@ void indomptableARM::takeCDinTotem(signed int height){
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-        LegIK((int)(160), (int)(height), (int)(0));
+        LegIK((int)(130), (int)(height), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = IKFemurAngle;
+        TibiaAngle = -(1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = 1.570796;
+        ActualGaitSpeed = 300;
+        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+        ServoDriver();
+
+        usleep((ActualGaitSpeed)*SLEEP_COEFF);
+
+        LegIK((int)(150), (int)(height), (int)(0));
         DesAnkleAngle = 0;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = IKFemurAngle;
@@ -536,7 +574,26 @@ void indomptableARM::takeGround(signed int x, signed int y){
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        // pump
+        pump_ok = 0;
+        des_pump.data = 0;
+        pump_pub.publish(des_pump);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+        while(pump_ok == 0) {
+                pump_pub.publish(des_pump);
+                usleep(50000);
+                ros::spinOnce();
+                usleep(50000);
+                ros::spinOnce();
+        }
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+
 
         LegIK((int)(x), (int)(-10), (int)(y));
         DesAnkleAngle = -1.570796;
@@ -550,7 +607,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
         ServoDriver();
         
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
         LegIK((int)(x), (int)(-90), (int)(y));
         DesAnkleAngle = -1.570796;
@@ -564,9 +621,29 @@ void indomptableARM::takeGround(signed int x, signed int y){
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        // unpump
+        pump_ok = 0;
+        des_pump.data = 1;
+        pump_pub.publish(des_pump);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+        while(pump_ok == 0) {
+                pump_pub.publish(des_pump);
+                usleep(50000);
+                ros::spinOnce();
+                usleep(50000);
+                ros::spinOnce();
+        }
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
         DesAnkleAngle = 0;
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         ServoDriver();
+
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
 
