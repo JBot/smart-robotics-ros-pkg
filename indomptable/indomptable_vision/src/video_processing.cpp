@@ -71,6 +71,25 @@ public:
             Point(lines[i+1][2], lines[i+1][3]), Scalar(255,255,0), 3, 8 );
           line( cv_ptr->image, Point(lines[i+1][0], lines[i+1][1]),
             Point(lines[i][2], lines[i][3]), Scalar(255,255,0), 3, 8 );
+
+	  /* Test of line intersection */
+	  int a, b, c, d, x, y;
+	  /* Segment equation */
+	  a = (lines[i][0] - lines[i+1][2]) / (lines[i][1] - lines[i+1][3]);
+	  b = lines[i][1] - a * lines[i][0];
+
+	  c = (lines[i+1][0] - lines[i][2]) / (lines[i+1][1] - lines[i][3]);
+          d = lines[i+1][1] - c * lines[i+1][0];
+	  /* Intersection point */
+	  x = (d - b) / (a - c);
+	  y = a * x + b;
+
+	  ROS_WARNING("intersection : %i | %i ", x, y);  
+	  
+	  // draw the circle center
+	  Point center2(cvRound(x), cvRound(y));
+          circle( cv_ptr->image, center2, 3, Scalar(0,255,0), -1, 8, 0 );
+
           i++;
           break;
         }

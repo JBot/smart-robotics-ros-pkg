@@ -134,21 +134,40 @@ struct termios oldtio_ssc, newtio_ssc;
 indomptableARM::indomptableARM()
 {
 
-    nh.param<std::string>("arm_pose_name", input_name, "input_arm_pose");
+    nh.param<std::string>("arm_pose_name", input_name, "left");
     nh.param("arm_pose_y", input_y, 0);
     //printf("%s\n", input_name.c_str());
     //printf("%i\n", input_y);
-    pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > (input_name, 5, &indomptableARM::poseCallback, this);
+    std::string tmp_string = input_name;
+    //tmp_string.append(input_name);
+    tmp_string.append("_arm_pose");
+    pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > (tmp_string, 5, &indomptableARM::poseCallback, this);
 
-    coxa_pub = nh.advertise < std_msgs::Float64 > ("left_soulder_roll_joint", 5);
-    femur_pub = nh.advertise < std_msgs::Float64 > ("left_soulder_lift_joint", 5);
-    tibia_pub = nh.advertise < std_msgs::Float64 > ("left_elbow_joint", 5);
-    ankle_pub = nh.advertise < std_msgs::Float64 > ("left_wrist_joint", 5);
-    roll_pub = nh.advertise < std_msgs::Float64 > ("left_hand_joint", 5);
-    hand_pub = nh.advertise < std_msgs::Float64 > ("hand", 5);
+    tmp_string = input_name;
+    tmp_string.append("_soulder_roll_joint");
+    coxa_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    tmp_string = input_name;
+    tmp_string.append("_soulder_lift_joint");
+    femur_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    tmp_string = input_name;
+    tmp_string.append("_elbow_joint");
+    tibia_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    tmp_string = input_name;
+    tmp_string.append("_wrist_joint");
+    ankle_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    tmp_string = input_name;
+    tmp_string.append("_hand_joint");
+    roll_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    tmp_string = input_name;
+    tmp_string.append("_hand");
+    hand_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
 
-    pump_pub = nh.advertise < std_msgs::Int32 > ("pump", 5);
-    pump_sub_ = nh.subscribe < std_msgs::Int32 > ("pump_feedback", 5, &indomptableARM::pumpCallback, this);
+    tmp_string = input_name;
+    tmp_string.append("_pump");
+    pump_pub = nh.advertise < std_msgs::Int32 > (tmp_string, 5);
+    tmp_string = input_name;
+    tmp_string.append("_pump_feedback");
+    pump_sub_ = nh.subscribe < std_msgs::Int32 > (tmp_string, 5, &indomptableARM::pumpCallback, this);
 
 //--------------------------------------------------------------------
 //[POSITIONS]
