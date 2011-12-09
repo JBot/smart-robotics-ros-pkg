@@ -69,6 +69,8 @@ class SSC32_ctrl {
 
     ros::NodeHandle nh;
 
+    int left_cpt;
+
 //====================================================================
 //[ANGLES]
 double leftCoxaAngle;   //Actual Angle of the Right Front Leg
@@ -98,7 +100,7 @@ SSC32_ctrl::SSC32_ctrl() {
 	lefthand_sub = nh.subscribe < std_msgs::Float64 > ("left_hand", 5, &SSC32_ctrl::lefthandCallback, this);
 
 	ActualGaitSpeed = 200;
-
+	left_cpt = 0;
 
         ser_fd_ssc = open(SSCDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if( ser_fd_ssc == -1)
@@ -167,6 +169,46 @@ SSC32_ctrl::SSC32_ctrl() {
 
 void SSC32_ctrl::leftcoxaCallback(const std_msgs::Float64::ConstPtr & value) {
 
+	leftCoxaAngle = value->data;
+
+	left_cpt++;
+	if(left_cpt > 5) {
+	        char Serout[260]={0};
+	        int temp = 0;
+
+        	std_msgs::Float64 tmp;
+
+       	 	temp = (int)( (double)(leftCoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
+        	sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
+
+        	temp = (int)( (double)(leftFemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
+        	sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
+
+        	temp = (int)( (double)(leftTibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
+        	sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
+
+        	temp = (int)( (double)(leftAnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
+        	sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
+
+        	temp = (int)( (double)(leftRollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+        	sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
+
+        	temp = (int)( (double)(leftHandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+        	sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
+
+
+        	// Time and <CR>
+        	sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
+
+        	// write to serial if connected
+        	if ( ser_fd_ssc ) {
+                	write(ser_fd_ssc, &Serout, sizeof(Serout));
+                	printf("%s \n",Serout);
+        	}
+
+		left_cpt = 0;
+	}
+/*
         char Serout[260]={0};
         int temp = 0;
 
@@ -182,9 +224,51 @@ void SSC32_ctrl::leftcoxaCallback(const std_msgs::Float64::ConstPtr & value) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
                 printf("%s \n",Serout);
         }
+*/
 }
 
 void SSC32_ctrl::leftfemurCallback(const std_msgs::Float64::ConstPtr & value) {
+
+	leftFemurAngle = value->data;
+
+        left_cpt++;
+        if(left_cpt > 5) {
+                char Serout[260]={0};
+                int temp = 0;
+
+                std_msgs::Float64 tmp;
+
+                temp = (int)( (double)(leftCoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
+                sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
+
+                temp = (int)( (double)(leftFemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
+                sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
+
+                temp = (int)( (double)(leftTibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
+                sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
+
+                temp = (int)( (double)(leftAnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
+                sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
+
+                temp = (int)( (double)(leftRollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
+
+                temp = (int)( (double)(leftHandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
+
+
+                // Time and <CR>
+                sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
+
+                // write to serial if connected
+                if ( ser_fd_ssc ) {
+                        write(ser_fd_ssc, &Serout, sizeof(Serout));
+                        printf("%s \n",Serout);
+                }
+
+                left_cpt = 0;
+        }
+/*
 
         char Serout[260]={0};
         int temp = 0;
@@ -201,10 +285,52 @@ void SSC32_ctrl::leftfemurCallback(const std_msgs::Float64::ConstPtr & value) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
                 printf("%s \n",Serout);
         }
+*/
 }
 
 void SSC32_ctrl::lefttibiaCallback(const std_msgs::Float64::ConstPtr & value) {
 
+	leftTibiaAngle = value->data;
+
+        left_cpt++;
+        if(left_cpt > 5) {
+                char Serout[260]={0};
+                int temp = 0;
+
+                std_msgs::Float64 tmp;
+
+                temp = (int)( (double)(leftCoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
+                sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
+
+                temp = (int)( (double)(leftFemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
+                sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
+
+                temp = (int)( (double)(leftTibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
+                sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
+
+                temp = (int)( (double)(leftAnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
+                sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
+
+                temp = (int)( (double)(leftRollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
+
+                temp = (int)( (double)(leftHandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
+
+
+                // Time and <CR>
+                sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
+
+                // write to serial if connected
+                if ( ser_fd_ssc ) {
+                        write(ser_fd_ssc, &Serout, sizeof(Serout));
+                        printf("%s \n",Serout);
+                }
+
+                left_cpt = 0;
+        }
+
+/*
         char Serout[260]={0};
         int temp = 0;
 
@@ -220,10 +346,52 @@ void SSC32_ctrl::lefttibiaCallback(const std_msgs::Float64::ConstPtr & value) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
                 printf("%s \n",Serout);
         }
+*/
 }
 
 void SSC32_ctrl::leftankleCallback(const std_msgs::Float64::ConstPtr & value) {
 
+	leftAnkleAngle = value->data;
+
+        left_cpt++;
+        if(left_cpt > 5) {
+                char Serout[260]={0};
+                int temp = 0;
+
+                std_msgs::Float64 tmp;
+
+                temp = (int)( (double)(leftCoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
+                sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
+
+                temp = (int)( (double)(leftFemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
+                sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
+
+                temp = (int)( (double)(leftTibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
+                sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
+
+                temp = (int)( (double)(leftAnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
+                sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
+
+                temp = (int)( (double)(leftRollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
+
+                temp = (int)( (double)(leftHandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
+
+
+                // Time and <CR>
+                sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
+
+                // write to serial if connected
+                if ( ser_fd_ssc ) {
+                        write(ser_fd_ssc, &Serout, sizeof(Serout));
+                        printf("%s \n",Serout);
+                }
+
+                left_cpt = 0;
+        }
+
+/*
         char Serout[260]={0};
         int temp = 0;
 
@@ -239,10 +407,52 @@ void SSC32_ctrl::leftankleCallback(const std_msgs::Float64::ConstPtr & value) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
                 printf("%s \n",Serout);
         }
+*/
 }
 
 void SSC32_ctrl::leftrollCallback(const std_msgs::Float64::ConstPtr & value) {
 
+	leftRollAngle = value->data;
+
+        left_cpt++;
+        if(left_cpt > 5) {
+                char Serout[260]={0};
+                int temp = 0;
+
+                std_msgs::Float64 tmp;
+
+                temp = (int)( (double)(leftCoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
+                sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
+
+                temp = (int)( (double)(leftFemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
+                sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
+
+                temp = (int)( (double)(leftTibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
+                sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
+
+                temp = (int)( (double)(leftAnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
+                sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
+
+                temp = (int)( (double)(leftRollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
+
+                temp = (int)( (double)(leftHandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
+
+
+                // Time and <CR>
+                sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
+
+                // write to serial if connected
+                if ( ser_fd_ssc ) {
+                        write(ser_fd_ssc, &Serout, sizeof(Serout));
+                        printf("%s \n",Serout);
+                }
+
+                left_cpt = 0;
+        }
+
+/*
         char Serout[260]={0};
         int temp = 0;
 
@@ -258,10 +468,52 @@ void SSC32_ctrl::leftrollCallback(const std_msgs::Float64::ConstPtr & value) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
                 printf("%s \n",Serout);
         }
+*/
 }
 
 void SSC32_ctrl::lefthandCallback(const std_msgs::Float64::ConstPtr & value) {
 
+	leftHandAngle = value->data;
+
+        left_cpt++;
+        if(left_cpt > 5) {
+                char Serout[260]={0};
+                int temp = 0;
+
+                std_msgs::Float64 tmp;
+
+                temp = (int)( (double)(leftCoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
+                sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
+
+                temp = (int)( (double)(leftFemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
+                sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
+
+                temp = (int)( (double)(leftTibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
+                sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
+
+                temp = (int)( (double)(leftAnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
+                sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
+
+                temp = (int)( (double)(leftRollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
+
+                temp = (int)( (double)(leftHandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
+                sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
+
+
+                // Time and <CR>
+                sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
+
+                // write to serial if connected
+                if ( ser_fd_ssc ) {
+                        write(ser_fd_ssc, &Serout, sizeof(Serout));
+                        printf("%s \n",Serout);
+                }
+
+                left_cpt = 0;
+        }
+
+/*
         char Serout[260]={0};
         int temp = 0;
 
@@ -277,6 +529,7 @@ void SSC32_ctrl::lefthandCallback(const std_msgs::Float64::ConstPtr & value) {
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
                 printf("%s \n",Serout);
         }
+*/
 }
 
 
