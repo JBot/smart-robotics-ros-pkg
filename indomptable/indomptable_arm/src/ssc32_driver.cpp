@@ -97,6 +97,8 @@ SSC32_ctrl::SSC32_ctrl() {
 	leftroll_sub = nh.subscribe < std_msgs::Float64 > ("left_hand_joint", 5, &SSC32_ctrl::leftrollCallback, this);
 	lefthand_sub = nh.subscribe < std_msgs::Float64 > ("left_hand", 5, &SSC32_ctrl::lefthandCallback, this);
 
+	ActualGaitSpeed = 200;
+
 
         ser_fd_ssc = open(SSCDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if( ser_fd_ssc == -1)
@@ -299,7 +301,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "ssc32_ctrl");
     SSC32_ctrl ssc32_ctrl;
     // Refresh rate
-    ros::Rate loop_rate(5);                                // 35 with bluetooth
+    ros::Rate loop_rate(15);                                // 35 with bluetooth
     while (ros::ok()) {
         ros::spinOnce();
         loop_rate.sleep();
