@@ -124,10 +124,11 @@ double IKFemurAngle;       //Output Angle of Femur in degrees
 double IKTibiaAngle;       //Output Angle of Tibia in degrees
 double IKCoxaAngle;        //Output Angle of Coxa in degrees
 
+/*
 // Serial
 int ser_fd_ssc;
 struct termios oldtio_ssc, newtio_ssc;
-
+*/
 
 };
 
@@ -190,7 +191,7 @@ HandAngle = 0;
     des_pump.data = 0;
     pump_ok = 0;
 
-
+/*
         ser_fd_ssc = open(SSCDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if( ser_fd_ssc == -1)
         {
@@ -216,7 +217,7 @@ HandAngle = 0;
                 fcntl(ser_fd_ssc, F_SETFL, FNDELAY);
 
         }
-
+*/
 }
 
 void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
@@ -687,11 +688,10 @@ void indomptableARM::takeGround(signed int x, signed int y){
 //--------------------------------------------------------------------
 //  ;[SERVO DRIVER] Updates the positions of the servos    
 void indomptableARM::ServoDriver(void){
-
+/*
         char Serout[260]={0};
         int temp = 0;
 
- 	std_msgs::Float64 tmp;
 
         temp = (int)( (double)(CoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
         sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
@@ -721,6 +721,8 @@ void indomptableARM::ServoDriver(void){
 		printf("%s \n",Serout);
  	}
         //printf("%s \n",Serout);
+*/
+ 	std_msgs::Float64 tmp;
 
 	tmp.data = CoxaAngle;
 	coxa_pub.publish(tmp);
@@ -742,6 +744,7 @@ void indomptableARM::ServoDriver(void){
 //[FREE SERVOS] Frees all the servos
 void indomptableARM::FreeServos()
 {
+/*
         int x =0;
         char Serout[260]={0};
         for ( x=0; x <= 31; x++ )
@@ -753,6 +756,7 @@ void indomptableARM::FreeServos()
         // write to serial if connected
         if ( ser_fd_ssc )
                 write(ser_fd_ssc, &Serout, sizeof(Serout));
+*/
 }
 
 
