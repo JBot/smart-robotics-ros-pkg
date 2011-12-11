@@ -2,9 +2,34 @@
 
     <node pkg="indomptable_arm" type="ssc32_driver" name="ssc_controller" output="screen"/>
 
-    <node pkg="indomptable_arm" type="arm" name="left_arm" output="screen"/>
-    <!-- Init params -->
-    <param name="arm_pose_name" value="left" type="string"/>
-    <param name="arm_pose_y" value="-60" type="int"/>
+    <node pkg="indomptable_arm" type="arm" name="left_arm" output="screen">
+        <!-- Init params -->
+	<remap from="arm_pose" to="left_arm_pose" />
+	<remap from="soulder_roll_joint" to="left_soulder_roll_joint" />
+	<remap from="soulder_lift_joint" to="left_soulder_lift_joint" />
+	<remap from="elbow_joint" to="left_elbow_joint" />
+	<remap from="wrist_joint" to="left_wrist_joint" />
+	<remap from="hand_joint" to="left_hand_joint" />
+	<remap from="hand" to="left_hand" />
+	<remap from="pump" to="left_pump" />
+	<remap from="pump_feedback" to="left_pump_feedback" />
+        <param name="arm_pose_name" value="left" type="string"/>
+        <param name="arm_pose_y" value="-60" type="int"/>
+    </node>
+
+    <node pkg="indomptable_arm" type="arm" name="right_arm" output="screen">
+        <!-- Init params -->
+	<remap from="arm_pose" to="right_arm_pose" />
+	<remap from="soulder_roll_joint" to="right_soulder_roll_joint" />
+	<remap from="soulder_lift_joint" to="right_soulder_lift_joint" />
+	<remap from="elbow_joint" to="right_elbow_joint" />
+	<remap from="wrist_joint" to="right_wrist_joint" />
+	<remap from="hand_joint" to="right_hand_joint" />
+	<remap from="hand" to="right_hand" />
+	<remap from="pump" to="right_pump" />
+	<remap from="pump_feedback" to="right_pump_feedback" />
+        <param name="arm_pose_name" value="right" type="string"/>
+        <param name="arm_pose_y" value="60" type="int"/>
+    </node>
 
   </launch>

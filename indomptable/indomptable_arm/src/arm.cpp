@@ -142,33 +142,33 @@ indomptableARM::indomptableARM()
     std::string tmp_string = input_name;
     //tmp_string.append(input_name);
     tmp_string.append("_arm_pose");
-    pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > (tmp_string, 5, &indomptableARM::poseCallback, this);
+    pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("arm_pose", 5, &indomptableARM::poseCallback, this);
 
     tmp_string = input_name;
     tmp_string.append("_soulder_roll_joint");
-    coxa_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    coxa_pub = nh.advertise < std_msgs::Float64 > ("soulder_roll_joint", 5);
     tmp_string = input_name;
     tmp_string.append("_soulder_lift_joint");
-    femur_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    femur_pub = nh.advertise < std_msgs::Float64 > ("soulder_lift_joint", 5);
     tmp_string = input_name;
     tmp_string.append("_elbow_joint");
-    tibia_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    tibia_pub = nh.advertise < std_msgs::Float64 > ("elbow_joint", 5);
     tmp_string = input_name;
     tmp_string.append("_wrist_joint");
-    ankle_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    ankle_pub = nh.advertise < std_msgs::Float64 > ("wrist_joint", 5);
     tmp_string = input_name;
     tmp_string.append("_hand_joint");
-    roll_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    roll_pub = nh.advertise < std_msgs::Float64 > ("hand_joint", 5);
     tmp_string = input_name;
     tmp_string.append("_hand");
-    hand_pub = nh.advertise < std_msgs::Float64 > (tmp_string, 5);
+    hand_pub = nh.advertise < std_msgs::Float64 > ("hand", 5);
 
     tmp_string = input_name;
     tmp_string.append("_pump");
-    pump_pub = nh.advertise < std_msgs::Int32 > (tmp_string, 5);
+    pump_pub = nh.advertise < std_msgs::Int32 > ("pump", 5);
     tmp_string = input_name;
     tmp_string.append("_pump_feedback");
-    pump_sub_ = nh.subscribe < std_msgs::Int32 > (tmp_string, 5, &indomptableARM::pumpCallback, this);
+    pump_sub_ = nh.subscribe < std_msgs::Int32 > ("pump_feedback", 5, &indomptableARM::pumpCallback, this);
 
 //--------------------------------------------------------------------
 //[POSITIONS]
@@ -597,7 +597,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
 
         // pump
         pump_ok = 0;
-        des_pump.data = 0;
+        des_pump.data = 1;
         pump_pub.publish(des_pump);
         usleep(50000);
         ros::spinOnce();
@@ -644,7 +644,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
 
         // unpump
         pump_ok = 0;
-        des_pump.data = 1;
+        des_pump.data = 0;
         pump_pub.publish(des_pump);
         usleep(50000);
         ros::spinOnce();
