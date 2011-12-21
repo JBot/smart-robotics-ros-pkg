@@ -84,7 +84,7 @@ public:
 	  x = (d - b) / (a - c);
 	  y = a * x + b;
 
-	  ROS_WARNING("intersection : %i | %i ", x, y);  
+	  ROS_ERROR("intersection : %i | %i ", x, y);  
 	  
 	  // draw the circle center
 	  Point center2(cvRound(x), cvRound(y));
