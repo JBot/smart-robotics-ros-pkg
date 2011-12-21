@@ -1,0 +1,17 @@
+<!-- -*- mode: XML -*- -->
+
+<launch>
+    <!-- Load controller configuration to parameter server -->
+    <rosparam file="$(find indomptable_arm)/dynamixel_joint_controllers.yaml" command="load"/>
+    
+    <!-- start specified joint controllers -->
+    <node name="dynamixel_controller_spawner" pkg="dynamixel_controllers" type="controller_spawner.py"
+          args="--manager=dxl_manager
+                --port=arm_port
+                --type=simple
+                left_soulder_roll_controller
+                left_soulder_lift_controller
+                left_elbow_controller
+                left_wrist_controller"
+          output="screen"/>
+</launch>

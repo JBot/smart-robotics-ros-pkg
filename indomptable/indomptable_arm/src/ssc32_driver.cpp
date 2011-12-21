@@ -92,10 +92,10 @@ struct termios oldtio_ssc, newtio_ssc;
 
 SSC32_ctrl::SSC32_ctrl() {
 
-	leftcoxa_sub = nh.subscribe < std_msgs::Float64 > ("left_soulder_roll_joint", 5, &SSC32_ctrl::leftcoxaCallback, this);
-	leftfemur_sub = nh.subscribe < std_msgs::Float64 > ("left_soulder_lift_joint", 5, &SSC32_ctrl::leftfemurCallback, this);
-	lefttibia_sub = nh.subscribe < std_msgs::Float64 > ("left_elbow_joint", 5, &SSC32_ctrl::lefttibiaCallback, this);
-	leftankle_sub = nh.subscribe < std_msgs::Float64 > ("left_wrist_joint", 5, &SSC32_ctrl::leftankleCallback, this);
+	leftcoxa_sub = nh.subscribe < std_msgs::Float64 > ("left_soulder_roll_controller/command", 5, &SSC32_ctrl::leftcoxaCallback, this);
+	leftfemur_sub = nh.subscribe < std_msgs::Float64 > ("left_soulder_lift_controller/command", 5, &SSC32_ctrl::leftfemurCallback, this);
+	lefttibia_sub = nh.subscribe < std_msgs::Float64 > ("left_elbow_controller/command", 5, &SSC32_ctrl::lefttibiaCallback, this);
+	leftankle_sub = nh.subscribe < std_msgs::Float64 > ("left_wrist_controller/command", 5, &SSC32_ctrl::leftankleCallback, this);
 	leftroll_sub = nh.subscribe < std_msgs::Float64 > ("left_hand_joint", 5, &SSC32_ctrl::leftrollCallback, this);
 	lefthand_sub = nh.subscribe < std_msgs::Float64 > ("left_hand", 5, &SSC32_ctrl::lefthandCallback, this);
 
@@ -169,7 +169,7 @@ SSC32_ctrl::SSC32_ctrl() {
 
 void SSC32_ctrl::leftcoxaCallback(const std_msgs::Float64::ConstPtr & value) {
 
-	leftCoxaAngle = value->data;
+	leftCoxaAngle = -value->data;
 
 	left_cpt++;
 	if(left_cpt > 5) {
@@ -351,7 +351,7 @@ void SSC32_ctrl::lefttibiaCallback(const std_msgs::Float64::ConstPtr & value) {
 
 void SSC32_ctrl::leftankleCallback(const std_msgs::Float64::ConstPtr & value) {
 
-	leftAnkleAngle = value->data;
+	leftAnkleAngle = -value->data;
 
         left_cpt++;
         if(left_cpt > 5) {

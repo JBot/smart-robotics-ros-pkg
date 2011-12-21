@@ -1,7 +1,5 @@
 <launch>
 
-    <node pkg="indomptable_arm" type="ssc32_driver" name="ssc_controller" output="screen"/>
-
     <node pkg="indomptable_arm" type="arm" name="left_arm" output="screen">
         <!-- Init params -->
 	<remap from="arm_pose" to="left_arm_pose" />
