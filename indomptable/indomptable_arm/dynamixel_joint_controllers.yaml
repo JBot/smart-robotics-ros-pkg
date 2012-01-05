@@ -4,7 +4,7 @@ left_soulder_roll_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: left_soulder_roll_joint
-    joint_speed: 2.0
+    joint_speed: 1.0
     motor:
         id: 1
         init: 512
@@ -17,7 +17,7 @@ left_soulder_lift_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: left_soulder_lift_joint
-    joint_speed: 2.0
+    joint_speed: 3.0
     motor:
         id: 2
         init: 512
@@ -30,7 +30,7 @@ left_elbow_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: left_elbow_joint
-    joint_speed: 2.0
+    joint_speed: 4.0
     motor:
         id: 3
         init: 512
@@ -43,7 +43,7 @@ left_wrist_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: left_wrist_joint
-    joint_speed: 2.0
+    joint_speed: 4.0
     motor:
         id: 4
         init: 512

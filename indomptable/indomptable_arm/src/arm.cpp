@@ -1,9 +1,12 @@
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Float64.h"
 #include "std_msgs/Int32.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
+
+#include "dynamixel_controllers/SetSpeed.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -20,14 +23,14 @@
 #include <cstdio>
 
 #include <sstream>
-#include <math.h>
+//#include <math.h>
+//#include <algorithm>
 
 #include <vector>
 
 
 
 #include <unistd.h>
-#include <math.h>
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>                               // for in-/output
@@ -66,6 +69,13 @@
 
 #define STOCK_HEIGHT	80
 
+#define MAX_SPEED 5.0
+
+
+#define min(x1,x2) ((x1) > (x2) ? (x2):(x1))
+#define max(x1,x2) ((x1) > (x2) ? (x1):(x2))
+
+
 class indomptableARM {
   public:
     indomptableARM();
@@ -79,6 +89,11 @@ class indomptableARM {
     ros::Publisher roll_pub;
     ros::Publisher hand_pub;
     ros::Publisher pump_pub;
+
+    ros::ServiceClient client_shoulder_roll;
+    ros::ServiceClient client_shoulder_lift;
+    ros::ServiceClient client_elbow;
+    ros::ServiceClient client_wrist;
 
   private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
@@ -111,6 +126,12 @@ double TibiaAngle;
 double AnkleAngle;
 double RollAngle;
 double HandAngle;
+double prev_CoxaAngle;   //Actual Angle of the Right Front Leg
+double prev_FemurAngle;
+double prev_TibiaAngle;
+double prev_AnkleAngle;
+double prev_RollAngle;
+double prev_HandAngle;
 //--------------------------------------------------------------------
 //[POSITIONS]
 signed int RFPosX;      //Actual Position of the Right Front Leg
@@ -170,6 +191,19 @@ indomptableARM::indomptableARM()
     tmp_string = input_name;
     tmp_string.append("_pump_feedback");
     pump_sub_ = nh.subscribe < std_msgs::Int32 > ("pump_feedback", 5, &indomptableARM::pumpCallback, this);
+
+    client_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_soulder_roll_controller/set_speed", true);
+    client_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_soulder_lift_controller/set_speed", true);
+    client_elbow = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_elbow_controller/set_speed", true);
+    client_wrist = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_wrist_controller/set_speed", true);
+
+    prev_CoxaAngle = 0;
+    prev_FemurAngle = 0;
+    prev_TibiaAngle = 0;
+    prev_AnkleAngle = 0;
+    prev_RollAngle = 0;
+    prev_HandAngle = 0;
+
 
 //--------------------------------------------------------------------
 //[POSITIONS]
@@ -270,10 +304,7 @@ char IKSolutionError;      //Output true if the solution is NOT possible
 
         //IKSW - Length between shoulder and wrist
         IKSW = sqrt((double)(((IKFeetPosXZ-CoxaLength)*(IKFeetPosXZ-CoxaLength))+(IKFeetPosY*IKFeetPosY)));
-        //IKSW2 = sqrt((double)(((IKFeetPosXZ-CoxaLength)*(IKFeetPosXZ-CoxaLength))+(IKFeetPosY*IKFeetPosY)));
 	
-	//printf("%i %f %f\n", IKFeetPosX, IKFeetPosXZ, IKSW);
-        
 	//IKA1 - Angle between SW line and the ground in rad
         IKA1 = atan2(IKFeetPosXZ-CoxaLength, IKFeetPosY);
 
@@ -281,21 +312,13 @@ char IKSolutionError;      //Output true if the solution is NOT possible
         IKA2 = acos( ((double)((FemurLength*FemurLength) - (TibiaLength*TibiaLength)) + (IKSW*IKSW)) / ((double)(2*FemurLength) * IKSW) );
 
         //IKFemurAngle
-        //IKFemurAngle = ( -(IKA1 + IKA2) * 180.0 / 3.141592 )+90;
         IKFemurAngle = ( -(IKA1 + IKA2) )+1.570796;
-	//printf("%f %f %f %f\n", (IKA1 + IKA2), -(IKA1 + IKA2), ( -(IKA1 + IKA2) * 180.0 / 3.141592 ), ( -(IKA1 + IKA2) * 180.0 / 3.141592 )+90);
-	//printf("%f %f\n", IKFemurAngle, ( -(IKA1 + IKA2) )+1.570796);
 
         //IKTibiaAngle
-        //IKTibiaAngle = -( 90-(acos( ( (double)(FemurLength*FemurLength) + (TibiaLength*TibiaLength) - (IKSW*IKSW) ) / ((double)(2*FemurLength*TibiaLength)) )*180.0 / 3.141592) );
         IKTibiaAngle = -( 1.570796-(acos( ( (double)(FemurLength*FemurLength) + (TibiaLength*TibiaLength) - (IKSW*IKSW) ) / ((double)(2*FemurLength*TibiaLength)) )) );
-	//printf("%f %f\n", IKTibiaAngle, -( 1.570796-(acos( ( (double)(FemurLength*FemurLength) + (TibiaLength*TibiaLength) - (IKSW*IKSW) ) / ((double)(2*FemurLength*TibiaLength)) )) ));
 
         //IKCoxaAngle
-        //GetBoogTan(IKFeetPosZ, IKFeetPosX);
-        //IKCoxaAngle = ((atan2(IKFeetPosZ, IKFeetPosX)*180.0) / 3.141592);
         IKCoxaAngle = ((atan2(IKFeetPosZ, IKFeetPosX)));
-	//printf("%f %f\n", IKCoxaAngle, ((atan2(IKFeetPosZ, IKFeetPosX))));
 
         //Set the Solution quality   
         if(IKSW < (double)(FemurLength+TibiaLength-30)) {
@@ -326,7 +349,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
 	RollAngle = 1.570796;
 	ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -339,7 +361,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed)*SLEEP_COEFF);
@@ -352,7 +373,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
 	RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -371,7 +391,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -385,7 +404,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -398,7 +416,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 0;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -411,7 +428,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -427,7 +443,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -459,7 +474,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 0;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -472,7 +486,6 @@ void indomptableARM::takeCDinTotem(signed int height){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 0;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -490,7 +503,6 @@ void indomptableARM::takeBARinTotem(void){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -503,7 +515,6 @@ void indomptableARM::takeBARinTotem(void){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -520,7 +531,6 @@ void indomptableARM::takeBARinTotem(void){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 500;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -533,7 +543,6 @@ void indomptableARM::takeBARinTotem(void){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 500;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -563,7 +572,6 @@ void indomptableARM::takeBARinTotem(void){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 1.570796;
         ActualGaitSpeed = 500;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -576,7 +584,6 @@ void indomptableARM::takeBARinTotem(void){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 0;
 	ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -594,7 +601,6 @@ void indomptableARM::takeGround(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -627,7 +633,6 @@ void indomptableARM::takeGround(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
         
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -641,7 +646,6 @@ void indomptableARM::takeGround(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -655,14 +659,12 @@ void indomptableARM::takeGround(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
 	DesAnkleAngle = 1.570796*2;
 	AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -702,7 +704,6 @@ void indomptableARM::takeGround(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 0;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -719,7 +720,6 @@ void indomptableARM::takeGround2(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -750,7 +750,6 @@ void indomptableARM::takeGround2(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -764,7 +763,6 @@ void indomptableARM::takeGround2(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -811,7 +809,6 @@ void indomptableARM::takeGround2(signed int x, signed int y){
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = 0;
         ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
@@ -861,7 +858,86 @@ void indomptableARM::ServoDriver(void){
  	}
         //printf("%s \n",Serout);
 */
+
+	printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
+
  	std_msgs::Float64 tmp;
+	dynamixel_controllers::SetSpeed tmp_speed;
+
+	double dist_CoxaAngle = fabs(prev_CoxaAngle - CoxaAngle);
+	double dist_FemurAngle = fabs(prev_FemurAngle - FemurAngle);
+	double dist_TibiaAngle = fabs(prev_TibiaAngle - TibiaAngle);
+	double dist_AnkleAngle = fabs(prev_AnkleAngle - AnkleAngle);
+	double dist_RollAngle = fabs(prev_RollAngle - RollAngle);
+	double dist_HandAngle = fabs(prev_HandAngle - HandAngle);
+
+	double distance_max = max(dist_CoxaAngle, dist_FemurAngle);
+	distance_max = max(distance_max, dist_TibiaAngle);
+	distance_max = max(distance_max, dist_AnkleAngle);
+	distance_max = max(distance_max, dist_RollAngle);
+	distance_max = max(distance_max, dist_HandAngle);
+
+	double speed_CoxaAngle = MAX_SPEED * dist_CoxaAngle / distance_max;
+	double speed_FemurAngle = MAX_SPEED * dist_FemurAngle / distance_max;
+	double speed_TibiaAngle = MAX_SPEED * dist_TibiaAngle / distance_max;
+	double speed_AnkleAngle = MAX_SPEED * dist_AnkleAngle / distance_max;
+	double speed_RollAngle = MAX_SPEED * dist_RollAngle / distance_max;
+
+
+    prev_CoxaAngle = CoxaAngle;
+    prev_FemurAngle = FemurAngle;
+    prev_TibiaAngle = TibiaAngle;
+    prev_AnkleAngle = AnkleAngle;
+    prev_RollAngle = RollAngle;
+    prev_HandAngle = HandAngle;
+
+	printf("speed %f %f %f %f\n", speed_CoxaAngle, speed_FemurAngle, speed_TibiaAngle, speed_AnkleAngle);
+
+	tmp_speed.request.speed = speed_CoxaAngle;
+  	if (client_shoulder_roll.call(tmp_speed))
+  	{
+    		//ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  	}
+  	else
+  	{
+    		ROS_ERROR("Failed to call service SetSpeed");
+  	}
+
+	tmp_speed.request.speed = speed_FemurAngle;
+  	if (client_shoulder_lift.call(tmp_speed))
+  	{
+    		//ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  	}
+  	else
+  	{
+    		ROS_ERROR("Failed to call service SetSpeed");
+	}
+
+	tmp_speed.request.speed = speed_TibiaAngle;
+  	if (client_elbow.call(tmp_speed))
+  	{
+    		//ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  	}
+  	else
+  	{
+    		ROS_ERROR("Failed to call service SetSpeed");
+  	}
+
+	tmp_speed.request.speed = speed_AnkleAngle;
+  	if (client_wrist.call(tmp_speed))
+  	{
+    		//ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  	}
+  	else
+  	{
+    		ROS_ERROR("Failed to call service SetSpeed");
+  	}
+
+
+
+
+
+
 
 	tmp.data = -CoxaAngle;
 	coxa_pub.publish(tmp);
