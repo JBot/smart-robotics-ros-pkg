@@ -1,4 +1,3 @@
-
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Float64.h"
@@ -7,6 +6,7 @@
 #include "geometry_msgs/PoseStamped.h"
 
 #include "dynamixel_controllers/SetSpeed.h"
+#include "dynamixel_msgs/JointState.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -45,13 +45,13 @@
 #include <getopt.h>
 #include <sys/time.h>
 
-
+/*
 #define False 0
 #define True  1 
 #define FALSE 0
 #define TRUE  1
-
-#define SLEEP_COEFF 3000 //2000
+*/
+#define SLEEP_COEFF 1000 //2000
 
 #define SSCDEVICE "/dev/ttyS0"
 #define BAUDRATE B115200
@@ -95,6 +95,11 @@ class indomptableARM {
     ros::ServiceClient client_elbow;
     ros::ServiceClient client_wrist;
 
+    ros::Subscriber sub_shoulder_roll;
+    ros::Subscriber sub_shoulder_lift;
+    ros::Subscriber sub_elbow;
+    ros::Subscriber sub_wrist;
+
   private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
     void pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback);
@@ -105,6 +110,13 @@ class indomptableARM {
     void takeBARinTotem(void);
     void takeGround(signed int x, signed int y);
     void takeGround2(signed int x, signed int y);
+    void waitState(void);
+    void releaseObject(void);
+    void waitMoveEnd(void);
+
+    void shoulder_rollCallback(const dynamixel_msgs::JointState::ConstPtr & joint);
+    void wristCallback(const dynamixel_msgs::JointState::ConstPtr & joint);
+
 
     ros::NodeHandle nh;
 
@@ -146,11 +158,11 @@ double IKFemurAngle;       //Output Angle of Femur in degrees
 double IKTibiaAngle;       //Output Angle of Tibia in degrees
 double IKCoxaAngle;        //Output Angle of Coxa in degrees
 
-/*
-// Serial
-int ser_fd_ssc;
-struct termios oldtio_ssc, newtio_ssc;
-*/
+
+dynamixel_msgs::JointState shoulder_roll_state;
+dynamixel_msgs::JointState wrist_state;
+
+
 
 };
 
@@ -196,6 +208,9 @@ indomptableARM::indomptableARM()
     client_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_soulder_lift_controller/set_speed", true);
     client_elbow = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_elbow_controller/set_speed", true);
     client_wrist = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_wrist_controller/set_speed", true);
+
+    sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/left_soulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
+    sub_wrist = nh.subscribe < dynamixel_msgs::JointState > ("/left_wrist_controller/state", 5, &indomptableARM::wristCallback, this);
 
     prev_CoxaAngle = 0;
     prev_FemurAngle = 0;
@@ -253,6 +268,9 @@ HandAngle = 0;
 
         }
 */
+
+	waitState();
+
 }
 
 void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
@@ -261,7 +279,7 @@ void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & p
 	//usleep(5000000); // For debug only
 
 	if( ((int)(pose->pose.position.y * 1000)) != 0 ) {
-		takeGround2((int)(pose->pose.position.x * 1000), (int)(pose->pose.position.y * 1000));
+		takeGround((int)(pose->pose.position.x * 1000), (int)(pose->pose.position.y * 1000));
 	}
 	else {
 		if( ((int)(pose->pose.position.z * 1000)) == 0 ) {
@@ -282,6 +300,22 @@ void indomptableARM::pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback
 
 }
 
+void indomptableARM::shoulder_rollCallback(const dynamixel_msgs::JointState::ConstPtr & joint){
+
+	shoulder_roll_state = *joint;
+
+}
+
+void indomptableARM::wristCallback(const dynamixel_msgs::JointState::ConstPtr & joint){
+
+	wrist_state = *joint;
+//	ROS_INFO("Blu : %d", joint->is_moving);
+}
+
+
+
+
+
 /****** Inverse Kinematics functions *******/
 
 void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed int IKFeetPosZ){
@@ -298,6 +332,7 @@ char IKSolution;         //Output true if the solution is possible
 char IKSolutionWarning;      //Output true if the solution is NEARLY possible
 char IKSolutionError;      //Output true if the solution is NOT possible
 
+	//IKFeetPosX = IKFeetPosX - 
 
         //Length between the Coxa and Feet
         IKFeetPosXZ =  sqrt((double)((IKFeetPosX*IKFeetPosX)+(IKFeetPosZ*IKFeetPosZ)));
@@ -320,20 +355,6 @@ char IKSolutionError;      //Output true if the solution is NOT possible
         //IKCoxaAngle
         IKCoxaAngle = ((atan2(IKFeetPosZ, IKFeetPosX)));
 
-        //Set the Solution quality   
-        if(IKSW < (double)(FemurLength+TibiaLength-30)) {
-                IKSolution = TRUE;
-        }
-        else {
-                if(IKSW < (double)(FemurLength+TibiaLength)) {
-                        IKSolutionWarning = TRUE;
-                }
-                else {
-                        IKSolutionError = TRUE;
-                }
-        }
-
-
 
         return;
 }
@@ -341,259 +362,7 @@ char IKSolutionError;      //Output true if the solution is NOT possible
 
 void indomptableARM::takeCDinTotem(signed int height){
 
-        LegIK((int)(90), (int)(height), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-	RollAngle = 1.570796;
-	ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(130), (int)(height), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed)*SLEEP_COEFF);
-
-        LegIK((int)(150), (int)(height), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-	RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-	// GRIP
-	HandAngle = 1.0;
-        ServoDriver();
-
-	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(80), (int)(height), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-
-        LegIK((int)(80), (int)(height), (int)(25));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(100), (int)(STOCK_HEIGHT+20), (int)(25));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 0;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(130), (int)(STOCK_HEIGHT+20), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-
-
-
-        LegIK((int)(130), (int)(STOCK_HEIGHT), (int)(0));
-        DesAnkleAngle = 1.570796*2;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-/*
-        LegIK((int)(0), (int)(STOCK_HEIGHT), (int)(0));
-        DesAnkleAngle = 1.570796*2;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-*/
-	// RELEASE
-	HandAngle = -0.5;
-        ServoDriver();
-
-	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(130), (int)(STOCK_HEIGHT), (int)(0));
-        DesAnkleAngle = 1.570796*2;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 0;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(110), (int)(0), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 0;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-
-}
-
-void indomptableARM::takeBARinTotem(void){
-
-        LegIK((int)(150), (int)(0), (int)(50));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(150), (int)(0), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        // PUMP
-
-	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(110), (int)(0), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 500;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(120), (int)(STOCK_HEIGHT), (int)(0));
-        DesAnkleAngle = 1.570796*2;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 500;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-/*
-        LegIK((int)(0), (int)(STOCK_HEIGHT), (int)(0));
-        DesAnkleAngle = 1.570796*2;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 500;
-        printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-*/
-	// UNPUMP
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(120), (int)(STOCK_HEIGHT), (int)(0));
-        DesAnkleAngle = 1.570796*2;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 1.570796;
-        ActualGaitSpeed = 500;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(110), (int)(0), (int)(0));
-        DesAnkleAngle = 0;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 0;
-	ActualGaitSpeed = 300;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-
-}
-
-void indomptableARM::takeGround(signed int x, signed int y){
-
-        LegIK((int)(x), (int)(-90), (int)(y));
+        LegIK((int)(180), (int)(-(42)), (int)(0));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -603,7 +372,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
         ActualGaitSpeed = 300;
         ServoDriver();
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	waitMoveEnd();
 
         // pump
         pump_ok = 0;
@@ -621,24 +390,8 @@ void indomptableARM::takeGround(signed int x, signed int y){
                 ros::spinOnce();
         }
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-
-
-        LegIK((int)(x), (int)(-10), (int)(y));
-        DesAnkleAngle = -1.570796;
-        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = -IKFemurAngle;
-        TibiaAngle = (1.570796 - IKTibiaAngle);
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = -IKCoxaAngle;
-        ActualGaitSpeed = 300;
-        ServoDriver();
-        
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-        LegIK((int)(x), (int)(-90), (int)(y));
+        LegIK((int)(220), (int)(-(42)), (int)(0));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -648,14 +401,48 @@ void indomptableARM::takeGround(signed int x, signed int y){
         ActualGaitSpeed = 300;
         ServoDriver();
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	waitMoveEnd();
+        //usleep((ActualGaitSpeed+50+50)*SLEEP_COEFF);
 
-// add
-        LegIK((int)(x), (int)(90), (int)(y));
-        DesAnkleAngle = 1.570796;
+        LegIK((int)(220), (int)((12)), (int)(0));
+        DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+	waitMoveEnd();
+        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(180), (int)(-(42)), (int)(0));
+        DesAnkleAngle = -1.570796;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	waitMoveEnd();
+
+	releaseObject();
+
+	waitState();
+
+}
+
+void indomptableARM::takeBARinTotem(void){
+
+        LegIK((int)(130), (int)(150), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
         RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
@@ -663,17 +450,67 @@ void indomptableARM::takeGround(signed int x, signed int y){
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-	DesAnkleAngle = 1.570796*2;
-	AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        LegIK((int)(170), (int)(150), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(130), (int)(150), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
 
 
-        // unpump
+	releaseObject();
+
+	waitState();
+
+}
+
+void indomptableARM::takeGround(signed int x, signed int y){
+
+        LegIK((int)(80), (int)(100), (int)(0));
+        DesAnkleAngle = -1.570796;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(80), (int)(135), (int)(0));
+        DesAnkleAngle = -1.570796;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        usleep((ActualGaitSpeed)*SLEEP_COEFF);
+
+        // pump
         pump_ok = 0;
-        des_pump.data = 0;
+        des_pump.data = 1;
         pump_pub.publish(des_pump);
         usleep(50000);
         ros::spinOnce();
@@ -687,27 +524,35 @@ void indomptableARM::takeGround(signed int x, signed int y){
                 ros::spinOnce();
         }
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-        DesAnkleAngle = 0;
-        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        ServoDriver();
-
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
-
-
-        LegIK((int)(120), (int)(0), (int)(0));
-        DesAnkleAngle = 0;
+        LegIK((int)(80), (int)(170), (int)(0));
+        DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
-        FemurAngle = IKFemurAngle;
-        TibiaAngle = -(1.570796 - IKTibiaAngle);
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
         AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
-        RollAngle = 0;
+        RollAngle = -IKCoxaAngle;
         ActualGaitSpeed = 300;
         ServoDriver();
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
+        LegIK((int)(80), (int)(100), (int)(0));
+        DesAnkleAngle = -1.570796;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+
+	releaseObject();
+
+	waitState();
 }
 
 void indomptableARM::takeGround2(signed int x, signed int y){
@@ -817,6 +662,94 @@ void indomptableARM::takeGround2(signed int x, signed int y){
 
 
 
+
+}
+
+
+
+void indomptableARM::waitMoveEnd(void){
+/*
+	usleep(50000); // For debug only
+	ros::spinOnce();
+	usleep(50000); // For debug only
+	ros::spinOnce();
+	while(wrist_state.is_moving == true) {
+
+		ROS_INFO("Bla : %d", wrist_state.is_moving);
+		usleep(50000); // For debug only
+		ros::spinOnce();
+
+	}
+
+		ROS_INFO("Bla : %d", wrist_state.is_moving);
+*/
+	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+
+}
+
+void indomptableARM::waitState(void){
+
+        LegIK((int)(100), (int)(60), (int)(0));
+        DesAnkleAngle = -1.570796;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+}
+
+void indomptableARM::releaseObject(void){
+
+        LegIK((int)(150), (int)((0)), (int)(0));
+        DesAnkleAngle = -1.570796;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+	waitMoveEnd();
+        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        LegIK((int)(160), (int)(-(10)), (int)(0));
+        DesAnkleAngle = -2.37;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+	waitMoveEnd();
+        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+        // unpump
+        pump_ok = 0;
+        des_pump.data = 0;
+        pump_pub.publish(des_pump);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+        while(pump_ok == 0) {
+                pump_pub.publish(des_pump);
+                usleep(50000);
+                ros::spinOnce();
+                usleep(50000);
+                ros::spinOnce();
+        }
+
+	waitMoveEnd();
+        //usleep((ActualGaitSpeed)*SLEEP_COEFF);
 
 }
 
@@ -938,7 +871,6 @@ void indomptableARM::ServoDriver(void){
 
 
 
-
 	tmp.data = -CoxaAngle;
 	coxa_pub.publish(tmp);
 	tmp.data = FemurAngle;
@@ -990,7 +922,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "indomptable_arm");
     indomptableARM indomptablearm;
     // Refresh rate
-    ros::Rate loop_rate(5);                                // 35 with bluetooth
+    ros::Rate loop_rate(10);                                // 35 with bluetooth
     while (ros::ok()) {
         ros::spinOnce();
         loop_rate.sleep();
