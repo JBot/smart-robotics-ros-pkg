@@ -261,10 +261,14 @@ ros::Publisher pp("right_pump_feedback", &test);
 
 void messageCbleft( const std_msgs::Int32& msg){
   //x = msg.data - 1.0;
-  if(msg.data == 0)
-    digitalWrite(8, LOW);  
-  else
+  if(msg.data == 0) {
+    digitalWrite(8, LOW);
+    digitalWrite(6, HIGH);
+  }  
+  else {
     digitalWrite(8, HIGH);
+    digitalWrite(6, LOW);
+  }
   test.data = msg.data;
   p.publish( &test );   
   
@@ -275,10 +279,14 @@ ros::Subscriber<std_msgs::Int32> s("left_pump", &messageCbleft);
 
 void messageCbright( const std_msgs::Int32& msg){
   //x = msg.data - 1.0;
-  if(msg.data == 0)
-    digitalWrite(9, LOW);  
-  else
+  if(msg.data == 0) {
+    digitalWrite(9, LOW);
+    digitalWrite(7, HIGH);
+  }  
+  else {
     digitalWrite(9, HIGH);
+    digitalWrite(7, LOW);
+  }
   test.data = msg.data;
   pp.publish( &test );   
   
@@ -486,8 +494,14 @@ void setup()
     
   pinMode(8, OUTPUT);
   digitalWrite(8, LOW);
+  pinMode(6, OUTPUT);
+  digitalWrite(6, HIGH);
+
   pinMode(9, OUTPUT);
   digitalWrite(9, LOW);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
+  
   nh.initNode();
   broadcaster.init(nh);
   nh.advertise(p);
