@@ -424,7 +424,7 @@
         <axis xyz="1 0 0" />
         </joint>
         
-        <joint name="left_soulder_roll_joint" type="revolute">
+        <joint name="left_shoulder_roll_joint" type="revolute">
         <parent link="left_shoulder_roll_link" />
         <child link="left_shoulder_link" />
         <origin xyz="0.01 0 0" rpy="0 0 0" />
@@ -440,7 +440,7 @@
         <axis xyz="1 0 0" />
         </joint>
 
-        <joint name="left_soulder_lift_joint" type="revolute">
+        <joint name="left_shoulder_lift_joint" type="revolute">
         <parent link="left_shoulder_lift_link" />
         <child link="left_shoulder_link2" />
         <origin xyz="0.01 0 0" rpy="0 0 0" />

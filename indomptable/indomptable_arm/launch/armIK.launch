@@ -3,8 +3,8 @@
     <node pkg="indomptable_arm" type="arm" name="left_arm" output="screen">
         <!-- Init params -->
 	<remap from="arm_pose" to="left_arm_pose" />
-	<remap from="soulder_roll_joint" to="left_soulder_roll_controller/command" />
-	<remap from="soulder_lift_joint" to="left_soulder_lift_controller/command" />
+	<remap from="shoulder_roll_joint" to="left_shoulder_roll_controller/command" />
+	<remap from="shoulder_lift_joint" to="left_shoulder_lift_controller/command" />
 	<remap from="elbow_joint" to="left_elbow_controller/command" />
 	<remap from="wrist_joint" to="left_wrist_controller/command" />
 	<remap from="hand_joint" to="left_hand_joint" />

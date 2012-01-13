@@ -6,6 +6,7 @@
 #include "geometry_msgs/PoseStamped.h"
 
 #include "dynamixel_controllers/SetSpeed.h"
+#include "dynamixel_controllers/SetComplianceSlope.h"
 #include "dynamixel_msgs/JointState.h"
 
 #include <sys/time.h>
@@ -95,6 +96,11 @@ class indomptableARM {
     ros::ServiceClient client_elbow;
     ros::ServiceClient client_wrist;
 
+    ros::ServiceClient slope_shoulder_roll;
+    ros::ServiceClient slope_shoulder_lift;
+    ros::ServiceClient slope_elbow;
+    ros::ServiceClient slope_wrist;
+
     ros::Subscriber sub_shoulder_roll;
     ros::Subscriber sub_shoulder_lift;
     ros::Subscriber sub_elbow;
@@ -178,12 +184,14 @@ indomptableARM::indomptableARM()
     tmp_string.append("_arm_pose");
     pose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("arm_pose", 5, &indomptableARM::poseCallback, this);
 
+    usleep(1000000);
+
     tmp_string = input_name;
-    tmp_string.append("_soulder_roll_joint");
-    coxa_pub = nh.advertise < std_msgs::Float64 > ("soulder_roll_joint", 5);
+    tmp_string.append("_shoulder_roll_joint");
+    coxa_pub = nh.advertise < std_msgs::Float64 > ("shoulder_roll_joint", 5);
     tmp_string = input_name;
-    tmp_string.append("_soulder_lift_joint");
-    femur_pub = nh.advertise < std_msgs::Float64 > ("soulder_lift_joint", 5);
+    tmp_string.append("_shoulder_lift_joint");
+    femur_pub = nh.advertise < std_msgs::Float64 > ("shoulder_lift_joint", 5);
     tmp_string = input_name;
     tmp_string.append("_elbow_joint");
     tibia_pub = nh.advertise < std_msgs::Float64 > ("elbow_joint", 5);
@@ -204,12 +212,19 @@ indomptableARM::indomptableARM()
     tmp_string.append("_pump_feedback");
     pump_sub_ = nh.subscribe < std_msgs::Int32 > ("pump_feedback", 5, &indomptableARM::pumpCallback, this);
 
-    client_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_soulder_roll_controller/set_speed", true);
-    client_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_soulder_lift_controller/set_speed", true);
+    usleep(1000000);
+
+    client_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_shoulder_roll_controller/set_speed", true);
+    client_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_shoulder_lift_controller/set_speed", true);
     client_elbow = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_elbow_controller/set_speed", true);
     client_wrist = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_wrist_controller/set_speed", true);
 
-    sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/left_soulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
+    slope_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_shoulder_roll_controller/set_compliance_slope", true);
+    slope_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_shoulder_lift_controller/set_compliance_slope", true);
+    slope_elbow = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_elbow_controller/set_compliance_slope", true);
+    slope_wrist = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_wrist_controller/set_compliance_slope", true);
+
+    sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/left_shoulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
     sub_wrist = nh.subscribe < dynamixel_msgs::JointState > ("/left_wrist_controller/state", 5, &indomptableARM::wristCallback, this);
 
     prev_CoxaAngle = 0;
@@ -220,56 +235,72 @@ indomptableARM::indomptableARM()
     prev_HandAngle = 0;
 
 
-//--------------------------------------------------------------------
-//[POSITIONS]
-RFPosX = 0;      //Actual Position of the Right Front Leg
-RFPosY = 0;
-RFPosZ = 0;
-//--------------------------------------------------------------------
-//[VARIABLES]
+    //--------------------------------------------------------------------
+    //[POSITIONS]
+    RFPosX = 0;      //Actual Position of the Right Front Leg
+    RFPosY = 0;
+    RFPosZ = 0;
+    //--------------------------------------------------------------------
+    //[VARIABLES]
 
-IKFemurAngle = 0;       //Output Angle of Femur in degrees
-IKTibiaAngle= 0;       //Output Angle of Tibia in degrees
-IKCoxaAngle = 0;        //Output Angle of Coxa in degrees
+    IKFemurAngle = 0;       //Output Angle of Femur in degrees
+    IKTibiaAngle= 0;       //Output Angle of Tibia in degrees
+    IKCoxaAngle = 0;        //Output Angle of Coxa in degrees
 
-ActualGaitSpeed = 200;
+    ActualGaitSpeed = 200;
 
-DesAnkleAngle = 0;
-RollAngle = 0;
-HandAngle = 0;
+    DesAnkleAngle = 0;
+    RollAngle = 0;
+    HandAngle = 0;
 
     des_pump.data = 0;
     pump_ok = 0;
 
-/*
-        ser_fd_ssc = open(SSCDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
-        if( ser_fd_ssc == -1)
-        {
-                printf( " SSC Serial Not Open \n" );
-        }
-        else
-        {
-                printf( " SSC Serial Open \n" );
-                tcgetattr(ser_fd_ssc, &oldtio_ssc);                             // Backup old port settings
-                memset(&newtio_ssc, 0, sizeof(newtio_ssc));
+    usleep(1000000);
 
-                newtio_ssc.c_iflag = IGNBRK | IGNPAR;
-                newtio_ssc.c_oflag = 0;
-                newtio_ssc.c_cflag = BAUDRATE | CREAD | CS8 | CLOCAL;
-                newtio_ssc.c_lflag = 0;
+    dynamixel_controllers::SetComplianceSlope tmp_slope;
 
-                tcflush(ser_fd_ssc, TCIFLUSH);
-                tcsetattr(ser_fd_ssc, TCSANOW, &newtio_ssc);
+    tmp_slope.request.slope = 128;
+    if (slope_shoulder_roll.call(tmp_slope))
+    {
+	    //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+	    ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_shoulder_lift.call(tmp_slope))
+    {
+	    //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+	    ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_elbow.call(tmp_slope))
+    {
+	    //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+	    ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_wrist.call(tmp_slope))
+    {
+	    //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+	    ROS_ERROR("Failed to call service SetSlope");
+    }
 
-                memset(&newtio_ssc, 0, sizeof(newtio_ssc));
-                tcgetattr(ser_fd_ssc, &newtio_ssc);
 
-                fcntl(ser_fd_ssc, F_SETFL, FNDELAY);
 
-        }
-*/
 
-	waitState();
+    /*
+     */
+
+    waitState();
 
 }
 
