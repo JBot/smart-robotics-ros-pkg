@@ -208,7 +208,7 @@
  	<link name="world" />
  	-->
 
-	<xacro:my_box name="base_link" lwh="0.27 0.31 0.003" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="base_link" lwh="0.24 0.32 0.003" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_box>
 	
@@ -220,27 +220,31 @@
 		<xacro:black1 />
 	</xacro:my_cylinder>
 	
-	<xacro:my_box name="netbook_level" lwh="0.27 0.31 0.003" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="first_level" lwh="0.24 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-	<xacro:my_box name="right_arm_panel" lwh="0.05 0.002 0.14" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="netbook_level" lwh="0.2 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-        <xacro:my_box name="left_arm_panel" lwh="0.05 0.002 0.14" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="top_level" lwh="0.24 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-        <xacro:my_box name="back_arm_panel" lwh="0.002 0.136 0.14" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="right_arm_panel" lwh="0.025 0.002 0.06" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-        <xacro:my_box name="right_panel" lwh="0.155 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+        <xacro:my_box name="left_arm_panel" lwh="0.025 0.002 0.06" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-        <xacro:my_box name="left_panel" lwh="0.155 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+        <xacro:my_box name="right_panel" lwh="0.16 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+        <xacro:my_box name="left_panel" lwh="0.16 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
@@ -263,7 +267,7 @@
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="${side}_shoulder_link2" lwh="0.038 0.05 0.025" xyz="0.007 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="${side}_shoulder_link2" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
@@ -271,7 +275,7 @@
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="${side}_elbow_link" lwh="0.038 0.05 0.025" xyz="0.007 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="${side}_elbow_link" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
@@ -279,19 +283,9 @@
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="${side}_wrist_link" lwh="0.038 0.05 0.025" xyz="0.007 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="${side}_wrist_link" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
-
-                <xacro:my_box name="${side}_wrist_roll_link" lwh="0.03 0.05 0.03" xyz="0 0.015 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-                        <xacro:ax12_color />
-                </xacro:my_box>
-
-                <xacro:my_box name="${side}_hand_link" lwh="0.05 0.03 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-                        <xacro:ax12_color />
-                </xacro:my_box>
-
-
 
 
 
@@ -366,16 +360,28 @@
   	</joint>
   	-->
 
+	<joint name="first_level_joint" type="fixed">
+    	<parent link="base_link" />
+    	<child link="first_level" />
+    	<origin xyz="0 0 0.1" rpy="0 0 0" />
+	</joint>
+	
 	<joint name="netbook_level_joint" type="fixed">
     	<parent link="base_link" />
     	<child link="netbook_level" />
-    	<origin xyz="0 0 0.253" rpy="0 0 0" />
+    	<origin xyz="-0.02 0 0.21" rpy="0 0 0" />
+	</joint>
+	
+	<joint name="top_level_joint" type="fixed">
+    	<parent link="base_link" />
+    	<child link="top_level" />
+    	<origin xyz="0 0 0.34" rpy="0 0 0" />
 	</joint>
 	
 	<joint name="base_laser_bottom_joint" type="fixed">
     	<parent link="base_link" />
     	<child link="base_laser_bottom" />
-    	<origin xyz="0.11 0 0.022" rpy="0 0 0" />
+    	<origin xyz="0.081 0 0.022" rpy="0 0 0" />
 	</joint>
 	
 	<joint name="base_laser_joint" type="fixed">
@@ -385,21 +391,15 @@
 	</joint>
 
 	<joint name="left_arm_panel_joint" type="fixed">
-    	<parent link="base_link" />
+    	<parent link="netbook_level" />
     	<child link="left_arm_panel" />
-    	<origin xyz="0.075 0.068 0.0715" rpy="0 0 0" />
+    	<origin xyz="0.065 0.09 0.03" rpy="0 0 0" />
 	</joint>
 
         <joint name="right_arm_panel_joint" type="fixed">
-        <parent link="base_link" />
+        <parent link="netbook_level" />
         <child link="right_arm_panel" />
-        <origin xyz="0.075 -0.068 0.0715" rpy="0 0 0" />
-        </joint>
-
-        <joint name="back_arm_panel_joint" type="fixed">
-        <parent link="base_link" />
-        <child link="back_arm_panel" />
-        <origin xyz="0.05 0 0.0715" rpy="0 0 0" />
+        <origin xyz="0.065 -0.09 0.03" rpy="0 0 0" />
         </joint>
 
         <joint name="left_panel_joint" type="fixed">
@@ -420,7 +420,7 @@
         <joint name="left_shoulder_joint" type="fixed">
         <parent link="left_arm_panel" />
         <child link="left_shoulder_roll_link" />
-        <origin xyz="0 0.016 0.06" rpy="0 0 0" />
+        <origin xyz="0 -0.016 0.005" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
         
@@ -452,7 +452,7 @@
         <joint name="left_elbow_servo_joint" type="fixed">
         <parent link="left_shoulder_link2" />
         <child link="left_elbow_servo_link" />
-        <origin xyz="0.051 0 0" rpy="0 0 0" />
+        <origin xyz="0.08 0 0" rpy="0 0 0" />
         <axis xyz="0 1 0" />
         </joint>
 
@@ -468,7 +468,7 @@
         <joint name="left_wrist_lift_joint" type="fixed">
         <parent link="left_elbow_link" />
         <child link="left_wrist_lift_link" />
-        <origin xyz="0.051 0 0" rpy="0 0 0" />
+        <origin xyz="0.08 0 0" rpy="0 0 0" />
         <axis xyz="0 1 0" />
         </joint>
 
@@ -480,23 +480,6 @@
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
         </joint>
-
-        <joint name="left_wrist_roll_joint" type="fixed">
-        <parent link="left_wrist_link" />
-        <child link="left_wrist_roll_link" />
-        <origin xyz="0.041 0 0" rpy="0 0 0" />
-        <axis xyz="0 1 0" />
-        </joint>
-
-        <joint name="left_hand_joint" type="revolute">
-        <parent link="left_wrist_roll_link" />
-        <child link="left_hand_link" />
-        <origin xyz="0.042 0 0" rpy="0 0 0" />
-        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
-        <axis xyz="1 0 0" />
-        <dynamics damping="0.0"/>
-        </joint>
-
 
 
 <!--        
