@@ -9,6 +9,8 @@
 #include "dynamixel_controllers/SetComplianceSlope.h"
 #include "dynamixel_msgs/JointState.h"
 
+#include <sensor_msgs/JointState.h>
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -106,6 +108,10 @@ class indomptableARM {
     ros::Subscriber sub_elbow;
     ros::Subscriber sub_wrist;
 
+    ros::Publisher joint_pub;
+
+    void joint_publish(void);
+
   private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
     void pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback);
@@ -168,7 +174,7 @@ double IKCoxaAngle;        //Output Angle of Coxa in degrees
 dynamixel_msgs::JointState shoulder_roll_state;
 dynamixel_msgs::JointState wrist_state;
 
-
+sensor_msgs::JointState joint_state;
 
 };
 
@@ -226,6 +232,29 @@ indomptableARM::indomptableARM()
 
     sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/left_shoulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
     sub_wrist = nh.subscribe < dynamixel_msgs::JointState > ("/left_wrist_controller/state", 5, &indomptableARM::wristCallback, this);
+
+
+    joint_pub = nh.advertise < sensor_msgs::JointState > ("joint_states", 1);
+    joint_state.header.stamp = ros::Time::now();
+    joint_state.name.resize(5);
+    joint_state.position.resize(5);
+    joint_state.velocity.resize(5);
+    joint_state.effort.resize(5);
+
+    joint_state.name[0] ="left_shoulder_roll_joint";
+    joint_state.name[1] ="left_shoulder_lift_joint";
+    joint_state.name[2] ="left_elbow_joint";
+    joint_state.name[3] ="left_wrist_joint";
+    joint_state.name[4] ="left_hand_joint";
+
+    joint_state.position[0] = 0.0;
+    joint_state.position[1] = 0.0;
+    joint_state.position[2] = 0.0;
+    joint_state.position[3] = 0.0;
+    joint_state.position[4] = 0.0;
+
+    joint_pub.publish(joint_state);
+
 
     prev_CoxaAngle = 0;
     prev_FemurAngle = 0;
@@ -295,13 +324,37 @@ indomptableARM::indomptableARM()
     }
 
 
-
+    joint_publish();
 
     /*
      */
 
     waitState();
 
+}
+
+void indomptableARM::joint_publish(void)
+{
+
+    joint_state.header.stamp = ros::Time::now();
+    joint_state.name.resize(5);
+    joint_state.position.resize(5);
+    joint_state.velocity.resize(5);
+    joint_state.effort.resize(5);
+
+    joint_state.name[0] ="left_shoulder_roll_joint";
+    joint_state.name[1] ="left_shoulder_lift_joint";
+    joint_state.name[2] ="left_elbow_joint";
+    joint_state.name[3] ="left_wrist_joint";
+    joint_state.name[4] ="left_hand_joint";
+
+    joint_state.position[0] = prev_CoxaAngle;
+    joint_state.position[1] = -prev_FemurAngle;
+    joint_state.position[2] = prev_TibiaAngle;
+    joint_state.position[3] = -prev_AnkleAngle;
+    joint_state.position[4] = 0.0;
+
+    joint_pub.publish(joint_state);
 }
 
 void indomptableARM::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
@@ -898,7 +951,7 @@ void indomptableARM::ServoDriver(void){
   	}
 
 
-
+	joint_publish();
 
 
 
@@ -955,6 +1008,7 @@ int main(int argc, char **argv)
     // Refresh rate
     ros::Rate loop_rate(10);                                // 35 with bluetooth
     while (ros::ok()) {
+	indomptablearm.joint_publish();
         ros::spinOnce();
         loop_rate.sleep();
     }
