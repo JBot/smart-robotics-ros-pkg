@@ -9,8 +9,8 @@
           args="--manager=dxl_manager
                 --port=arm_port
                 --type=simple
-                left_soulder_roll_controller
-                left_soulder_lift_controller
+                left_shoulder_roll_controller
+                left_shoulder_lift_controller
                 left_elbow_controller
                 left_wrist_controller"
           output="screen"/>

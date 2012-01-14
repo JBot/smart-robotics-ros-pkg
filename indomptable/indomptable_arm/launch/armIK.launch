@@ -1,6 +1,6 @@
 <launch>
 
-    <node pkg="indomptable_arm" type="arm" name="left_arm" output="screen">
+    <node pkg="indomptable_arm" type="arm_left" name="left_arm" output="screen">
         <!-- Init params -->
 	<remap from="arm_pose" to="left_arm_pose" />
 	<remap from="shoulder_roll_joint" to="left_shoulder_roll_controller/command" />
@@ -14,5 +14,21 @@
         <param name="arm_pose_name" value="left" type="string"/>
         <param name="arm_pose_y" value="-60" type="int"/>
     </node>
+
+    <node pkg="indomptable_arm" type="arm_right" name="right_arm" output="screen">
+        <!-- Init params -->
+        <remap from="arm_pose" to="right_arm_pose" />
+        <remap from="shoulder_roll_joint" to="right_shoulder_roll_controller/command" />
+        <remap from="shoulder_lift_joint" to="right_shoulder_lift_controller/command" />
+        <remap from="elbow_joint" to="right_elbow_controller/command" />
+        <remap from="wrist_joint" to="right_wrist_controller/command" />
+        <remap from="hand_joint" to="right_hand_joint" />
+        <remap from="hand" to="right_hand" />
+        <remap from="pump" to="right_pump" />
+        <remap from="pump_feedback" to="right_pump_feedback" />
+        <param name="arm_pose_name" value="right" type="string"/>
+        <param name="arm_pose_y" value="60" type="int"/>
+    </node>
+
 
   </launch>

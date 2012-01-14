@@ -54,25 +54,16 @@
 #define FALSE 0
 #define TRUE  1
 */
-#define SLEEP_COEFF 1000 //2000
-
-#define SSCDEVICE "/dev/ttyS0"
-#define BAUDRATE B115200
+#define SLEEP_COEFF 1600 //1000 //2000
 
 #define CoxaLength 78 //43      //Length of the Coxa [mm]
 #define FemurLength 82 //76      //Length of the Femur [mm]
 #define TibiaLength 94 //66     //NEW Lenght of the Tibia [mm]
 //#define CoxaAngle 0      //Default Coxa setup angle
 
-// SERVO OFFSET
-#define SERVO_OFFSET0   (-88)
-#define SERVO_OFFSET4   80
-#define SERVO_OFFSET8   194
-#define SERVO_OFFSET12   101
-
 #define STOCK_HEIGHT	80
 
-#define MAX_SPEED 5.0
+#define MAX_SPEED 3.0 //5.0
 
 
 #define min(x1,x2) ((x1) > (x2) ? (x2):(x1))
@@ -181,7 +172,7 @@ sensor_msgs::JointState joint_state;
 indomptableARM::indomptableARM()
 {
 
-    nh.param<std::string>("arm_pose_name", input_name, "left");
+    nh.param<std::string>("arm_pose_name", input_name, "right");
     nh.param("arm_pose_y", input_y, 0);
     //printf("%s\n", input_name.c_str());
     //printf("%i\n", input_y);
@@ -220,18 +211,18 @@ indomptableARM::indomptableARM()
 
     usleep(1000000);
 
-    client_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_shoulder_roll_controller/set_speed", true);
-    client_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_shoulder_lift_controller/set_speed", true);
-    client_elbow = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_elbow_controller/set_speed", true);
-    client_wrist = nh.serviceClient<dynamixel_controllers::SetSpeed>("/left_wrist_controller/set_speed", true);
+    client_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetSpeed>("/right_shoulder_roll_controller/set_speed", true);
+    client_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetSpeed>("/right_shoulder_lift_controller/set_speed", true);
+    client_elbow = nh.serviceClient<dynamixel_controllers::SetSpeed>("/right_elbow_controller/set_speed", true);
+    client_wrist = nh.serviceClient<dynamixel_controllers::SetSpeed>("/right_wrist_controller/set_speed", true);
 
-    slope_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_shoulder_roll_controller/set_compliance_slope", true);
-    slope_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_shoulder_lift_controller/set_compliance_slope", true);
-    slope_elbow = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_elbow_controller/set_compliance_slope", true);
-    slope_wrist = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/left_wrist_controller/set_compliance_slope", true);
+    slope_shoulder_roll = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_shoulder_roll_controller/set_compliance_slope", true);
+    slope_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_shoulder_lift_controller/set_compliance_slope", true);
+    slope_elbow = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_elbow_controller/set_compliance_slope", true);
+    slope_wrist = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_wrist_controller/set_compliance_slope", true);
 
-    sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/left_shoulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
-    sub_wrist = nh.subscribe < dynamixel_msgs::JointState > ("/left_wrist_controller/state", 5, &indomptableARM::wristCallback, this);
+    sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/right_shoulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
+    sub_wrist = nh.subscribe < dynamixel_msgs::JointState > ("/right_wrist_controller/state", 5, &indomptableARM::wristCallback, this);
 
 
     joint_pub = nh.advertise < sensor_msgs::JointState > ("joint_states", 1);
@@ -241,11 +232,11 @@ indomptableARM::indomptableARM()
     joint_state.velocity.resize(5);
     joint_state.effort.resize(5);
 
-    joint_state.name[0] ="left_shoulder_roll_joint";
-    joint_state.name[1] ="left_shoulder_lift_joint";
-    joint_state.name[2] ="left_elbow_joint";
-    joint_state.name[3] ="left_wrist_joint";
-    joint_state.name[4] ="left_hand_joint";
+    joint_state.name[0] ="right_shoulder_roll_joint";
+    joint_state.name[1] ="right_shoulder_lift_joint";
+    joint_state.name[2] ="right_elbow_joint";
+    joint_state.name[3] ="right_wrist_joint";
+    joint_state.name[4] ="right_hand_joint";
 
     joint_state.position[0] = 0.0;
     joint_state.position[1] = 0.0;
@@ -289,7 +280,7 @@ indomptableARM::indomptableARM()
 
     dynamixel_controllers::SetComplianceSlope tmp_slope;
 
-    tmp_slope.request.slope = 128;
+    tmp_slope.request.slope = 90;
     if (slope_shoulder_roll.call(tmp_slope))
     {
 	    //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
@@ -342,11 +333,11 @@ void indomptableARM::joint_publish(void)
     joint_state.velocity.resize(5);
     joint_state.effort.resize(5);
 
-    joint_state.name[0] ="left_shoulder_roll_joint";
-    joint_state.name[1] ="left_shoulder_lift_joint";
-    joint_state.name[2] ="left_elbow_joint";
-    joint_state.name[3] ="left_wrist_joint";
-    joint_state.name[4] ="left_hand_joint";
+    joint_state.name[0] ="right_shoulder_roll_joint";
+    joint_state.name[1] ="right_shoulder_lift_joint";
+    joint_state.name[2] ="right_elbow_joint";
+    joint_state.name[3] ="right_wrist_joint";
+    joint_state.name[4] ="right_hand_joint";
 
     joint_state.position[0] = prev_CoxaAngle;
     joint_state.position[1] = -prev_FemurAngle;
@@ -446,7 +437,7 @@ char IKSolutionError;      //Output true if the solution is NOT possible
 
 void indomptableARM::takeCDinTotem(signed int height){
 
-        LegIK((int)(180), (int)(-(42)), (int)(0));
+	LegIK((int)(180), (int)(-(42)), (int)(0));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -475,7 +466,7 @@ void indomptableARM::takeCDinTotem(signed int height){
         }
 
 
-        LegIK((int)(220), (int)(-(42)), (int)(0));
+        LegIK((int)(230), (int)(-(42)), (int)(0));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -488,7 +479,7 @@ void indomptableARM::takeCDinTotem(signed int height){
 	waitMoveEnd();
         //usleep((ActualGaitSpeed+50+50)*SLEEP_COEFF);
 
-        LegIK((int)(220), (int)((12)), (int)(0));
+        LegIK((int)(230), (int)((12)), (int)(0));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -568,7 +559,7 @@ void indomptableARM::takeBARinTotem(void){
 
 void indomptableARM::takeGround(signed int x, signed int y){
 
-        LegIK((int)(80), (int)(100), (int)(0));
+        LegIK((int)(80), (int)(100), (int)(y));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -580,7 +571,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-        LegIK((int)(80), (int)(135), (int)(0));
+        LegIK((int)(80), (int)(135), (int)(y));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -609,7 +600,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
         }
 
 
-        LegIK((int)(80), (int)(170), (int)(0));
+        LegIK((int)(80), (int)(170), (int)(y));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -621,7 +612,7 @@ void indomptableARM::takeGround(signed int x, signed int y){
 
         usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-        LegIK((int)(80), (int)(100), (int)(0));
+        LegIK((int)(80), (int)(100), (int)(y));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -767,7 +758,7 @@ void indomptableARM::waitMoveEnd(void){
 
 		ROS_INFO("Bla : %d", wrist_state.is_moving);
 */
-	usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	usleep((200+50)*SLEEP_COEFF);
 
 
 }
@@ -814,7 +805,19 @@ void indomptableARM::releaseObject(void){
         ServoDriver();
 
 	waitMoveEnd();
-        //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+	LegIK((int)(120), (int)((30)), (int)(0));
+        DesAnkleAngle = -2.7;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        waitMoveEnd();
+
 
         // unpump
         pump_ok = 0;
@@ -834,6 +837,19 @@ void indomptableARM::releaseObject(void){
 
 	waitMoveEnd();
         //usleep((ActualGaitSpeed)*SLEEP_COEFF);
+
+        LegIK((int)(150), (int)((0)), (int)(0));
+        DesAnkleAngle = -2.7;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+        waitMoveEnd();
+
 
 }
 
@@ -917,7 +933,7 @@ void indomptableARM::ServoDriver(void){
   	}
   	else
   	{
-    		ROS_ERROR("Failed to call service SetSpeed");
+    		ROS_ERROR("Failed to call service SetSpeed1");
   	}
 
 	tmp_speed.request.speed = speed_FemurAngle;
@@ -927,7 +943,7 @@ void indomptableARM::ServoDriver(void){
   	}
   	else
   	{
-    		ROS_ERROR("Failed to call service SetSpeed");
+    		ROS_ERROR("Failed to call service SetSpeed2");
 	}
 
 	tmp_speed.request.speed = speed_TibiaAngle;
@@ -937,7 +953,7 @@ void indomptableARM::ServoDriver(void){
   	}
   	else
   	{
-    		ROS_ERROR("Failed to call service SetSpeed");
+    		ROS_ERROR("Failed to call service SetSpeed3");
   	}
 
 	tmp_speed.request.speed = speed_AnkleAngle;
@@ -947,7 +963,7 @@ void indomptableARM::ServoDriver(void){
   	}
   	else
   	{
-    		ROS_ERROR("Failed to call service SetSpeed");
+    		ROS_ERROR("Failed to call service SetSpeed4");
   	}
 
 

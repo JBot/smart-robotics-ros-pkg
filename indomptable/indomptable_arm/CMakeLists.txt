@@ -29,5 +29,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-rosbuild_add_executable(arm src/arm.cpp)
+rosbuild_add_executable(arm_left src/arm_left.cpp)
+rosbuild_add_executable(arm_right src/arm_right.cpp)
 rosbuild_add_executable(ssc32_driver src/ssc32_driver.cpp)
