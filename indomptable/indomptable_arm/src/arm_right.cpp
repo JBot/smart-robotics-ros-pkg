@@ -80,8 +80,6 @@ class indomptableARM {
     ros::Publisher femur_pub;
     ros::Publisher tibia_pub;
     ros::Publisher ankle_pub;
-    ros::Publisher roll_pub;
-    ros::Publisher hand_pub;
     ros::Publisher pump_pub;
 
     ros::ServiceClient client_shoulder_roll;
@@ -101,6 +99,8 @@ class indomptableARM {
 
     ros::Publisher joint_pub;
 
+    ros::Publisher done_pub;
+
     void joint_publish(void);
 
   private:
@@ -116,10 +116,6 @@ class indomptableARM {
     void waitState(void);
     void releaseObject(void);
     void waitMoveEnd(void);
-
-    void shoulder_rollCallback(const dynamixel_msgs::JointState::ConstPtr & joint);
-    void wristCallback(const dynamixel_msgs::JointState::ConstPtr & joint);
-
 
     ros::NodeHandle nh;
 
@@ -161,10 +157,6 @@ double IKFemurAngle;       //Output Angle of Femur in degrees
 double IKTibiaAngle;       //Output Angle of Tibia in degrees
 double IKCoxaAngle;        //Output Angle of Coxa in degrees
 
-
-dynamixel_msgs::JointState shoulder_roll_state;
-dynamixel_msgs::JointState wrist_state;
-
 sensor_msgs::JointState joint_state;
 
 };
@@ -195,12 +187,6 @@ indomptableARM::indomptableARM()
     tmp_string = input_name;
     tmp_string.append("_wrist_joint");
     ankle_pub = nh.advertise < std_msgs::Float64 > ("wrist_joint", 5);
-    tmp_string = input_name;
-    tmp_string.append("_hand_joint");
-    roll_pub = nh.advertise < std_msgs::Float64 > ("hand_joint", 5);
-    tmp_string = input_name;
-    tmp_string.append("_hand");
-    hand_pub = nh.advertise < std_msgs::Float64 > ("hand", 5);
 
     tmp_string = input_name;
     tmp_string.append("_pump");
@@ -220,9 +206,6 @@ indomptableARM::indomptableARM()
     slope_shoulder_lift = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_shoulder_lift_controller/set_compliance_slope", true);
     slope_elbow = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_elbow_controller/set_compliance_slope", true);
     slope_wrist = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/right_wrist_controller/set_compliance_slope", true);
-
-    sub_shoulder_roll = nh.subscribe < dynamixel_msgs::JointState > ("/right_shoulder_roll_controller/state", 5, &indomptableARM::shoulder_rollCallback, this);
-    sub_wrist = nh.subscribe < dynamixel_msgs::JointState > ("/right_wrist_controller/state", 5, &indomptableARM::wristCallback, this);
 
 
     joint_pub = nh.advertise < sensor_msgs::JointState > ("joint_states", 1);
@@ -246,6 +229,7 @@ indomptableARM::indomptableARM()
 
     joint_pub.publish(joint_state);
 
+    done_pub = nh.advertise < std_msgs::Int32 > ("right_arm_done", 2);
 
     prev_CoxaAngle = 0;
     prev_FemurAngle = 0;
@@ -374,20 +358,6 @@ void indomptableARM::pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback
     	pump_ok = 0;
 
 }
-
-void indomptableARM::shoulder_rollCallback(const dynamixel_msgs::JointState::ConstPtr & joint){
-
-	shoulder_roll_state = *joint;
-
-}
-
-void indomptableARM::wristCallback(const dynamixel_msgs::JointState::ConstPtr & joint){
-
-	wrist_state = *joint;
-//	ROS_INFO("Blu : %d", joint->is_moving);
-}
-
-
 
 
 
@@ -775,6 +745,10 @@ void indomptableARM::waitState(void){
         ActualGaitSpeed = 300;
         ServoDriver();
 
+        std_msgs::Int32 tmp_done;
+        tmp_done.data = 1;
+        done_pub.publish(tmp_done);
+
         //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
 }
@@ -979,10 +953,6 @@ void indomptableARM::ServoDriver(void){
 	tibia_pub.publish(tmp);
 	tmp.data = -AnkleAngle;
 	ankle_pub.publish(tmp);
-	tmp.data = RollAngle;
-	roll_pub.publish(tmp);
-	tmp.data = HandAngle;
-	hand_pub.publish(tmp);
 
         return;
 }

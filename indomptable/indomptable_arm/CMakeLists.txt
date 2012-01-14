@@ -31,4 +31,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_executable(arm_left src/arm_left.cpp)
 rosbuild_add_executable(arm_right src/arm_right.cpp)
+rosbuild_add_executable(arm_manager src/arm_manager.cpp)
 rosbuild_add_executable(ssc32_driver src/ssc32_driver.cpp)
