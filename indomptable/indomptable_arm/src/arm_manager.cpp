@@ -60,6 +60,8 @@ class indomptableARM_manager {
     ros::Publisher left_pose_pub;
     ros::Publisher right_pose_pub;
 
+    ros::Publisher straight_move_pub;
+
   private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
     void leftdoneCallback(const std_msgs::Int32::ConstPtr & done);
@@ -85,6 +87,7 @@ indomptableARM_manager::indomptableARM_manager()
     left_pose_pub = nh.advertise < geometry_msgs::PoseStamped > ("left_arm_pose", 5);
     right_pose_pub = nh.advertise < geometry_msgs::PoseStamped > ("right_arm_pose", 5);
 
+    straight_move_pub = nh.advertise < std_msgs::Int32 > ("straight_move", 3);
 
     left_ready = 1;
     right_ready = 1;

@@ -295,6 +295,24 @@ void messageCbright( const std_msgs::Int32& msg){
 
 ros::Subscriber<std_msgs::Int32> ss("right_pump", &messageCbright);
 
+
+void positionCb( const geometry_msgs::Pose2D& goal_msg){
+
+        goal.x = goal_msg.x;
+        goal.y = goal_msg.y;
+        
+        maximus.theta += angle_coord(&maximus, goal_msg.x, goal_msg.y);
+        
+        maximus.pos_X = goal_msg.x;
+        maximus.pos_Y = goal_msg.y;
+        
+        //goto_xy(goal_msg.x, goal_msg.y); 
+        
+}
+
+ros::Subscriber<geometry_msgs::Pose2D> pose_sub("indomptable_goal", &positionCb);
+
+
 /***********************/
 /* INTERRUPT FUNCTIONS */
 /***********************/
@@ -508,20 +526,21 @@ void setup()
   nh.subscribe(s);
   nh.advertise(pp);
   nh.subscribe(ss);
+  nh.subscribe(pose_sub);
 
 }
 
 void loop()
 {  
   // drive in a circle
-  double dx = 0.2;
+  /*double dx = 0.2;
   double dtheta = 0.18;
   x += cos(theta)*dx*0.1;
   y += sin(theta)*dx*0.1;
   theta += dtheta*0.1;
   if(theta > 3.14)
     theta=-3.14;
-    
+    */
   // tf odom->base_link
   t.header.frame_id = odom;
   t.child_frame_id = base_link;

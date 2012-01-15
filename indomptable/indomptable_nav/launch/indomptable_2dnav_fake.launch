@@ -1,0 +1,18 @@
+<launch>
+
+  <node pkg="indomptable_nav" type="indomptable_transform_pose" name="indomptable_pose_node" output="screen">
+  </node>
+
+  <!-- Publish a static transform between the robot base and the map frame -->
+  <node pkg="tf" type="static_transform_publisher" name="map_base_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+
+  <node pkg="eurobot_obstacles" type="pc_eurobot_obstacles" name="eurobot_obstacles" output="screen">
+  </node>
+
+  <node pkg="map_server" type="map_server" name="eurobot_map" args="$(find indomptable_nav)/mymap.yaml" output="screen">
+  </node>
+
+  <node pkg="indomptable_nav" type="pathwrapper" name="indomptable_pathwrapper" output="screen">
+  </node>
+
+</launch>

@@ -201,7 +201,8 @@
 			<turnGravityOff>true</turnGravityOff>
 		</gazebo>
     </xacro:macro>
-    
+
+
  	<!-- ============================   Body   ============================ -->
  	
  	<!--
@@ -263,7 +264,7 @@
                         <xacro:bracket_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="${side}_shoulder_lift_link" lwh="0.05 0.03 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                <xacro:my_box name="${side}_shoulder_lift_link" lwh="0.05 0.03 0.03" xyz="0.015 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
 
@@ -285,6 +286,10 @@
 
                 <xacro:my_box name="${side}_wrist_link" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_pump_link" lwh="0.026 0.01 0.01" xyz="0 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:ax12_color />
                 </xacro:my_box>
 
 
@@ -433,6 +438,23 @@
         <dynamics damping="0.0"/>
         </joint>
 
+	<joint name="left_shoulder_joint2" type="fixed">
+        <parent link="left_shoulder_link" />
+        <child link="left_shoulder_link2" />
+        <origin xyz="0.03 0 0" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+	<joint name="left_shoulder_lift_joint" type="revolute">
+        <parent link="left_shoulder_link2" />
+        <child link="left_shoulder_lift_link" />
+        <origin xyz="0.054 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+<!--
         <joint name="left_shoulder_joint2" type="fixed">
         <parent link="left_shoulder_link" />
         <child link="left_shoulder_lift_link" />
@@ -448,11 +470,11 @@
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
         </joint>
-
+-->
         <joint name="left_elbow_servo_joint" type="fixed">
-        <parent link="left_shoulder_link2" />
+        <parent link="left_shoulder_lift_link" />
         <child link="left_elbow_servo_link" />
-        <origin xyz="0.08 0 0" rpy="0 0 0" />
+        <origin xyz="0.075 0 0" rpy="0 0 0" />
         <axis xyz="0 1 0" />
         </joint>
 
@@ -481,6 +503,12 @@
         <dynamics damping="0.0"/>
         </joint>
 
+        <joint name="left_pump_joint" type="fixed">
+        <parent link="left_wrist_link" />
+        <child link="left_pump_link" />
+        <origin xyz="0.067 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
 
 
 
@@ -546,6 +574,13 @@
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="right_pump_joint" type="fixed">
+        <parent link="right_wrist_link" />
+        <child link="right_pump_link" />
+        <origin xyz="0.067 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
         </joint>
 
 

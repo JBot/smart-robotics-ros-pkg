@@ -209,22 +209,20 @@ indomptableARM::indomptableARM()
 
     joint_pub = nh.advertise < sensor_msgs::JointState > ("joint_states", 1);
     joint_state.header.stamp = ros::Time::now();
-    joint_state.name.resize(5);
-    joint_state.position.resize(5);
-    joint_state.velocity.resize(5);
-    joint_state.effort.resize(5);
+    joint_state.name.resize(4);
+    joint_state.position.resize(4);
+    joint_state.velocity.resize(4);
+    joint_state.effort.resize(4);
 
     joint_state.name[0] ="left_shoulder_roll_joint";
     joint_state.name[1] ="left_shoulder_lift_joint";
     joint_state.name[2] ="left_elbow_joint";
     joint_state.name[3] ="left_wrist_joint";
-    joint_state.name[4] ="left_hand_joint";
 
     joint_state.position[0] = 0.0;
     joint_state.position[1] = 0.0;
     joint_state.position[2] = 0.0;
     joint_state.position[3] = 0.0;
-    joint_state.position[4] = 0.0;
 
     joint_pub.publish(joint_state);
 
@@ -490,7 +488,20 @@ void indomptableARM::takeBARinTotem(void){
         ActualGaitSpeed = 300;
         ServoDriver();
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	waitMoveEnd();
+
+        LegIK((int)(150), (int)(150), (int)(0));
+        DesAnkleAngle = 0;
+        CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+        FemurAngle = -IKFemurAngle;
+        TibiaAngle = (1.570796 - IKTibiaAngle);
+        AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+        RollAngle = -IKCoxaAngle;
+        ActualGaitSpeed = 300;
+        ServoDriver();
+
+	waitMoveEnd();
+
 
         LegIK((int)(170), (int)(150), (int)(0));
         DesAnkleAngle = 0;
@@ -502,7 +513,7 @@ void indomptableARM::takeBARinTotem(void){
         ActualGaitSpeed = 300;
         ServoDriver();
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	waitMoveEnd();
 
         LegIK((int)(130), (int)(150), (int)(0));
         DesAnkleAngle = 0;
@@ -514,7 +525,7 @@ void indomptableARM::takeBARinTotem(void){
         ActualGaitSpeed = 300;
         ServoDriver();
 
-        usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+	waitMoveEnd();
 
 
 
