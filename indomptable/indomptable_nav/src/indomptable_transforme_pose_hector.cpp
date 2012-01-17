@@ -6,6 +6,8 @@
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/Float32.h>
 
+#include "indomptable_nav/GetRobotPose.h"
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -28,14 +30,18 @@ class TransformPoseHector {
     TransformPoseHector();
     void publish_all(tf::TransformListener& listener);
 
-     ros::Publisher odom_pub;
+    bool getRobotPose(indomptable_nav::GetRobotPose::Request  &req, indomptable_nav::GetRobotPose::Response &res );
 
+
+     ros::Publisher odom_pub;
+     ros::ServiceServer pose_service;
 
   private:
     void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
      ros::NodeHandle nh;
 
      nav_msgs::Odometry my_odom;
+     geometry_msgs::PoseStamped robot_pose;
      double old_x;
      double old_y;
      double old_theta;
@@ -68,7 +74,21 @@ TransformPoseHector::TransformPoseHector()
     old_theta = 0;
     old_time = my_odom.header.stamp;
 
+    //pose_service = nh.advertiseService("get_robot_pose", getRobotPose);
+    pose_service = nh.advertiseService("get_robot_pose", &TransformPoseHector::getRobotPose, this);
 }
+
+bool TransformPoseHector::getRobotPose(indomptable_nav::GetRobotPose::Request  &req,
+					indomptable_nav::GetRobotPose::Response &res )
+{
+  res.pose = robot_pose;
+  //res.sum = req.a + req.b;
+  //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+  //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+  return true;
+}
+
+
 
 void TransformPoseHector::rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose)
 {
@@ -111,9 +131,11 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
 
         try{
                 ros::Time now = ros::Time::now();
-                listener.waitForTransform("/map", "/base_link", now, ros::Duration(5.0));
+                listener.waitForTransform("/map", "/base_link", now, ros::Duration(0.5));
                 geometry_msgs::PoseStamped base_pose;
                 listener.transformPose("/map", odom_pose, base_pose);
+		
+		robot_pose = base_pose;		
 
 		my_odom.header.stamp = base_pose.header.stamp;
 		my_odom.pose.pose.position.x = base_pose.pose.position.x;
@@ -157,7 +179,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "transformPose");
     TransformPoseHector transform_Pose;
     // Refresh rate
-    ros::Rate loop_rate(50);                                // 35 with bluetooth
+    ros::Rate loop_rate(60);                                // 35 with bluetooth
 
     tf::TransformListener listener(ros::Duration(10));
 
