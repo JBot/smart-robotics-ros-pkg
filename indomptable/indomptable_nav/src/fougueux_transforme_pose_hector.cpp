@@ -54,10 +54,10 @@ class TransformPoseHector {
 
 TransformPoseHector::TransformPoseHector()
 {
-    odom_pub = nh.advertise < nav_msgs::Odometry > ("odom", 50);
+    odom_pub = nh.advertise < nav_msgs::Odometry > ("odom_fougueux", 50);
 
     my_odom.header.frame_id = "/map";
-    my_odom.child_frame_id = "/base_link";
+    my_odom.child_frame_id = "/base_link2";
     my_odom.header.stamp = ros::Time::now();
 
     my_odom.pose.pose.position.x = 0;
@@ -77,10 +77,10 @@ TransformPoseHector::TransformPoseHector()
     old_theta = 0;
     old_time = my_odom.header.stamp;
 
-    cloud_pub = nh.advertise<sensor_msgs::PointCloud>("indomptable_cloud", 2);
+    cloud_pub = nh.advertise<sensor_msgs::PointCloud>("fougueux_cloud", 2);
 
     //pose_service = nh.advertiseService("get_robot_pose", getRobotPose);
-    pose_service = nh.advertiseService("/indomptable/get_robot_pose", &TransformPoseHector::getRobotPose, this);
+    pose_service = nh.advertiseService("/fougueux/get_robot_pose", &TransformPoseHector::getRobotPose, this);
 }
 
 bool TransformPoseHector::getRobotPose(indomptable_nav::GetRobotPose::Request  &req,
@@ -118,7 +118,7 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
 {
 
         geometry_msgs::PoseStamped odom_pose;
-        odom_pose.header.frame_id = "/base_link";
+        odom_pose.header.frame_id = "/base_link2";
 
         //we'll just use the most recent transform available for our simple example
         odom_pose.header.stamp = ros::Time();
@@ -136,7 +136,7 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
 
         try{
                 ros::Time now = ros::Time::now();
-                listener.waitForTransform("/map", "/base_link", now, ros::Duration(0.5));
+                listener.waitForTransform("/map", "/base_link2", now, ros::Duration(0.5));
                 geometry_msgs::PoseStamped base_pose;
                 listener.transformPose("/map", odom_pose, base_pose);
 		
@@ -218,7 +218,7 @@ int main(int argc, char **argv)
 {
 
 
-    ros::init(argc, argv, "transformPose");
+    ros::init(argc, argv, "transformPose_fougueux");
     TransformPoseHector transform_Pose;
     // Refresh rate
     ros::Rate loop_rate(60);                                // 35 with bluetooth
