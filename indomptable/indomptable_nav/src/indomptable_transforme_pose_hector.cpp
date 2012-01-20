@@ -5,6 +5,7 @@
 #include <tf/transform_listener.h>
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/Float32.h>
+#include <sensor_msgs/PointCloud.h>
 
 #include "indomptable_nav/GetRobotPose.h"
 
@@ -34,6 +35,8 @@ class TransformPoseHector {
 
 
      ros::Publisher odom_pub;
+     ros::Publisher cloud_pub;
+
      ros::ServiceServer pose_service;
 
   private:
@@ -74,8 +77,10 @@ TransformPoseHector::TransformPoseHector()
     old_theta = 0;
     old_time = my_odom.header.stamp;
 
+    cloud_pub = nh.advertise<sensor_msgs::PointCloud>("indomptable_cloud", 2);
+
     //pose_service = nh.advertiseService("get_robot_pose", getRobotPose);
-    pose_service = nh.advertiseService("get_robot_pose", &TransformPoseHector::getRobotPose, this);
+    pose_service = nh.advertiseService("/indomptable/get_robot_pose", &TransformPoseHector::getRobotPose, this);
 }
 
 bool TransformPoseHector::getRobotPose(indomptable_nav::GetRobotPose::Request  &req,
@@ -153,6 +158,43 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
 		my_odom.twist.twist.angular.z =  (tf::getYaw (my_odom.pose.pose.orientation) - old_theta) / (my_odom.header.stamp.toSec() - old_time.toSec());
 
 		odom_pub.publish(my_odom);
+
+
+    sensor_msgs::PointCloud cloud;
+    cloud.header.stamp = ros::Time::now();
+    cloud.header.frame_id = "/map";
+
+    cloud.set_points_size(4);
+
+    //we'll also add an intensity channel to the cloud
+    cloud.set_channels_size(1);
+    cloud.channels[0].name = "intensities";
+    cloud.channels[0].set_values_size(4);
+
+    //generate some fake data for our point cloud
+
+    // Tree
+      cloud.points[0].x = base_pose.pose.position.x + 0.1;
+      cloud.points[0].y = base_pose.pose.position.y;
+      cloud.points[0].z = 0;
+      cloud.channels[0].values[0] = 199;
+
+      cloud.points[1].x = base_pose.pose.position.x - 0.1;
+      cloud.points[1].y = base_pose.pose.position.y;
+      cloud.points[1].z = 0;
+      cloud.channels[0].values[1] = 199;
+
+      cloud.points[2].x = base_pose.pose.position.x;
+      cloud.points[2].y = base_pose.pose.position.y + 0.1;
+      cloud.points[2].z = 0;
+      cloud.channels[0].values[2] = 199;
+
+      cloud.points[3].x = base_pose.pose.position.x;
+      cloud.points[3].y = base_pose.pose.position.y - 0.1;
+      cloud.points[3].z = 0;
+      cloud.channels[0].values[3] = 199;
+
+      cloud_pub.publish(cloud);
 
 		old_x = base_pose.pose.position.x;
 		old_y = base_pose.pose.position.y;

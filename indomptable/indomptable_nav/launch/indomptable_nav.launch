@@ -1,0 +1,60 @@
+<launch>
+  <node pkg="hokuyo_node" type="hokuyo_node" name="indomptable_laser_publisher" output="screen">
+    <param name="frame_id" value="base_laser" />
+    <param name="min_ang" value="-2.086214" />
+    <param name="max_ang" value="2.092350" />
+  </node>
+
+  <node pkg="indomptable_nav" type="indomptable_transform_pose_hector" name="indomptable_pose_node" output="screen">
+  </node>
+
+  <!-- Publish a static transform between the robot base and the map frame -->
+  <node pkg="tf" type="static_transform_publisher" name="map_base_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+
+  <node pkg="eurobot_obstacles" type="pc_eurobot_obstacles" name="eurobot_obstacles" output="screen">
+  </node>
+
+  <node pkg="map_server" type="map_server" name="eurobot_map" args="$(find indomptable_nav)/mymap.yaml" output="screen">
+  </node>
+
+  <node pkg="indomptable_nav" type="pathwrapper" name="indomptable_pathwrapper" output="screen">
+  </node>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="arduino_serial_odometry" output="screen">
+    <param name="baud" value="57600" />
+    <param name="port" value="/dev/ttyUSB0" />
+  </node>
+
+  <node pkg="move_base" type="move_base" respawn="true" name="move_base_indomptable" output="screen">
+    <rosparam file="$(find indomptable_nav)/launch/indomptable_costmap_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find indomptable_nav)/launch/no_costmap_params.yaml" command="load" ns="local_costmap" />
+<!--    <rosparam file="$(find indomptable_nav)/launch/local_costmap_params_hector.yaml" command="load" /> -->
+<!--    <rosparam file="$(find indomptable_nav)/launch/global_costmap_params_hector.yaml" command="load" /> -->
+    <rosparam file="$(find indomptable_nav)/launch/base_local_planner_params_hector.yaml" command="load" />
+  </node>
+
+  <node pkg="move_base" type="move_base" respawn="true" name="move_base_fougueux" output="screen">
+    <rosparam file="$(find indomptable_nav)/launch/fougueux_costmap_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find indomptable_nav)/launch/no_costmap_params.yaml" command="load" ns="local_costmap" />
+<!--    <rosparam file="$(find indomptable_nav)/launch/local_costmap_params_hector.yaml" command="load" /> -->
+<!--    <rosparam file="$(find indomptable_nav)/launch/global_costmap_params_hector.yaml" command="load" /> -->
+    <rosparam file="$(find indomptable_nav)/launch/base_local_planner_params_hector.yaml" command="load" />
+  </node>
+
+
+  <!-- Run the costmap node -->
+<!--
+  <node name="indomptable_costmap_node" pkg="costmap_2d" type="costmap_2d_node" output="screen"> 
+    <rosparam file="$(find indomptable_nav)/launch/indomptable_costmap_params.yaml" command="load" ns="costmap" />
+  </node>
+-->
+  <!-- Run the costmap node -->
+<!--
+  <node name="fougueux_costmap_node" pkg="costmap_2d" type="costmap_2d_node" output="screen">
+    <rosparam file="$(find indomptable_nav)/launch/fougueux_costmap_params.yaml" command="load" ns="costmap" />
+  </node>
+
+  <node name="navfn_node" pkg="navfn" type="navfn_node" >
+  </node>
+-->
+</launch>
