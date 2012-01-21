@@ -66,7 +66,7 @@ Pathwrapper::Pathwrapper()
     goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_test/goal", 20, &Pathwrapper::goalCallback, this);
     // Path suscriber
     //path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/TrajectoryPlannerROS/global_plan", 20, &MaximusPath::pathCallback, this);
-    path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/NavfnROS/plan", 20, &Pathwrapper::pathCallback, this);
+    path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base_indomptable/NavfnROS/plan", 20, &Pathwrapper::pathCallback, this);
 
     pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/indomptable_goal", 50);
     poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);

@@ -1,13 +1,21 @@
 <launch>
   <master auto="start"/>
 
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-
-
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base_indomptable" output="screen">
     <rosparam file="$(find indomptable_nav)/launch/costmap_common_params_fake.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find indomptable_nav)/launch/costmap_common_params_fake.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find indomptable_nav)/launch/localcostmap_common_params_fake.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find indomptable_nav)/launch/local_costmap_params_hector.yaml" command="load" />
     <rosparam file="$(find indomptable_nav)/launch/global_costmap_params_hector.yaml" command="load" />
     <rosparam file="$(find indomptable_nav)/launch/base_local_planner_params_hector.yaml" command="load" />
   </node>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base_fougueux" output="screen">
+    <rosparam file="$(find indomptable_nav)/launch/fcostmap_common_params_fake.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find indomptable_nav)/launch/localcostmap_common_params_fake.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find indomptable_nav)/launch/local_costmap_params_hector.yaml" command="load" />
+    <rosparam file="$(find indomptable_nav)/launch/fglobal_costmap_params_hector.yaml" command="load" />
+    <rosparam file="$(find indomptable_nav)/launch/base_local_planner_params_hector.yaml" command="load" />
+  </node>
+
+
 </launch>

@@ -1,8 +1,9 @@
-global_costmap:
+local_costmap:
   global_frame: /map
   robot_base_frame: base_link
-  update_frequency: 4.0
-  publish_frequency: 4.0
+  update_frequency: 0.1
+  publish_frequency: 0.1
   static_map: true
   rolling_window: false
-  resolution: 0.02
+  resolution: 0.1
+

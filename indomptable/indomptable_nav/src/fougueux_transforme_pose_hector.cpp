@@ -48,6 +48,7 @@ class TransformPoseHector {
      double old_x;
      double old_y;
      double old_theta;
+     double cpt;
      ros::Time old_time;
 
 };
@@ -81,6 +82,8 @@ TransformPoseHector::TransformPoseHector()
 
     //pose_service = nh.advertiseService("get_robot_pose", getRobotPose);
     pose_service = nh.advertiseService("/fougueux/get_robot_pose", &TransformPoseHector::getRobotPose, this);
+
+    cpt = 0.0;
 }
 
 bool TransformPoseHector::getRobotPose(indomptable_nav::GetRobotPose::Request  &req,
@@ -140,6 +143,11 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
                 geometry_msgs::PoseStamped base_pose;
                 listener.transformPose("/map", odom_pose, base_pose);
 		
+		base_pose.pose.position.y = base_pose.pose.position.y + cpt;
+		cpt = cpt + 0.001;
+		if(cpt > 0.5)
+			cpt = -0.01;
+
 		robot_pose = base_pose;		
 
 		my_odom.header.stamp = base_pose.header.stamp;
