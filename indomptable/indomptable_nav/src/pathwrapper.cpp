@@ -66,7 +66,7 @@ Pathwrapper::Pathwrapper()
     goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_test/goal", 20, &Pathwrapper::goalCallback, this);
     // Path suscriber
     //path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/TrajectoryPlannerROS/global_plan", 20, &MaximusPath::pathCallback, this);
-    path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base_indomptable/NavfnROS/plan", 20, &Pathwrapper::pathCallback, this);
+    path_sub_ = nh.subscribe < nav_msgs::Path > ("/my_indomptable_path", 20, &Pathwrapper::pathCallback, this);
 
     pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/indomptable_goal", 50);
     poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);
@@ -107,7 +107,7 @@ void Pathwrapper::rotate(double heading, double attitude, double bank, geometry_
 
 void Pathwrapper::pathCallback(const nav_msgs::Path::ConstPtr & path)
 {
-
+/*
 if(path->poses.std::vector<geometry_msgs::PoseStamped >::size() < 4) {
 
 
@@ -119,7 +119,7 @@ if(cpt_send == 0) {
 	cpt_send++;
 }
 else {
-
+*/
     ROS_INFO("Path begin.");
     my_path = *path;
     ROS_INFO("Path next.");
@@ -223,11 +223,11 @@ if( !(my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
 //    ROS_INFO("Path sent.");
 
    cpt_send = 0;
-}
+//}
 
 
 
-}
+//}
 
 }
 
