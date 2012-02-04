@@ -1,5 +1,8 @@
 <launch>
 
+    <node pkg="indomptable_arm" type="arm_manager" name="arm_manager" output="screen">
+    </node>
+
     <node pkg="indomptable_arm" type="arm_left" name="left_arm" output="screen">
         <!-- Init params -->
 	<remap from="arm_pose" to="left_arm_pose" />

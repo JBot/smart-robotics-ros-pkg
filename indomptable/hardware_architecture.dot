@@ -1,0 +1,44 @@
+digraph INDOMPTABLE_HARD {
+  overlap = scale;
+
+  LAPTOP [shape=hexagon, style=bold, label="Laptop + Ubuntu + ROS"];
+  USBHUB [label="USB HUB"];
+  ARDUINO_MOTION [shape=hexagon, label="ArduinoMega"];
+  WIFI [label="Wifi"];
+  BLUETOOTH [label="Bluetooth"];
+  MOTOR_CTRL [label="RoboClaw\nMotor controller"];
+  PML [label="Lidar"];
+  WEBCAM [label="Webcam"];
+  USB2AX12 [label="USB2AX\n(made by Xevel)"];
+  ARM [label="ARM with 4 DOF"];
+  MOTOR [label="DC motors"];
+  ENCODER [label="Encoders"];
+  RELAY [label="Relay board"];
+  VACUUMPUMP [label="Vacuum pump"];
+  SUCTION [label="Suction Pad"];
+  ELECTROVALVE [label="Electro-valve"];
+
+  USBHUB -> ARDUINO_MOTION [label="USB"];
+  LAPTOP -> WIFI [label="Internal"];
+  LAPTOP -> BLUETOOTH [label="Internal"];
+  LAPTOP -> USBHUB [label="USB"];
+  USBHUB -> USB2AX12 [label="USB"];
+  USBHUB -> WEBCAM [label="USB"];
+  LAPTOP -> PML [label="USB"];
+
+  ARDUINO_MOTION -> MOTOR_CTRL [label="Serial"];
+  MOTOR_CTRL -> MOTOR [label=""];
+  MOTOR -> ENCODER;
+  ENCODER -> ARDUINO_MOTION [label="External interruption"];
+
+  ARDUINO_MOTION -> RELAY [label="GPIO"];
+
+  RELAY -> VACUUMPUMP [label="12V"];
+  RELAY -> ELECTROVALVE [label="5V"];
+  VACUUMPUMP -> ELECTROVALVE [label="Pipe"];
+  ELECTROVALVE -> SUCTION [label="Pipe"];
+
+  USB2AX12 -> ARM [label="Serial"];
+  ARM -> SUCTION;
+}
+

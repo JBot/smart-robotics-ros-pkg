@@ -34,14 +34,16 @@ void delay_ms(uint16_t millis)
 /***********/
 /* Defines */
 /***********/
-#define TICK_PER_MM_LEFT 	(91.143671935*2)//91.143671935
-#define TICK_PER_MM_RIGHT 	(91.143671935*2)//91.143671935
-#define DIAMETER 		195.0                      //155.0                      // Distance between the 2 wheels
+#define TICK_PER_MM_LEFT 	(18.6256756)
+#define TICK_PER_MM_RIGHT 	(18.6256756)
+#define TICK_PER_M_LEFT 	(18215.6756)
+#define TICK_PER_M_RIGHT 	(18215.6756)
+#define DIAMETER 		0.300                      // Distance between the 2 wheels
 
 #define TWOPI 			6.2831853070
 #define RAD2DEG 		57.2958                    /* radians to degrees conversion */
 
-#define ENC_TICKS 100 // 100 // 512
+#define ENC_TICKS 100
 #define QUAD_TICKS (4*ENC_TICKS)
 #define GEAR_REDUCTION (50)
 #define TOTAL_TICKS (GEAR_REDUCTION * QUAD_TICKS)
@@ -49,7 +51,7 @@ void delay_ms(uint16_t millis)
 #define WHEEL_DIAMETER 0.07
 #define WHEEL_PERIMETER (WHEEL_DIAMETER * 3.14159265)
 
-#define WHEEL_DISTANCE 0.166 // 0.2704
+#define WHEEL_DISTANCE 0.230
 #define TURN_PERIMETER (WHEEL_DISTANCE * 3.14159265)
 
 // Types of motor
@@ -66,14 +68,14 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         20000//20000
-#define ALPHA_MAX_ACCEL         400//300
-#define ALPHA_MAX_DECEL         5000                       //2500
-#define DELTA_MAX_SPEED         25000//51000 
-#define DELTA_MAX_SPEED_BACK    35000 
-#define DELTA_MAX_SPEED_BACK_PAWN    45000
-#define DELTA_MAX_ACCEL         1000//1000     
-#define DELTA_MAX_DECEL         10000 
+#define ALPHA_MAX_SPEED         2000//20000
+#define ALPHA_MAX_ACCEL         40//300
+#define ALPHA_MAX_DECEL         500                       //2500
+#define DELTA_MAX_SPEED         2500//51000 
+#define DELTA_MAX_SPEED_BACK    3500 
+#define DELTA_MAX_SPEED_BACK_PAWN    4500
+#define DELTA_MAX_ACCEL         100//1000     
+#define DELTA_MAX_DECEL         1000 
 
 //#define PATH_FOLLOWING          1
 
@@ -312,6 +314,18 @@ void positionCb( const geometry_msgs::Pose2D& goal_msg){
 
 ros::Subscriber<geometry_msgs::Pose2D> pose_sub("indomptable_goal", &positionCb);
 
+void messageCbSpeed(const geometry_msgs::Twist& msg) {
+        //toggle();   // blink the led
+      delta_motor.des_speed = (signed long) (msg.linear.x * ticks_per_m / 60);
+
+    alpha_motor.des_speed = (signed long) (msg.angular.z * ticks_per_rad / 5);
+
+    write_RoboClaw_speed_M1M2(128, delta_motor.des_speed - alpha_motor.des_speed, delta_motor.des_speed + alpha_motor.des_speed);
+
+}
+
+ros::Subscriber<geometry_msgs::Twist> subspeed("cmd_vel", &messageCbSpeed);
+
 
 /***********************/
 /* INTERRUPT FUNCTIONS */
@@ -527,6 +541,7 @@ void setup()
   nh.advertise(pp);
   nh.subscribe(ss);
   nh.subscribe(pose_sub);
+  nh.subscribe(subspeed);
 
 }
 
@@ -565,10 +580,10 @@ void init_Robot(struct robot *my_robot)
 {
     my_robot->pos_X = 0;                               // -700
     my_robot->pos_Y = 0.14;                                 // 700
-    my_robot->theta = PI/2;                                   // PI/2
+    my_robot->theta = 0; //PI/2;                                   // PI/2
     my_robot->desX = 0;
     my_robot->desY = 0;
-    my_robot->desTheta = PI/2;
+    my_robot->desTheta = 0; //PI/2;
 }
 
 void init_blue_Robot(struct robot *my_robot)
@@ -906,16 +921,16 @@ void get_Odometers(void)
     last_left = left_wheel;
     last_right = right_wheel;
 
-    left_mm = ((double) left_diff) / 9262.8378129;
-    right_mm = ((double) right_diff) / 9262.8378129;
+    left_mm = ((double) left_diff) / TICK_PER_M_LEFT;
+    right_mm = ((double) right_diff) / TICK_PER_M_LEFT;
 
     distance = (left_mm + right_mm) / 2;
     total_distance += distance;
     bot_command_delta.current_distance += distance;
 
-    maximus.theta += (right_mm - left_mm) / 0.2704;
-    bot_command_alpha.current_distance += (right_mm - left_mm) / 0.2704;
-    total_theta += (right_mm - left_mm) / 0.2704;
+    maximus.theta += (right_mm - left_mm) / DIAMETER;
+    bot_command_alpha.current_distance += (right_mm - left_mm) / DIAMETER;
+    total_theta += (right_mm - left_mm) / DIAMETER;
 
     if (maximus.theta > PI)
         maximus.theta -= TWOPI;
