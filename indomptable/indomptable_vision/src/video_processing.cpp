@@ -21,7 +21,7 @@ public:
   ImageConverter()
     : it_(nh_)
   {
-    image_pub_ = it_.advertise("out", 1);
+    image_pub_ = it_.advertise("/out/image_raw", 1);
     image_sub_ = it_.subscribe("/camera/image_raw", 1, &ImageConverter::imageCb, this);
 
     //cv::namedWindow(WINDOW);
@@ -64,24 +64,25 @@ public:
     Canny( gray, gray, 16, 33, 3 );
     vector<Vec4i> lines;
     HoughLinesP( gray, lines, 1, CV_PI/180, 10.0, 240.0, 15.0 );
-    for( size_t i = 0; i < lines.size(); i++ )
+
+/*    for( size_t i = 0; i < lines.size(); i++ )
     {
         if( ((lines.size() - i) > 1) && (sqrt((lines[i][0]-lines[i+1][0])*(lines[i][0]-lines[i+1][0]) + (lines[i][1]-lines[i+1][1])*(lines[i][1]-lines[i+1][1])) > 125 ) && (sqrt((lines[i][0]-lines[i+1][0])*(lines[i][0]-lines[i+1][0]) + (lines[i][1]-lines[i+1][1])*(lines[i][1]-lines[i+1][1])) < 170 )) {
           line( cv_ptr->image, Point(lines[i][0], lines[i][1]),
             Point(lines[i+1][2], lines[i+1][3]), Scalar(255,255,0), 3, 8 );
           line( cv_ptr->image, Point(lines[i+1][0], lines[i+1][1]),
             Point(lines[i][2], lines[i][3]), Scalar(255,255,0), 3, 8 );
-
+*/
 	  /* Test of line intersection */
-	  int a, b, c, d, x, y;
+//	  int a, b, c, d, x, y;
 	  /* Segment equation */
-	  a = (lines[i][0] - lines[i+1][2]) / (lines[i][1] - lines[i+1][3]);
+/*	  a = (lines[i][0] - lines[i+1][2]) / (lines[i][1] - lines[i+1][3]);
 	  b = lines[i][1] - a * lines[i][0];
 
 	  c = (lines[i+1][0] - lines[i][2]) / (lines[i+1][1] - lines[i][3]);
           d = lines[i+1][1] - c * lines[i+1][0];
-	  /* Intersection point */
-	  x = (d - b) / (a - c);
+*/	  /* Intersection point */
+/*	  x = (d - b) / (a - c);
 	  y = a * x + b;
 
 	  ROS_ERROR("intersection : %i | %i ", x, y);  
@@ -98,7 +99,7 @@ public:
             Point(lines[i][2], lines[i][3]), Scalar(255,0,0), 3, 8 );
         }
     }
-
+*/
 
 /*    Mat gray = Mat::zeros(cv_ptr->image.rows, cv_ptr->image.cols, CV_8UC3);
     Mat out;
@@ -182,7 +183,7 @@ public:
 */
 
     
-//    image_pub_.publish(cv_ptr->toImageMsg());
+    image_pub_.publish(cv_ptr->toImageMsg());
     waitKey(3);
   }
 };

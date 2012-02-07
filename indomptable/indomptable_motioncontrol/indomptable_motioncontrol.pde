@@ -36,9 +36,9 @@ void delay_ms(uint16_t millis)
 /***********/
 #define TICK_PER_MM_LEFT 	(18.6256756)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
-#define TICK_PER_M_LEFT 	(18215.6756)
-#define TICK_PER_M_RIGHT 	(18215.6756)
-#define DIAMETER 		0.300                      // Distance between the 2 wheels
+#define TICK_PER_M_LEFT 	(18205.6756)
+#define TICK_PER_M_RIGHT 	(18205.6756)
+#define DIAMETER 		0.2990 //0.2962                      // Distance between the 2 wheels
 
 #define TWOPI 			6.2831853070
 #define RAD2DEG 		57.2958                    /* radians to degrees conversion */
@@ -67,15 +67,24 @@ void delay_ms(uint16_t millis)
 #define PROCESSING_COMMAND 	1
 #define WAITING_BEGIN 		2
 #define ERROR 			3
-
-#define ALPHA_MAX_SPEED         2000//20000
-#define ALPHA_MAX_ACCEL         40//300
-#define ALPHA_MAX_DECEL         500                       //2500
-#define DELTA_MAX_SPEED         2500//51000 
+/*
+#define ALPHA_MAX_SPEED         6000//20000
+#define ALPHA_MAX_ACCEL         100//300
+#define ALPHA_MAX_DECEL         1000                       //2500
+#define DELTA_MAX_SPEED         6000//51000 
 #define DELTA_MAX_SPEED_BACK    3500 
 #define DELTA_MAX_SPEED_BACK_PAWN    4500
-#define DELTA_MAX_ACCEL         100//1000     
-#define DELTA_MAX_DECEL         1000 
+#define DELTA_MAX_ACCEL         300//1000     
+#define DELTA_MAX_DECEL         2000
+*/
+#define ALPHA_MAX_SPEED         7000//20000
+#define ALPHA_MAX_ACCEL         300//300
+#define ALPHA_MAX_DECEL         2000                       //2500
+#define DELTA_MAX_SPEED         7000//51000 
+#define DELTA_MAX_SPEED_BACK    3500 
+#define DELTA_MAX_SPEED_BACK_PAWN    4500
+#define DELTA_MAX_ACCEL         400//1000     
+#define DELTA_MAX_DECEL         3000 
 
 //#define PATH_FOLLOWING          1
 
@@ -181,6 +190,7 @@ struct Point prev_position;
 
 int global_cpt = 0;
 
+int cpt_asserv = 0;
 
 double ticks_per_m = TOTAL_TICKS / WHEEL_PERIMETER;
 double m_per_tick = WHEEL_PERIMETER / TOTAL_TICKS;
@@ -303,17 +313,17 @@ void positionCb( const geometry_msgs::Pose2D& goal_msg){
         goal.x = goal_msg.x;
         goal.y = goal_msg.y;
         
-        maximus.theta += angle_coord(&maximus, goal_msg.x, goal_msg.y);
+//        maximus.theta += angle_coord(&maximus, goal_msg.x, goal_msg.y);
         
-        maximus.pos_X = goal_msg.x;
-        maximus.pos_Y = goal_msg.y;
+//        maximus.pos_X = goal_msg.x;
+//        maximus.pos_Y = goal_msg.y;
         
-        //goto_xy(goal_msg.x, goal_msg.y); 
+        goto_xy(goal_msg.x, goal_msg.y); 
         
 }
 
 ros::Subscriber<geometry_msgs::Pose2D> pose_sub("indomptable_goal", &positionCb);
-
+/*
 void messageCbSpeed(const geometry_msgs::Twist& msg) {
         //toggle();   // blink the led
       delta_motor.des_speed = (signed long) (msg.linear.x * ticks_per_m / 60);
@@ -325,7 +335,7 @@ void messageCbSpeed(const geometry_msgs::Twist& msg) {
 }
 
 ros::Subscriber<geometry_msgs::Twist> subspeed("cmd_vel", &messageCbSpeed);
-
+*/
 
 /***********************/
 /* INTERRUPT FUNCTIONS */
@@ -406,7 +416,12 @@ ISR(TIMER1_OVF_vect)
 {
     sei();                                                 // enable interrupts
     get_Odometers();
-
+/*
+    do_motion_control();
+    if ((transmit_status) == 1)
+      move_motors(ALPHADELTA);
+*/
+  if(cpt_asserv > 3) {
     if (motion_control_ON == 1) {
         do_motion_control();
         if (roboclaw_ON == 1)
@@ -416,6 +431,11 @@ ISR(TIMER1_OVF_vect)
         if (roboclaw_ON == 1)
             move_motors(LEFTRIGHT);                        // Update the motor speed
     }
+    cpt_asserv = 0;
+  }
+  else {
+    cpt_asserv++;
+  }
 
 }
 
@@ -474,7 +494,7 @@ void setup()
     // Compare B Match Interrupt: Off
     // Compare C Match Interrupt: Off
     TCCR1A = 0x01;
-    TCCR1B = 0x04;
+    TCCR1B = 0x03; // 4
     TCNT1H = 0x00;
     TCNT1L = 0x00;
     ICR1H = 0x00;
@@ -541,7 +561,10 @@ void setup()
   nh.advertise(pp);
   nh.subscribe(ss);
   nh.subscribe(pose_sub);
-  nh.subscribe(subspeed);
+//  nh.subscribe(subspeed);
+
+  motion_control_ON = 1;
+  roboclaw_ON = 1;
 
 }
 
@@ -567,9 +590,20 @@ void loop()
   t.header.stamp = nh.now();
   
   broadcaster.sendTransform(t);
+
   nh.spinOnce();
-  
   delay(10);
+  
+  nh.spinOnce();  
+  delay(10);
+
+  nh.spinOnce();  
+  delay(10);
+
+  nh.spinOnce();  
+  delay(10);
+
+
 }
 
 
@@ -648,9 +682,9 @@ void init_motors(void)
     alpha_motor.cur_speed = 0;
     alpha_motor.last_error = 0;
     alpha_motor.error_sum = 0;
-    alpha_motor.kP = 230;
+    alpha_motor.kP = 150; //230;
     alpha_motor.kI = 0;
-    alpha_motor.kD = 340;
+    alpha_motor.kD = 250; //340;
     alpha_motor.accel = ALPHA_MAX_ACCEL;
     alpha_motor.decel = ALPHA_MAX_DECEL;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;
@@ -662,9 +696,9 @@ void init_motors(void)
     delta_motor.cur_speed = 0;
     delta_motor.last_error = 0;
     delta_motor.error_sum = 0;
-    delta_motor.kP = 600;
+    delta_motor.kP = 300; //600;
     delta_motor.kI = 0;
-    delta_motor.kD = 200;
+    delta_motor.kD = 100; //200;
     delta_motor.accel = DELTA_MAX_ACCEL;
     delta_motor.decel = DELTA_MAX_DECEL;
     delta_motor.max_speed = DELTA_MAX_SPEED;
@@ -1007,10 +1041,10 @@ void do_motion_control(void)
         
         double dist = distance_coord(&maximus, goal.x, goal.y);
         //double max_possible_speed = 1050000 * dist / ang;
-        double max_possible_speed = 2500000 * abs(dist) / abs(ang);
-        if(max_possible_speed < 200)
+        double max_possible_speed = 350000 * abs(dist) / abs(ang); //350000
+        if(max_possible_speed < 50)
           max_possible_speed = 0;
-        delta_motor.max_speed = min(max_possible_speed, DELTA_MAX_SPEED);       
+        delta_motor.max_speed = min(max_possible_speed, DELTA_MAX_SPEED - 3000);       
         set_new_command(&bot_command_delta, dist);
         prev_bot_command_delta.state = WAITING_BEGIN;
     } else {
