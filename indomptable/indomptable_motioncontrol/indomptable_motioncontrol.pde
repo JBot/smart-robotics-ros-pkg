@@ -1,5 +1,5 @@
 /* 
- * rosserial Planar Odometry Example
+ *  Planar Odometry 
  */
 #include <ros.h>
 #include <ros/time.h>
@@ -40,6 +40,8 @@ void delay_ms(uint16_t millis)
 #define TICK_PER_M_RIGHT 	(18205.6756)
 #define DIAMETER 		    0.2990      //0.2962                      // Distance between the 2 wheels
 
+#define DISTANCE_REAR_WHEELS    0.120
+
 #define CORFUGE             1.2
 
 #define TWOPI 			    6.2831853070
@@ -69,26 +71,33 @@ void delay_ms(uint16_t millis)
 #define PROCESSING_COMMAND 	1
 #define WAITING_BEGIN 		2
 #define ERROR 			3
-/*
-#define ALPHA_MAX_SPEED         6000//20000
-#define ALPHA_MAX_ACCEL         100//300
+
+#define ALPHA_MAX_SPEED         3000//20000
+#define ALPHA_MAX_ACCEL         300//300
 #define ALPHA_MAX_DECEL         1000                       //2500
 #define DELTA_MAX_SPEED         6000//51000 
 #define DELTA_MAX_SPEED_BACK    3500 
 #define DELTA_MAX_SPEED_BACK_PAWN    4500
 #define DELTA_MAX_ACCEL         300//1000     
 #define DELTA_MAX_DECEL         2000
-*/
-#define ALPHA_MAX_SPEED         7000    //20000
-#define ALPHA_MAX_ACCEL         300     //300
-#define ALPHA_MAX_DECEL         2000    //2500
+
+/*
+#define ALPHA_MAX_SPEED         5000    //20000
+#define ALPHA_MAX_ACCEL         500     //300
+#define ALPHA_MAX_DECEL         2500    //2500
 #define DELTA_MAX_SPEED         7000    //51000
 #define DELTA_MAX_SPEED_BACK    3500
 #define DELTA_MAX_SPEED_BACK_PAWN    4500
 #define DELTA_MAX_ACCEL         400     //1000
 #define DELTA_MAX_DECEL         3000
-
+*/
 //#define PATH_FOLLOWING          1
+
+
+#define LEFT_REAR_SENSOR        43
+#define RIGHT_REAR_SENSOR       42
+
+
 
 /***********************/
 /* Specific structures */
@@ -148,7 +157,7 @@ volatile long right_cnt = 0;
 char output_ON = 0;
 char roboclaw_ON = 0;
 char motion_control_ON = 1;
-
+int8_t color = -1;
 
 int last_left = 0;
 int last_right = 0;
@@ -193,6 +202,8 @@ struct Point prev_position;
 int global_cpt = 0;
 
 int cpt_asserv = 0;
+int alpha_and_theta = 0;
+
 
 double ticks_per_m = TOTAL_TICKS / WHEEL_PERIMETER;
 double m_per_tick = WHEEL_PERIMETER / TOTAL_TICKS;
@@ -335,6 +346,7 @@ void positionCb(const geometry_msgs::Pose2D & goal_msg)
 
 ros::Subscriber < geometry_msgs::Pose2D > pose_sub("indomptable_goal",
                                                    &positionCb);
+
 /*
 void messageCbSpeed(const geometry_msgs::Twist& msg) {
         //toggle();   // blink the led
@@ -433,6 +445,7 @@ ISR(TIMER1_OVF_vect)
     if ((transmit_status) == 1)
       move_motors(ALPHADELTA);
 */
+
     if (cpt_asserv > 3) {
         if (motion_control_ON == 1) {
             do_motion_control();
@@ -555,6 +568,10 @@ void setup()
     // Global enable interrupts
     sei();
 
+    pinMode(LEFT_REAR_SENSOR, INPUT);
+    pinMode(RIGHT_REAR_SENSOR, INPUT);
+
+
     pinMode(8, OUTPUT);
     digitalWrite(8, LOW);
     pinMode(6, OUTPUT);
@@ -572,11 +589,25 @@ void setup()
     nh.advertise(pp);
     nh.subscribe(ss);
     nh.subscribe(pose_sub);
-//  nh.subscribe(subspeed);
+//    nh.subscribe(subspeed);
+
+    // Enable motion control for auto init
+    alpha_and_theta = 0;
+    motion_control_ON = 1;
+    roboclaw_ON = 1;
+    
+    // auto init
+    color = -1;
+    init_first_position(&maximus);
+
+    // Disable motion control
+    motion_control_ON = 0;
+    roboclaw_ON = 0;
+    alpha_and_theta = 1;
 
     motion_control_ON = 1;
     roboclaw_ON = 1;
-
+    
 }
 
 void loop()
@@ -610,10 +641,10 @@ void loop()
 
     nh.spinOnce();
     delay(10);
-
+/*
     nh.spinOnce();
     delay(10);
-
+*/
 
 }
 
@@ -694,9 +725,9 @@ void init_motors(void)
     alpha_motor.cur_speed = 0;
     alpha_motor.last_error = 0;
     alpha_motor.error_sum = 0;
-    alpha_motor.kP = 150;       //230;
+    alpha_motor.kP = 75; //100; //150;       //230;
     alpha_motor.kI = 0;
-    alpha_motor.kD = 250;       //340;
+    alpha_motor.kD = 122; //166; //250;       //340;
     alpha_motor.accel = ALPHA_MAX_ACCEL;
     alpha_motor.decel = ALPHA_MAX_DECEL;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;
@@ -716,6 +747,73 @@ void init_motors(void)
     delta_motor.max_speed = DELTA_MAX_SPEED;
     delta_motor.distance = 0.0;
 }
+
+void init_first_position(struct robot *my_robot)
+{
+    // Put the robot in low speed mode
+    delta_motor.max_speed = 1500;
+    alpha_motor.max_speed = 1000;
+    // go back to touch the wall
+    set_new_command(&bot_command_alpha, 0);
+    set_new_command(&bot_command_delta, -1000);
+
+    while ((digitalRead(LEFT_REAR_SENSOR) == 0) || (digitalRead(RIGHT_REAR_SENSOR) == 0)) {
+        delay(100);
+
+    }
+    delay(300);
+    // Set the Y position and theta
+    my_robot->theta = PI / 2;
+    my_robot->pos_Y = DISTANCE_REAR_WHEELS;
+    my_robot->pos_X = 0;
+
+    delay(100);
+    // Stop the motors
+    set_new_command(&bot_command_alpha, 0);
+    set_new_command(&bot_command_delta, 0);
+    delay(100);
+    // Go forward, turn, and go bachward to touch the other wall
+    set_new_command(&bot_command_delta, 0.180);
+    delay(8000);
+    set_new_command(&bot_command_alpha, (color * PI / 2 * RAD2DEG));
+    delay(10000);
+    set_new_command(&bot_command_delta, -1000);
+
+    while ((digitalRead(LEFT_REAR_SENSOR) == 0) || (digitalRead(RIGHT_REAR_SENSOR) == 0)) {
+        delay(100);
+
+    }
+    delay(300);
+    // Set the X and theta values
+    my_robot->pos_X = color * (1.500 - DISTANCE_REAR_WHEELS);
+    if (color == 1) {
+        my_robot->theta = PI;
+    } else {
+        my_robot->theta = 0;
+    }
+
+    delay(100);
+
+    // Stop the motors
+    set_new_command(&bot_command_alpha, 0);
+    set_new_command(&bot_command_delta, 0);
+
+    delay(1000);
+    // Go in the middle of the starting area
+    set_new_command(&bot_command_delta, 0.100);
+
+    delay(6000);
+    // Set the speed to the maximum
+    delta_motor.max_speed = DELTA_MAX_SPEED;
+    alpha_motor.max_speed = ALPHA_MAX_SPEED;
+
+    goal.x = maximus.pos_X;
+    goal.y = maximus.pos_Y;
+
+    delay(100);
+
+}
+
 
 
 /***********************/
@@ -988,7 +1086,7 @@ void get_Odometers(void)
 
     // Le coef Gargamel
     double K = 1;
-    double derive_x, derive_y;
+    //double derive_x, derive_y;
     double dx, dy;
 
     left_wheel = left_cnt;
@@ -1103,6 +1201,31 @@ void do_motion_control(void)
 
 #else
 
+
+if(alpha_and_theta == 0) {
+    // PID angle
+    alpha_motor.des_speed = compute_position_PID(&bot_command_alpha, &alpha_motor);
+
+    // PID distance
+    if ((bot_command_alpha.state == WAITING_BEGIN) || (bot_command_alpha.state == PROCESSING_COMMAND)) {        // If alpha motor have not finished its movement 
+
+    } else {
+        if ((bot_command_delta.state != PROCESSING_COMMAND) && (prev_bot_command_delta.state == WAITING_BEGIN)) {
+            prev_bot_command_delta.state = PROCESSING_COMMAND;
+            set_new_command(&bot_command_delta, prev_bot_command_delta.desired_distance);
+        }
+        //delta_motor.des_speed = compute_position_PID(&bot_command_delta, &delta_motor);
+
+    }
+    delta_motor.des_speed = compute_position_PID(&bot_command_delta, &delta_motor);
+
+    /*if (bot_command_alpha.state == WAITING_BEGIN) {
+       bot_command_alpha.state = PROCESSING_COMMAND;
+       } */
+}
+else {
+
+
     // PID angle
     alpha_motor.des_speed =
         compute_position_PID(&bot_command_alpha, &alpha_motor);
@@ -1119,11 +1242,11 @@ void do_motion_control(void)
 
         double dist = distance_coord(&maximus, goal.x, goal.y);
         //double max_possible_speed = 1050000 * dist / ang;
-        double max_possible_speed = 350000 * abs(dist) / abs(ang);      //350000
-        if (max_possible_speed < 50)
+        double max_possible_speed = 105000 * abs(dist) / abs(ang);      //35000
+        if (max_possible_speed < 70)
             max_possible_speed = 0;
         delta_motor.max_speed =
-            min(max_possible_speed, DELTA_MAX_SPEED - 3000);
+            min(max_possible_speed, DELTA_MAX_SPEED - 1500);
         set_new_command(&bot_command_delta, dist);
         prev_bot_command_delta.state = WAITING_BEGIN;
     } else {
@@ -1139,6 +1262,7 @@ void do_motion_control(void)
     delta_motor.des_speed =
         compute_position_PID(&bot_command_delta, &delta_motor);
 
+}
 #endif
 
 
@@ -1329,3 +1453,6 @@ void goto_next_goal(void)
     }
 
 }
+
+
+
