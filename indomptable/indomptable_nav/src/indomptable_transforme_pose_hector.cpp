@@ -148,14 +148,14 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
 		my_odom.pose.pose.position.z = base_pose.pose.position.z;
 		my_odom.pose.pose.orientation = base_pose.pose.orientation;
 
-		my_odom.twist.twist.linear.x = 0;//sqrt(pow(base_pose.pose.position.x - old_x, 2) + pow(base_pose.pose.position.y - old_y, 2)) / (my_odom.header.stamp.toSec() - old_time.toSec());
+		my_odom.twist.twist.linear.x = sqrt(pow(base_pose.pose.position.x - old_x, 2) + pow(base_pose.pose.position.y - old_y, 2)) / (my_odom.header.stamp.toSec() - old_time.toSec());
 		//my_odom.twist.twist.linear.x = xspeed.data;
 		my_odom.twist.twist.linear.y = 0;
 		my_odom.twist.twist.linear.z = 0;
 		my_odom.twist.twist.angular.x = 0;
 		my_odom.twist.twist.angular.y = 0;
 		//my_odom.twist.twist.angular.z = tspeed.data;
-		my_odom.twist.twist.angular.z = 0;// (tf::getYaw (my_odom.pose.pose.orientation) - old_theta) / (my_odom.header.stamp.toSec() - old_time.toSec());
+		my_odom.twist.twist.angular.z = (tf::getYaw (my_odom.pose.pose.orientation) - old_theta) / (my_odom.header.stamp.toSec() - old_time.toSec());
 
 		odom_pub.publish(my_odom);
 

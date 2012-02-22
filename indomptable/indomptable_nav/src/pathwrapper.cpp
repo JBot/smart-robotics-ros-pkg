@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Empty.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseArray.h"
 #include "geometry_msgs/Pose2D.h"
@@ -48,6 +49,8 @@ class Pathwrapper {
     ros::Publisher pose2D_pub;
     ros::Publisher poseArray_pub;
 
+    ros::Publisher pathdone_pub;
+
   private:
     void pathCallback(const nav_msgs::Path::ConstPtr & path);
     void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
@@ -70,6 +73,8 @@ Pathwrapper::Pathwrapper()
 
     pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/indomptable_goal", 50);
     poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);
+
+    pathdone_pub = nh.advertise < std_msgs::Empty > ("/path_done", 50);
 
     my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
 
@@ -306,6 +311,24 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+				}
+				
+				if( (my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
+                    usleep(1000000);
+                    int i = 0;
+                    double test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
+                    while( ( test > 0.02) && ( i < 20 ) ) {
+                        usleep(100000);
+                        ros::Time now = ros::Time::now();
+                        listener.waitForTransform("/odom", "/base_link", now, ros::Duration(5.0));
+                        geometry_msgs::PoseStamped base_pose;
+                        listener.transformPose("/odom", odom_pose, base_pose);
+                        i++;
+                        test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
+                        ROS_ERROR("i : %d / dist : %f", i, test);
+                    }
+					std_msgs::Empty empty;
+					Pathwrapper::pathdone_pub.publish(empty);
 				}
 				//ros::Duration(0.02).sleep();
 				//ROS_INFO("Path sent.");

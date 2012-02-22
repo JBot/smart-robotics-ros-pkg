@@ -3,6 +3,8 @@
   <node pkg="indomptable_ai" type="trajectory_wrapper_indomptable" name="indomptable_trajectory_manager" output="screen">
   </node>
 
+  <node pkg="indomptable_ai" type="indomptable_main_ai" name="indomptable_main_ai" output="screen">
+  </node>
 
 
 </launch>

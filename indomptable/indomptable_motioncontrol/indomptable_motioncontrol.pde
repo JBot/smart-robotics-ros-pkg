@@ -6,6 +6,7 @@
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Empty.h>
 //#include <nav_msgs/Odometry.h>
@@ -72,8 +73,8 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         3000//20000
-#define ALPHA_MAX_ACCEL         300//300
+#define ALPHA_MAX_SPEED         4000//20000
+#define ALPHA_MAX_ACCEL         200//300
 #define ALPHA_MAX_DECEL         1000                       //2500
 #define DELTA_MAX_SPEED         6000//51000 
 #define DELTA_MAX_SPEED_BACK    3500 
@@ -157,7 +158,7 @@ volatile long right_cnt = 0;
 char output_ON = 0;
 char roboclaw_ON = 0;
 char motion_control_ON = 1;
-int8_t color = -1;
+int8_t color = 1;//-1;
 
 int last_left = 0;
 int last_right = 0;
@@ -332,6 +333,7 @@ ros::Subscriber < std_msgs::Int32 > ss("right_pump", &messageCbright);
 void positionCb(const geometry_msgs::Pose2D & goal_msg)
 {
 
+    alpha_and_theta = 1;
     goal.x = goal_msg.x;
     goal.y = goal_msg.y;
 
@@ -360,6 +362,56 @@ void messageCbSpeed(const geometry_msgs::Twist& msg) {
 
 ros::Subscriber<geometry_msgs::Twist> subspeed("cmd_vel", &messageCbSpeed);
 */
+
+std_msgs::Int8 val;
+ros::Publisher ack_a("alpha_feedback", &val);
+ros::Publisher ack_d("delta_feedback", &val);
+
+void messageCbalpha_ros(const std_msgs::Int32 & msg)
+{
+
+    set_new_command(&bot_command_alpha, 0);
+    set_new_command(&bot_command_delta, 0);
+    alpha_and_theta = 0;
+    //x = msg.data - 1.0;
+    double angletodo = (((double)msg.data) / 1000.0) - maximus.theta;
+   
+    if (angletodo > PI)
+        angletodo = angletodo - 2 * PI;
+    if (angletodo < -PI)
+        angletodo = 2 * PI + angletodo;
+
+    set_new_command(&bot_command_alpha, angletodo * RAD2DEG );
+    //set_new_command(&bot_command_alpha, msg.data / 1000);
+    //set_new_command(&bot_command_delta, 0);    
+    val.data = 1;
+    ack_a.publish(&val);
+
+}
+
+ros::Subscriber < std_msgs::Int32 > alpha_ros("alpha_ros", &messageCbalpha_ros);
+
+void messageCbdelta_ros(const std_msgs::Int32 & msg)
+{
+
+    set_new_command(&bot_command_alpha, 0);
+    set_new_command(&bot_command_delta, 0);
+    alpha_and_theta = 0;
+    //x = msg.data - 1.0;
+    double dist = (((double)msg.data) / 1000.0);
+
+    set_new_command(&bot_command_delta, dist );
+    //set_new_command(&bot_command_alpha, msg.data / 1000);
+    //set_new_command(&bot_command_delta, 0);    
+    val.data = 1;
+    ack_d.publish(&val);
+
+}
+
+ros::Subscriber < std_msgs::Int32 > delta_ros("delta_ros", &messageCbdelta_ros);
+
+
+
 
 /***********************/
 /* INTERRUPT FUNCTIONS */
@@ -590,6 +642,10 @@ void setup()
     nh.subscribe(ss);
     nh.subscribe(pose_sub);
 //    nh.subscribe(subspeed);
+    nh.subscribe(alpha_ros);
+    nh.subscribe(delta_ros);
+    nh.advertise(ack_a);
+    nh.advertise(ack_d);
 
     // Enable motion control for auto init
     alpha_and_theta = 0;
@@ -597,7 +653,7 @@ void setup()
     roboclaw_ON = 1;
     
     // auto init
-    color = -1;
+    color = 1;//-1;
     init_first_position(&maximus);
 
     // Disable motion control
@@ -725,9 +781,9 @@ void init_motors(void)
     alpha_motor.cur_speed = 0;
     alpha_motor.last_error = 0;
     alpha_motor.error_sum = 0;
-    alpha_motor.kP = 75; //100; //150;       //230;
+    alpha_motor.kP = 100; //150;       //230;
     alpha_motor.kI = 0;
-    alpha_motor.kD = 122; //166; //250;       //340;
+    alpha_motor.kD = 166; //250;       //340;
     alpha_motor.accel = ALPHA_MAX_ACCEL;
     alpha_motor.decel = ALPHA_MAX_DECEL;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;

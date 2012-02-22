@@ -87,7 +87,7 @@ indomptableARM_manager::indomptableARM_manager()
     left_pose_pub = nh.advertise < geometry_msgs::PoseStamped > ("left_arm_pose", 5);
     right_pose_pub = nh.advertise < geometry_msgs::PoseStamped > ("right_arm_pose", 5);
 
-    straight_move_pub = nh.advertise < std_msgs::Int32 > ("straight_move", 3);
+    straight_move_pub = nh.advertise < std_msgs::Int32 > ("delta_ros", 3);
 
     left_ready = 1;
     right_ready = 1;

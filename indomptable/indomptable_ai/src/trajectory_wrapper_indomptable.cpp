@@ -136,7 +136,7 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
     }
 
 
-    ROS_INFO("Goal sent.");
+    ROS_INFO("Trajectory manager : Goal sent.");
 
 }
 

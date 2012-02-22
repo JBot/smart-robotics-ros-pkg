@@ -7,6 +7,6 @@ transform_tolerance: 0.3
 
 observation_sources: laser_scan_sensor 
 
-laser_scan_sensor: {sensor_frame: base_laser, data_type: LaserScan, topic: /scan, expected_update_rate: 0.1, marking: true, clearing: true}
+laser_scan_sensor: {sensor_frame: base_laser, data_type: LaserScan, topic: /scan, expected_update_rate: 5, marking: true, clearing: true}
 
 
