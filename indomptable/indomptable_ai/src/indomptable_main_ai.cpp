@@ -17,6 +17,7 @@
 
 #include "indomptable_nav/GetRobotPose.h"
 #include "indomptable_ai/GetObjective.h"
+#include "indomptable_ai/UpdatePriority.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -67,15 +68,17 @@ class MainAI {
         ros::ServiceClient get_pose;
         ros::ServiceClient get_path;
         ros::ServiceClient get_objective;
+        ros::ServiceClient update_objective;
 
         list<pair<uint32_t, geometry_msgs::Pose2D> > current_list;
+        ros::Publisher delet_pub;
 
     private:
         void pathCallback(const std_msgs::Empty::ConstPtr & empty);
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
-        geometry_msgs::Pose2D final_pose;
+        geometry_msgs::PoseStamped final_objective;
 
         uint8_t state;
 
@@ -112,9 +115,13 @@ MainAI::MainAI()
 
     get_objective = nh.serviceClient<indomptable_ai::GetObjective>("/indomptable/get_objective");
 
-    final_pose.x = 0.0;
-    final_pose.y = 0.0;
-    final_pose.theta = 0.0;
+    update_objective = nh.serviceClient<indomptable_ai::UpdatePriority>("/indomptable/update_priority");
+
+    delet_pub = nh.advertise < geometry_msgs::PoseStamped > ("/indomptable/delet_objective", 5);
+
+    final_objective.pose.position.x = 0.0;
+    final_objective.pose.position.y = 0.0;
+    final_objective.pose.position.z = 0.0;
 
     state = 0;
 
@@ -152,6 +159,7 @@ void MainAI::main_loop(void)
     std_msgs::Int32 tmpaction;
     indomptable_nav::GetRobotPose tmp_pose;
     indomptable_ai::GetObjective tmp_obj;
+    indomptable_ai::UpdatePriority update_prio;
     
     tmppose.pose.position.x = 0;
     tmppose.pose.position.y = 0;
@@ -163,11 +171,13 @@ void MainAI::main_loop(void)
             {
                 tmppose.pose.position.x = tmp_obj.response.goal.pose.position.x;
                 tmppose.pose.position.y = tmp_obj.response.goal.pose.position.y;
+                final_objective = tmp_obj.response.goal;
             }
             else
             {
                 ROS_ERROR("Failed to call service GetObjective");
             }
+
 
             if( (tmppose.pose.position.x == 0.0) && (tmppose.pose.position.y == 0.0) )
                 current_list = random_move;
@@ -235,6 +245,21 @@ void MainAI::main_loop(void)
                         ROS_ERROR("Sending object %f %f %f", tmppose.pose.position.x, tmppose.pose.position.y, tmppose.pose.position.z);
                         usleep(5000000);
                         //state += 2;
+                        tmppose.pose.position.x = color*(1.500 - 0.250);
+                        tmppose.pose.position.y = 0.800;
+                        tmppose.pose.position.z = 0.0;
+                        update_prio.request.goal = tmppose;
+                        tmpaction.data = 1;
+                        update_prio.request.prio = tmpaction;
+
+                        if (update_objective.call(update_prio))
+                        {  
+                        }   
+                        else
+                        {
+                            ROS_ERROR("Failed to call service UpdatePriority");
+                        }
+
                         break;
                     default :
                         break;
@@ -242,6 +267,8 @@ void MainAI::main_loop(void)
                 current_list.pop_front();
             }
             else {
+                //update_prio.goal = final_objective;
+                delet_pub.publish(final_objective);
                 state = 0;
             }
             break;

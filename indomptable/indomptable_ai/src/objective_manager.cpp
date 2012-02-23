@@ -15,6 +15,7 @@
 
 #include "indomptable_nav/GetRobotPose.h"
 #include "indomptable_ai/GetObjective.h"
+#include "indomptable_ai/UpdatePriority.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -41,35 +42,39 @@ using namespace std;
 
 
 class ObjectiveManager {
-  public:
-    ObjectiveManager();
-    void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
-    void loop(void);
+    public:
+        ObjectiveManager();
+        void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
+        void loop(void);
 
-    ros::Publisher goal_debug;
-    ros::Publisher path_debug;
+        ros::Publisher goal_debug;
+        ros::Publisher path_debug;
 
-    ros::ServiceClient get_pose;
-    ros::ServiceClient get_path;
+        ros::ServiceClient get_pose;
+        ros::ServiceClient get_path;
 
-    ros::ServiceServer goal_service;
+        ros::ServiceServer goal_service;
 
+        ros::Subscriber delet_sub;
+        ros::ServiceServer update_prio_service;
 
-  private:
-    double compute_distance(nav_msgs::Path path_to_compute);
-    bool getObjective(indomptable_ai::GetObjective::Request  &req, indomptable_ai::GetObjective::Response &res );
+    private:
+        double compute_distance(nav_msgs::Path path_to_compute);
+        bool getObjective(indomptable_ai::GetObjective::Request  &req, indomptable_ai::GetObjective::Response &res );
+        bool updateObjective(indomptable_ai::UpdatePriority::Request  &req, indomptable_ai::UpdatePriority::Response &res );
+        void deletCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
 
-    ros::NodeHandle nh;
+        ros::NodeHandle nh;
 
-     nav_msgs::Path my_path;
-     geometry_msgs::Pose2D final_pose;
+        nav_msgs::Path my_path;
+        geometry_msgs::Pose2D final_pose;
 
-    geometry_msgs::PoseStamped best_objective;
+        geometry_msgs::PoseStamped best_objective;
 
-    //map<geometry_msgs::Pose2D, uint32_t> objectives;
-    list< pair<geometry_msgs::PoseStamped, uint32_t> > objectives;
-    
-    int color;
+        //map<geometry_msgs::Pose2D, uint32_t> objectives;
+        list< pair<geometry_msgs::PoseStamped, uint32_t> > objectives;
+
+        int color;
 };
 
 ObjectiveManager::ObjectiveManager()
@@ -84,10 +89,15 @@ ObjectiveManager::ObjectiveManager()
 
     goal_service = nh.advertiseService("/indomptable/get_objective", &ObjectiveManager::getObjective, this);
 
+    delet_sub = nh.subscribe < geometry_msgs::PoseStamped > ("/indomptable/delet_objective", 10, &ObjectiveManager::deletCallback, this);
+
+    update_prio_service = nh.advertiseService("/indomptable/update_priority", &ObjectiveManager::updateObjective, this);
+
+
     my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
 
     if (my_path.poses.std::vector < geometry_msgs::PoseStamped >::size() >
-        (my_path.poses.std::vector < geometry_msgs::PoseStamped >::max_size() - 2)) {
+            (my_path.poses.std::vector < geometry_msgs::PoseStamped >::max_size() - 2)) {
         my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
     }
 
@@ -125,7 +135,7 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.y = 1.700;
     // Priority : 5
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) );
-    
+
 
     tmp_obj.pose.position.x = color*(-1.500 + 0.640 + 0.477); // bottle
     tmp_obj.pose.position.y = 1.700;
@@ -172,6 +182,55 @@ bool ObjectiveManager::getObjective(indomptable_ai::GetObjective::Request  &req,
     return true;
 }
 
+bool ObjectiveManager::updateObjective(indomptable_ai::UpdatePriority::Request  &req, indomptable_ai::UpdatePriority::Response &res )
+{
+
+    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list;
+    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list2;
+
+    tmp_list = objectives;
+
+    while (!tmp_list.empty()) {
+
+        if( (tmp_list.back().first.pose.position.x == req.goal.pose.position.x) && (tmp_list.back().first.pose.position.y == req.goal.pose.position.y) ) {
+
+            tmp_list2.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_list.back().first, tmp_list.back().second + req.prio.data) );
+        }
+        else {
+            tmp_list2.push_back(tmp_list.back());
+        }
+        tmp_list.pop_back();
+
+    }
+
+    objectives = tmp_list2;
+
+}
+
+void ObjectiveManager::deletCallback(const geometry_msgs::PoseStamped::ConstPtr & pose) 
+{
+
+    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list;
+    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list2;
+
+    tmp_list = objectives;
+
+    while (!tmp_list.empty()) {
+
+        if( (tmp_list.back().first.pose.position.x == pose->pose.position.x) && (tmp_list.back().first.pose.position.y == pose->pose.position.y) ) {
+
+        }
+        else {
+            tmp_list2.push_back(tmp_list.back());
+        }
+        tmp_list.pop_back();
+
+    }
+
+    objectives = tmp_list2;
+
+
+}
 
 
 void ObjectiveManager::rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose)
