@@ -39,7 +39,7 @@ void delay_ms(uint16_t millis)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
 #define TICK_PER_M_LEFT 	(18205.6756)
 #define TICK_PER_M_RIGHT 	(18205.6756)
-#define DIAMETER 		    0.2990      //0.2962                      // Distance between the 2 wheels
+#define DIAMETER 		0.2972 //    0.2990      //0.2962                      // Distance between the 2 wheels
 
 #define DISTANCE_REAR_WHEELS    0.120
 
@@ -73,7 +73,7 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         4000//20000
+#define ALPHA_MAX_SPEED         2000//20000
 #define ALPHA_MAX_ACCEL         200//300
 #define ALPHA_MAX_DECEL         1000                       //2500
 #define DELTA_MAX_SPEED         6000//51000 
@@ -856,9 +856,9 @@ void init_first_position(struct robot *my_robot)
 
     delay(1000);
     // Go in the middle of the starting area
-    set_new_command(&bot_command_delta, 0.100);
+    set_new_command(&bot_command_delta, 0.200);
 
-    delay(6000);
+    delay(8000);
     // Set the speed to the maximum
     delta_motor.max_speed = DELTA_MAX_SPEED;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;
