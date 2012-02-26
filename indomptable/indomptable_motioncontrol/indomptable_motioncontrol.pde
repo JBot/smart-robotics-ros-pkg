@@ -202,7 +202,7 @@ struct Point prev_position;
 
 int global_cpt = 0;
 
-int cpt_asserv = 0;
+uint8_t cpt_asserv = 0;
 int alpha_and_theta = 0;
 
 
@@ -504,10 +504,10 @@ ISR(TIMER1_OVF_vect)
             if (roboclaw_ON == 1)
                 if ((transmit_status) == 1)
                     move_motors(ALPHADELTA);    // Update the motor speed
-        } else {
-            if (roboclaw_ON == 1)
-                move_motors(LEFTRIGHT); // Update the motor speed
-        }
+        } //else {
+          //  if (roboclaw_ON == 1)
+          //      move_motors(LEFTRIGHT); // Update the motor speed
+        //}
         cpt_asserv = 0;
     } else {
         cpt_asserv++;
@@ -1087,18 +1087,18 @@ signed long convert_ticks2dist(signed long ticks)
 /********************/
 /* MOTORS FUNCTIONS */
 /********************/
-void move_motors(char type)
+inline void move_motors(char type)
 {
-    if (type == ALPHADELTA)
+    //if (type == ALPHADELTA)
         write_RoboClaw_speed_M1M2(128,
                                   delta_motor.des_speed -
                                   alpha_motor.des_speed,
                                   delta_motor.des_speed +
                                   alpha_motor.des_speed);
     //write_SaberTooth_speed_M1M2(130, delta_motor.des_speed - alpha_motor.des_speed, delta_motor.des_speed + alpha_motor.des_speed);
-    else
-        write_RoboClaw_speed_M1M2(128, left_motor.des_speed,
-                                  right_motor.des_speed);
+    //else
+    //    write_RoboClaw_speed_M1M2(128, left_motor.des_speed,
+    //                              right_motor.des_speed);
     //write_SaberTooth_speed_M1M2(130, left_motor.des_speed, right_motor.des_speed);
 }
 
@@ -1128,7 +1128,7 @@ void update_motor(struct motor *used_motor)
 /********************************/
 
 /* Compute the position of the robot */
-void get_Odometers(void)
+inline void get_Odometers(void)
 {
     long left_wheel = 0;
     long right_wheel = 0;
@@ -1207,7 +1207,7 @@ void get_Odometers(void)
 /*******************************/
 /* MOTION CONTROL FUNCTIONS */
 /*******************************/
-void do_motion_control(void)
+inline void do_motion_control(void)
 {
 
 #ifdef PATH_FOLLOWING
