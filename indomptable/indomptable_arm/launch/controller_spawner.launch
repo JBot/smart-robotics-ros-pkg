@@ -12,6 +12,10 @@
                 left_shoulder_roll_controller
                 left_shoulder_lift_controller
                 left_elbow_controller
-                left_wrist_controller"
+                left_wrist_controller
+                right_shoulder_roll_controller
+                right_shoulder_lift_controller
+                right_elbow_controller
+                right_wrist_controller"
           output="screen"/>
 </launch>

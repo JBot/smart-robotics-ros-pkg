@@ -229,6 +229,7 @@ void ObjectiveManager::deletCallback(const geometry_msgs::PoseStamped::ConstPtr 
 
     objectives = tmp_list2;
 
+    ObjectiveManager::loop();
 
 }
 
@@ -302,21 +303,21 @@ void ObjectiveManager::loop(void)
         }
 
 
-        ROS_ERROR("Prio : %d", iter->second);
+        //ROS_ERROR("Prio : %d", iter->second);
         //tmp_plan.request.start = 90;
         tmp_plan.request.goal = iter->first;
         tmp_plan.request.tolerance = 0.01;
         if (get_path.call(tmp_plan))
         {  
             //ROS_INFO("Sum: %ld", get_path.response.plan);
-            path_debug.publish(tmp_plan.response.plan);
+            //path_debug.publish(tmp_plan.response.plan);
 
             // compute distance to goal 
             current_prio = (2.0) / (ObjectiveManager::compute_distance(tmp_plan.response.plan));
             if(current_prio < 10000000.0) {
                 // add it to the base priority
                 current_prio = current_prio + (double)iter->second;
-                ROS_ERROR("Prio tot : %f", current_prio);
+                //ROS_ERROR("Prio tot : %f", current_prio);
                 if(current_prio > best_prio) {
                     best_prio = current_prio;
                     best_objective = iter->first;
@@ -330,7 +331,7 @@ void ObjectiveManager::loop(void)
         }
 
 
-        usleep(200000); // For debug purpose
+        //usleep(200000); // For debug purpose
     }
     // end loop
 
@@ -370,7 +371,7 @@ int main(int argc, char **argv)
     tf::TransformListener listener(ros::Duration(10));
 
     // Refresh rate
-    ros::Rate loop_rate(0.3);
+    ros::Rate loop_rate(0.5);
     float rotation = 0.0;
     while (ros::ok()) {
 

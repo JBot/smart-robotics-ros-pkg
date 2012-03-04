@@ -39,7 +39,7 @@ void delay_ms(uint16_t millis)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
 #define TICK_PER_M_LEFT 	(18205.6756)
 #define TICK_PER_M_RIGHT 	(18205.6756)
-#define DIAMETER 		0.2972 //    0.2990      //0.2962                      // Distance between the 2 wheels
+#define DIAMETER 		0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
 
 #define DISTANCE_REAR_WHEELS    0.120
 
@@ -73,7 +73,7 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         2000//20000
+#define ALPHA_MAX_SPEED         4000//20000
 #define ALPHA_MAX_ACCEL         200//300
 #define ALPHA_MAX_DECEL         1000                       //2500
 #define DELTA_MAX_SPEED         6000//51000 
@@ -297,11 +297,11 @@ void messageCbleft(const std_msgs::Int32 & msg)
 {
     //x = msg.data - 1.0;
     if (msg.data == 0) {
-        digitalWrite(8, LOW);
-        digitalWrite(6, HIGH);
-    } else {
+        digitalWrite(9, LOW);
         digitalWrite(8, HIGH);
-        digitalWrite(6, LOW);
+    } else {
+        digitalWrite(9, HIGH);
+        digitalWrite(8, LOW);
     }
     test.data = msg.data;
     p.publish(&test);
@@ -315,10 +315,10 @@ void messageCbright(const std_msgs::Int32 & msg)
 {
     //x = msg.data - 1.0;
     if (msg.data == 0) {
-        digitalWrite(9, LOW);
+        digitalWrite(6, LOW);
         digitalWrite(7, HIGH);
     } else {
-        digitalWrite(9, HIGH);
+        digitalWrite(6, HIGH);
         digitalWrite(7, LOW);
     }
     test.data = msg.data;
@@ -501,9 +501,9 @@ ISR(TIMER1_OVF_vect)
     if (cpt_asserv > 3) {
         if (motion_control_ON == 1) {
             do_motion_control();
-            if (roboclaw_ON == 1)
-                if ((transmit_status) == 1)
-                    move_motors(ALPHADELTA);    // Update the motor speed
+//            if (roboclaw_ON == 1)
+//                if ((transmit_status) == 1)
+//                    move_motors(ALPHADELTA);    // Update the motor speed
         } //else {
           //  if (roboclaw_ON == 1)
           //      move_motors(LEFTRIGHT); // Update the motor speed
@@ -624,13 +624,13 @@ void setup()
     pinMode(RIGHT_REAR_SENSOR, INPUT);
 
 
-    pinMode(8, OUTPUT);
-    digitalWrite(8, LOW);
-    pinMode(6, OUTPUT);
-    digitalWrite(6, HIGH);
-
     pinMode(9, OUTPUT);
     digitalWrite(9, LOW);
+    pinMode(8, OUTPUT);
+    digitalWrite(8, HIGH);
+
+    pinMode(6, OUTPUT);
+    digitalWrite(6, LOW);
     pinMode(7, OUTPUT);
     digitalWrite(7, HIGH);
 
@@ -647,6 +647,23 @@ void setup()
     nh.advertise(ack_a);
     nh.advertise(ack_d);
 
+/*
+    // Disable motion control
+    motion_control_ON = 0;
+    roboclaw_ON = 0;
+
+
+    signed long P = 0x200 >> 4;
+    signed long I = 0x100 >> 4;
+    signed long D = 0x80 >> 4;
+    signed long QPPS = 11000;
+    
+    write_RoboClaw_PID_M1(128, D, P, I, QPPS);
+    delay(10);
+    write_RoboClaw_PID_M2(128, D, P, I, QPPS);
+    //write_RoboClaw_PID_M2(128, (signed long) 0x40, (signed long) 0x100, (signed long) 0x50, (signed long) 22000);
+    delay(10);
+  */  
     // Enable motion control for auto init
     alpha_and_theta = 0;
     motion_control_ON = 1;
@@ -654,7 +671,7 @@ void setup()
     
     // auto init
     color = 1;//-1;
-    init_first_position(&maximus);
+    //init_first_position(&maximus);
 
     // Disable motion control
     motion_control_ON = 0;
@@ -668,15 +685,6 @@ void setup()
 
 void loop()
 {
-    // drive in a circle
-    /*double dx = 0.2;
-       double dtheta = 0.18;
-       x += cos(theta)*dx*0.1;
-       y += sin(theta)*dx*0.1;
-       theta += dtheta*0.1;
-       if(theta > 3.14)
-       theta=-3.14;
-     */
     // tf odom->base_link
     t.header.frame_id = odom;
     t.child_frame_id = base_link;
@@ -1050,6 +1058,107 @@ write_RoboClaw_allcmd_M1M2(char addr, signed long accel,
 
     Serial2.print(checkSUM);
 }
+
+// Used to change the PID values of motor 1
+void write_RoboClaw_PID_M1(char addr, signed long D,
+                                    signed long P,
+                                    signed long I,
+                                    signed long QPPS)
+{
+    char checkSUM;
+    checkSUM =
+        (addr + 28 + ((char) ((D >> 24) & 0xFF)) +
+         ((char) ((D >> 16) & 0xFF)) +
+         ((char) ((D >> 8) & 0xFF)) + ((char) (D & 0xFF)) +
+         ((char) ((P >> 24) & 0xFF)) +
+         ((char) ((P >> 16) & 0xFF)) +
+         ((char) ((P >> 8) & 0xFF)) + ((char) (P & 0xFF)) +
+         ((char) ((I >> 24) & 0xFF)) +
+         ((char) ((I >> 16) & 0xFF)) +
+         ((char) ((I >> 8) & 0xFF)) +
+         ((char) (I & 0xFF)) +
+         ((char) ((QPPS >> 24) & 0xFF)) +
+         ((char) ((QPPS >> 16) & 0xFF)) +
+         ((char) ((QPPS >> 8) & 0xFF)) +
+         ((char) (QPPS & 0xFF)) ) & 0x7F;
+    Serial2.print(addr);
+    Serial2.print(28);
+    Serial2.print(((char) ((D >> 24) & 0xFF)));
+    Serial2.print(((char) ((D >> 16) & 0xFF)));
+    Serial2.print(((char) ((D >> 8) & 0xFF)));
+    Serial2.print(((char) (D & 0xFF)));
+
+    Serial2.print(((char) ((P >> 24) & 0xFF)));
+    Serial2.print(((char) ((P >> 16) & 0xFF)));
+    Serial2.print(((char) ((P >> 8) & 0xFF)));
+    Serial2.print(((char) (P & 0xFF)));
+
+    Serial2.print(((char) ((I >> 24) & 0xFF)));
+    Serial2.print(((char) ((I >> 16) & 0xFF)));
+    Serial2.print(((char) ((I >> 8) & 0xFF)));
+    Serial2.print(((char) (I & 0xFF)));
+
+    Serial2.print(((char) ((QPPS >> 24) & 0xFF)));
+    Serial2.print(((char) ((QPPS >> 16) & 0xFF)));
+    Serial2.print(((char) ((QPPS >> 8) & 0xFF)));
+    Serial2.print(((char) (QPPS & 0xFF)));
+
+    //Serial2.print(1);
+
+    Serial2.print(checkSUM);
+}
+
+// Used to change the PID values of motor 2
+void write_RoboClaw_PID_M2(char addr, signed long D,
+                                    signed long P,
+                                    signed long I,
+                                    signed long QPPS)
+{
+    char checkSUM;
+    checkSUM =
+        (addr + 29 + ((char) ((D >> 24) & 0xFF)) +
+         ((char) ((D >> 16) & 0xFF)) +
+         ((char) ((D >> 8) & 0xFF)) + ((char) (D & 0xFF)) +
+         ((char) ((P >> 24) & 0xFF)) +
+         ((char) ((P >> 16) & 0xFF)) +
+         ((char) ((P >> 8) & 0xFF)) + ((char) (P & 0xFF)) +
+         ((char) ((I >> 24) & 0xFF)) +
+         ((char) ((I >> 16) & 0xFF)) +
+         ((char) ((I >> 8) & 0xFF)) +
+         ((char) (I & 0xFF)) +
+         ((char) ((QPPS >> 24) & 0xFF)) +
+         ((char) ((QPPS >> 16) & 0xFF)) +
+         ((char) ((QPPS >> 8) & 0xFF)) +
+         ((char) (QPPS & 0xFF)) ) & 0x7F;
+    Serial2.print(addr);
+    Serial2.print(29);
+    Serial2.print(((char) ((D >> 24) & 0xFF)));
+    Serial2.print(((char) ((D >> 16) & 0xFF)));
+    Serial2.print(((char) ((D >> 8) & 0xFF)));
+    Serial2.print(((char) (D & 0xFF)));
+
+    Serial2.print(((char) ((P >> 24) & 0xFF)));
+    Serial2.print(((char) ((P >> 16) & 0xFF)));
+    Serial2.print(((char) ((P >> 8) & 0xFF)));
+    Serial2.print(((char) (P & 0xFF)));
+
+    Serial2.print(((char) ((I >> 24) & 0xFF)));
+    Serial2.print(((char) ((I >> 16) & 0xFF)));
+    Serial2.print(((char) ((I >> 8) & 0xFF)));
+    Serial2.print(((char) (I & 0xFF)));
+
+    Serial2.print(((char) ((QPPS >> 24) & 0xFF)));
+    Serial2.print(((char) ((QPPS >> 16) & 0xFF)));
+    Serial2.print(((char) ((QPPS >> 8) & 0xFF)));
+    Serial2.print(((char) (QPPS & 0xFF)));
+
+    //Serial2.print(1);
+
+    Serial2.print(checkSUM);
+}
+
+
+
 
 // Used to change the speed value of motors 1 and 2
 void write_SaberTooth_speed_M1M2(char addr, signed long speedM1,

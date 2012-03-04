@@ -81,8 +81,8 @@ right_shoulder_lift_controller:
     motor:
         id: 6
         init: 512
-        min: 35
-        max: 975
+        min: 73
+        max: 981
 
 right_elbow_controller:
     controller:
@@ -95,8 +95,8 @@ right_elbow_controller:
     motor:
         id: 7
         init: 512
-        min: 20
-        max: 975
+        min: 8
+        max: 1016
 
 right_wrist_controller:
     controller:

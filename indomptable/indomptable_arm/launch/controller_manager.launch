@@ -6,7 +6,7 @@
             namespace: dxl_manager
             serial_ports:
                 arm_port:
-                    port_name: "/dev/ttyACM1"
+                    port_name: "/dev/ttyACM0"
                     baud_rate: 1000000
                     min_motor_id: 1
                     max_motor_id: 10

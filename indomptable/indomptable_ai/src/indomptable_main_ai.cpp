@@ -73,25 +73,29 @@ class MainAI {
         list<pair<uint32_t, geometry_msgs::Pose2D> > current_list;
         ros::Publisher delet_pub;
 
+        ros::Subscriber pause_sub;
+        ros::Subscriber resume_sub;
     private:
         void pathCallback(const std_msgs::Empty::ConstPtr & empty);
+        void pauseCallback(const std_msgs::Empty::ConstPtr & empty);
+        void resumeCallback(const std_msgs::Empty::ConstPtr & empty);
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
         geometry_msgs::PoseStamped final_objective;
 
-        uint8_t state;
+        uint8_t state; // Working / Pause / X / X // X / X / X / Position
 
-        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_self_n;
+        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_self_n; // TODO => take objects
         list<pair<uint32_t, geometry_msgs::Pose2D> > totem_self_s;
         list<pair<uint32_t, geometry_msgs::Pose2D> > totem_opp_n;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_opp_s;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > bottle_1;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > bottle_2;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > release;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > steal_opp;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > gold_middle;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > random_move;
+        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_opp_s; 
+        list<pair<uint32_t, geometry_msgs::Pose2D> > bottle_1; // Ok
+        list<pair<uint32_t, geometry_msgs::Pose2D> > bottle_2; // Ok
+        list<pair<uint32_t, geometry_msgs::Pose2D> > release; // TODO
+        list<pair<uint32_t, geometry_msgs::Pose2D> > steal_opp; // TODO => Start camera and watch
+        list<pair<uint32_t, geometry_msgs::Pose2D> > gold_middle; // TODO => take
+        list<pair<uint32_t, geometry_msgs::Pose2D> > random_move; // TODO => random
 
         int color;
 };
@@ -109,6 +113,8 @@ MainAI::MainAI()
     path_sub_ = nh.subscribe < std_msgs::Empty > ("/path_done", 20, &MainAI::pathCallback, this);
 
 
+    pause_sub = nh.subscribe < std_msgs::Empty > ("/pause_AI", 20, &MainAI::pauseCallback, this);
+    resume_sub = nh.subscribe < std_msgs::Empty > ("/resume_AI", 20, &MainAI::resumeCallback, this);
 
 
     get_pose = nh.serviceClient<indomptable_nav::GetRobotPose>("/indomptable/get_robot_pose");
@@ -147,6 +153,125 @@ MainAI::MainAI()
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
 
+
+    tmp.x = color * (1.5 - 1.100);
+    tmp.y = 1.530;
+    tmp.theta = 0;
+    totem_self_s.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -1.57079;
+    totem_self_s.push_back(make_pair(ANGLE, tmp));
+    tmp.x = color * (1.5 - 1.100);
+    tmp.y = 1.500;
+    tmp.theta = 0.0;
+    totem_self_s.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0.12;
+    tmp.y = 0.06;
+    tmp.theta = 0.072;
+    totem_self_s.push_back(make_pair(OBJECT, tmp));
+
+
+    tmp.x = -color * (1.5 - 1.100);
+    tmp.y = 0.470;
+    tmp.theta = 0;
+    totem_opp_n.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1.57079;
+    totem_opp_n.push_back(make_pair(ANGLE, tmp));
+    tmp.x = -color * (1.5 - 1.100);
+    tmp.y = 0.600;
+    tmp.theta = 0.0;
+    totem_opp_n.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0.12;
+    tmp.y = 0.06;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+
+
+    tmp.x = -color * (1.5 - 1.100);
+    tmp.y = 1.530;
+    tmp.theta = 0;
+    totem_opp_s.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -1.57079;
+    totem_opp_s.push_back(make_pair(ANGLE, tmp));
+    tmp.x = -color * (1.5 - 1.100);
+    tmp.y = 1.500;
+    tmp.theta = 0.0;
+    totem_opp_s.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0.12;
+    tmp.y = 0.06;
+    tmp.theta = 0.072;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+
+
+    tmp.x = color * (1.5 - 0.250);
+    tmp.y = 0.8;
+    tmp.theta = 0;
+    release.push_back(make_pair(POSITION, tmp));
+
+
+    tmp.x = color * (1.5 - 0.640);
+    tmp.y = 1.7;
+    tmp.theta = 0;
+    bottle_1.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -1.57079;
+    bottle_1.push_back(make_pair(ANGLE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = -0.150;
+    bottle_1.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = 0.150;
+    bottle_1.push_back(make_pair(DISTANCE, tmp));
+
+
+    tmp.x = color * (-1.500 + 0.640 + 0.477);
+    tmp.y = 1.7;
+    tmp.theta = 0;
+    bottle_2.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -1.57079;
+    bottle_2.push_back(make_pair(ANGLE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = -0.150;
+    bottle_2.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = 0.150;
+    bottle_2.push_back(make_pair(DISTANCE, tmp));
+
+
+    tmp.x = color * (0);
+    tmp.y = (2.000 - 0.647);
+    tmp.theta = 0;
+    gold_middle.push_back(make_pair(POSITION, tmp));
+
+
+    tmp.x = -color * (1.500 - 0.250);
+    tmp.y = 0.8;
+    tmp.theta = 0;
+    steal_opp.push_back(make_pair(POSITION, tmp));
+
+
+    tmp.x = color * (1.500 - 0.250);
+    tmp.y = 0.25;
+    tmp.theta = 0;
+    random_move.push_back(make_pair(POSITION, tmp));
+
+
+
+
+
+
     current_list = totem_self_n;
 
     usleep(2000000);
@@ -179,28 +304,48 @@ void MainAI::main_loop(void)
             }
 
 
-            if( (tmppose.pose.position.x == 0.0) && (tmppose.pose.position.y == 0.0) )
+            if( (tmppose.pose.position.x == 0.0) && (tmppose.pose.position.y == 0.0) ) {
                 current_list = random_move;
-            if( (tmppose.pose.position.x == color*(1.500 - 1.100)) && (tmppose.pose.position.y == 0.600) )
+                ROS_ERROR("Random");
+            }
+            if( (tmppose.pose.position.x == color*(1.500 - 1.100)) && (tmppose.pose.position.y == 0.600) ) {
                 current_list = totem_self_n;
-            if( (tmppose.pose.position.x == color*(1.500 - 1.100)) && (tmppose.pose.position.y == 1.400) )
+                ROS_ERROR("Totem Self N");
+            }
+            if( (tmppose.pose.position.x == color*(1.500 - 1.100)) && (tmppose.pose.position.y == 1.400) ) {
                 current_list = totem_self_s;
-            if( (tmppose.pose.position.x == color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) )
+                ROS_ERROR("Totem Self S");
+            }
+            if( (tmppose.pose.position.x == color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) ) {
                 current_list = release;
-            if( (tmppose.pose.position.x == color*(1.500 - 0.640)) && (tmppose.pose.position.y == 1.700) )
+                ROS_ERROR("Release");
+            }
+            if( (tmppose.pose.position.x == color*(1.500 - 0.640)) && (tmppose.pose.position.y == 1.700) ) {
                 current_list = bottle_1;
-            if( (tmppose.pose.position.x == color*(-1.500 + 0.640 + 0.477)) && (tmppose.pose.position.y == 1.700) )
+                ROS_ERROR("Bottle 1");
+            }
+            if( (tmppose.pose.position.x == color*(-1.500 + 0.640 + 0.477)) && (tmppose.pose.position.y == 1.700) ) {
                 current_list = bottle_2;
-            if( (tmppose.pose.position.x == color*(0)) && (tmppose.pose.position.y == (2.000 - 0.647)) )
+                ROS_ERROR("Bottle 2");
+            }
+            if( (tmppose.pose.position.x == color*(0)) && (tmppose.pose.position.y == (2.000 - 0.647)) ) {
                 current_list = gold_middle;
-            if( (tmppose.pose.position.x == -color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) )
+                ROS_ERROR("Gold");
+            }
+            if( (tmppose.pose.position.x == -color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) ) {
                 current_list = steal_opp;
-            if( (tmppose.pose.position.x == -color*(1.500 - 1.100)) && (tmppose.pose.position.y == 0.600) )
+                ROS_ERROR("Steal");
+            }
+            if( (tmppose.pose.position.x == -color*(1.500 - 1.100)) && (tmppose.pose.position.y == 0.600) ) {
                 current_list = totem_opp_n;
-            if( (tmppose.pose.position.x == -color*(1.500 - 1.100)) && (tmppose.pose.position.y == 1.400) )
+                ROS_ERROR("Totem Opp N");
+            }
+            if( (tmppose.pose.position.x == -color*(1.500 - 1.100)) && (tmppose.pose.position.y == 1.400) ) {
                 current_list = totem_opp_s;
+                ROS_ERROR("Totem Opp S");
+            }
 
-            current_list = totem_self_n;
+            //current_list = totem_self_n;
             state = 0b10000000;
             break;
         case 0b10000000 : // Next action for the objective
@@ -221,21 +366,30 @@ void MainAI::main_loop(void)
                         usleep(3000000);
                         break;
                     case DISTANCE :
+                        if (current_list.front().second.theta == 0.0) {
 
-                        if (get_pose.call(tmp_pose))
-                        {
-                            //ROS_INFO("Sum: %ld", get_path.response.plan);
-                            tmppose.pose.position.x = tmp_pose.response.pose.pose.position.x;
-                            tmppose.pose.position.y = tmp_pose.response.pose.pose.position.y;
-                            tmpaction.data = (sqrt( pow(current_list.front().second.x - tmppose.pose.position.x, 2) + pow(current_list.front().second.y - tmppose.pose.position.y, 2)) * 1000) ;
+                            if (get_pose.call(tmp_pose))
+                            {
+                                //ROS_INFO("Sum: %ld", get_path.response.plan);
+                                tmppose.pose.position.x = tmp_pose.response.pose.pose.position.x;
+                                tmppose.pose.position.y = tmp_pose.response.pose.pose.position.y;
+                                tmpaction.data = (sqrt( pow(current_list.front().second.x - tmppose.pose.position.x, 2) + pow(current_list.front().second.y - tmppose.pose.position.y, 2)) * 1000) ;
+                                delta_pub.publish(tmpaction);
+                                ROS_ERROR("Sending distance %d", tmpaction.data);
+                            }
+                            else
+                            {
+                                ROS_ERROR("Failed to call service GetRobotPose");
+                            }
+                            usleep(2000000);
+
+                        }
+                        else {
+                            tmpaction.data = current_list.front().second.theta * 1000;
                             delta_pub.publish(tmpaction);
                             ROS_ERROR("Sending distance %d", tmpaction.data);
+                            usleep(2000000);
                         }
-                        else
-                        {
-                            ROS_ERROR("Failed to call service GetRobotPose");
-                        }
-                        usleep(3000000);
                         break;
                     case OBJECT :
                         tmppose.pose.position.x = current_list.front().second.x;
@@ -269,6 +423,7 @@ void MainAI::main_loop(void)
             else {
                 //update_prio.goal = final_objective;
                 delet_pub.publish(final_objective);
+                usleep(200000);
                 state = 0;
             }
             break;
@@ -315,6 +470,25 @@ void MainAI::pathCallback(const std_msgs::Empty::ConstPtr & empty)
     }
 }
 
+void MainAI::pauseCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+    if( state & 0b01000000 ) {
+        //state -= 1;
+    }
+    else {
+        state += 0b01000000;
+    }
+}
+
+void MainAI::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+    if( state & 0b01000000 ) {
+        state -= 0b01000000;
+    }
+    else {
+        //state += 0b01000000;
+    }
+}
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
