@@ -117,7 +117,7 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = color*(1.500 - 1.100); // totem self
     tmp_obj.pose.position.y = 0.600; 
     // Priority : 20
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 8) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 20) );
 
     tmp_obj.pose.position.x = color*(1.500 - 1.100); // totem self
     tmp_obj.pose.position.y = 1.400;
@@ -128,7 +128,7 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = color*(1.500 - 0.250); // release
     tmp_obj.pose.position.y = 0.800;
     // Priority : 1
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 1) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) ); // TO CHANGE
 
 
     tmp_obj.pose.position.x = color*(1.500 - 0.640); // bottle
@@ -273,7 +273,7 @@ double ObjectiveManager::compute_distance(nav_msgs::Path path_to_compute)
         }
 
     }
-    ROS_ERROR("Distance : %f", distance);
+    //ROS_ERROR("Distance : %f", distance);
 
     return distance;
 
@@ -313,7 +313,7 @@ void ObjectiveManager::loop(void)
             //path_debug.publish(tmp_plan.response.plan);
 
             // compute distance to goal 
-            current_prio = (2.0) / (ObjectiveManager::compute_distance(tmp_plan.response.plan));
+            current_prio = (3.0) / (ObjectiveManager::compute_distance(tmp_plan.response.plan));
             if(current_prio < 10000000.0) {
                 // add it to the base priority
                 current_prio = current_prio + (double)iter->second;

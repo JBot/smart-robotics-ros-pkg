@@ -404,7 +404,7 @@ void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed 
 
 void indomptableARM::takeCDinTotem(signed int height){
 
-    /*	LegIK((int)(180), (int)(-(42)), (int)(0));
+    	LegIK((int)(180), (int)(-(42)), (int)(0));
         DesAnkleAngle = -1.570796;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -415,7 +415,7 @@ void indomptableARM::takeCDinTotem(signed int height){
         ServoDriver();
 
         waitMoveEnd();
-     */
+     
     // pump
     pump_ok = 0;
     des_pump.data = 1;

@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Empty.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseArray.h"
 #include "geometry_msgs/Pose2D.h"
@@ -40,6 +41,7 @@ class TrajectoryManager {
   public:
     TrajectoryManager();
     void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
+    void recompute_path(void);
 
     // Goal suscriber
     ros::Subscriber goal_sub_;
@@ -49,18 +51,26 @@ class TrajectoryManager {
     ros::ServiceClient get_pose;
     ros::ServiceClient get_path;
 
+    ros::Subscriber pathdone_sub_;
+    ros::Publisher pathimpossible_pub;
   private:
     void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+    void pathDoneCallback(const std_msgs::Empty::ConstPtr & pose);
      ros::NodeHandle nh;
 
+     int status; // 0 = pause ; 1 = checking path
+     int cpt;
+
      nav_msgs::Path my_path;
-     geometry_msgs::Pose2D final_pose;
+     geometry_msgs::PoseStamped final_pose;
 
 };
 
 TrajectoryManager::TrajectoryManager()
 {
 
+    status = 0;	
+    cpt = 0;
     // Goal suscriber
     goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base/goal_test", 20, &TrajectoryManager::goalCallback, this);
 
@@ -69,6 +79,9 @@ TrajectoryManager::TrajectoryManager()
 
     path_pub = nh.advertise < nav_msgs::Path > ("/my_indomptable_path", 50);
 
+    pathdone_sub_ = nh.subscribe < std_msgs::Empty > ("/path_done", 20, &TrajectoryManager::pathDoneCallback, this);
+    pathimpossible_pub = nh.advertise < std_msgs::Empty > ("/goal_unreachable", 20);
+
     my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
 
     if (my_path.poses.std::vector < geometry_msgs::PoseStamped >::size() >
@@ -76,12 +89,66 @@ TrajectoryManager::TrajectoryManager()
         my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
     }
 
-    final_pose.x = 0.0;
-    final_pose.y = 0.14;
-    final_pose.theta = 0.0;
+    final_pose.pose.position.x = 0.0;
+    final_pose.pose.position.y = 0.14;
+    final_pose.pose.position.z = 0.0;
+    //final_pose.theta = 0.0;
 
 }
 
+void TrajectoryManager::recompute_path(void)
+{
+
+if( (status == 1) ){
+   if(cpt > 50) { // 50
+    nav_msgs::GetPlan tmp_plan;
+
+    indomptable_nav::GetRobotPose tmp_pose;
+
+
+
+    if (get_pose.call(tmp_pose))
+    {  
+            //ROS_INFO("Sum: %ld", get_path.response.plan);
+        tmp_plan.request.start = tmp_pose.response.pose;
+    }   
+    else
+    {
+            ROS_ERROR("Failed to call service GetRobotPose");
+    }
+
+    if( sqrt( pow(final_pose.pose.position.x - tmp_pose.response.pose.pose.position.x, 2) + pow(final_pose.pose.position.y - tmp_pose.response.pose.pose.position.y, 2) ) < 0.14 ) {
+
+	status = 0;
+
+    }
+    else {
+	    //tmp_plan.request.start = 90;
+	    tmp_plan.request.goal = final_pose;
+	    tmp_plan.request.tolerance = 0.01;
+	    if (get_path.call(tmp_plan))
+	    {  
+		    //ROS_INFO("Sum: %ld", get_path.response.plan);
+		    path_pub.publish(tmp_plan.response.plan);
+	    }   
+	    else
+	    {
+		    ROS_ERROR("Failed to call service GetPlan");
+	    }
+
+
+	    ROS_INFO("Trajectory manager : Goal RE-sent.");
+    }
+    cpt = 0;
+
+  }
+  else {
+    cpt++;
+  }
+}
+
+
+}
 
 void TrajectoryManager::rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose)
 {
@@ -102,10 +169,14 @@ void TrajectoryManager::rotate(double heading, double attitude, double bank, geo
     pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
 }
 
+void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
+{
+  status = 0;
+}
+
 void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
-    final_pose.x = pose->pose.position.x;
-    final_pose.y = pose->pose.position.y;
+    final_pose = *pose;
 
     nav_msgs::GetPlan tmp_plan;
 
@@ -127,8 +198,16 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
     tmp_plan.request.tolerance = 0.01;
     if (get_path.call(tmp_plan))
     {
-            //ROS_INFO("Sum: %ld", get_path.response.plan);
+	    //ROS_INFO("Sum: %ld", get_path.response.plan);
 	path_pub.publish(tmp_plan.response.plan);
+	
+	if(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty()) {
+		// Goal unreachable
+		std_msgs::Empty empty;
+		pathimpossible_pub.publish(empty);
+
+		return;
+	}
     }
     else
     {
@@ -136,8 +215,10 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
     }
 
 
-    ROS_INFO("Trajectory manager : Goal sent.");
+    ROS_INFO("Trajectory manager : Path sent.");
 
+    status = 1;
+    cpt = 0;
 }
 
 /**
@@ -168,7 +249,7 @@ int main(int argc, char **argv)
 
                 ros::spinOnce();
                 loop_rate.sleep();
-
+		trajectorymanager.recompute_path();
         }
 
         ros::Duration(2.0).sleep();

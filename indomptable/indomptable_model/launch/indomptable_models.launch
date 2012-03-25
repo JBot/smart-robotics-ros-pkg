@@ -1,0 +1,26 @@
+<launch>
+    <!-- Load the URDF/Xacro model of our robot -->
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find indomptable_model)/urdf/indomptable.urdf.xacro'" />
+
+    <!-- Publish the robot state -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <param name="publish_frequency" value="20.0"/>
+    </node>
+   
+    <!-- Publish a static transform between the robot base and the world frame -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="world_base_broadcaster" args="0 0 0.0325 0 0 0 /world /base_link 100" /> -->
+
+    <!-- Load the URDF/Xacro model of our robot -->
+    <param name="field_description" command="$(find xacro)/xacro.py '$(find indomptable_model)/urdf/field.urdf.xacro'" />
+
+    <!-- Publish the robot state -->
+    <node name="field_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <param name="publish_frequency" value="20.0"/>
+        <remap from="robot_description" to="field_description" />
+    </node>
+
+    <!-- Publish a static transform between the robot base and the world frame -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="world_base_broadcaster" args="0 0 0.0325 0 0 0 /world /base_link 100" /> -->
+
+
+</launch>

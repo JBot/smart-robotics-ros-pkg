@@ -5,7 +5,7 @@ robot_radius: 0.16
 inflation_radius: 0.19
 transform_tolerance: 0.3
 
-observation_sources: laser_scan_sensor field_sensor indomptable_sensor
+observation_sources: field_sensor indomptable_sensor
 
 laser_scan_sensor: {sensor_frame: base_laser, data_type: LaserScan, topic: /scan, expected_update_rate: 0.5, marking: true, clearing: true}
 field_sensor: {sensor_frame: map, data_type: PointCloud, topic: /cloud, expected_update_rate: 0.5, marking: true, clearing: false}

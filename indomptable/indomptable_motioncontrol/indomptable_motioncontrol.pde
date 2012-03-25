@@ -39,7 +39,7 @@ void delay_ms(uint16_t millis)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
 #define TICK_PER_M_LEFT 	(18205.6756)
 #define TICK_PER_M_RIGHT 	(18205.6756)
-#define DIAMETER 		0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
+#define DIAMETER 		0.2981// 0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
 
 #define DISTANCE_REAR_WHEELS    0.120
 
@@ -73,10 +73,10 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         4000//20000
+#define ALPHA_MAX_SPEED         4000//8000 //4000//20000
 #define ALPHA_MAX_ACCEL         200//300
 #define ALPHA_MAX_DECEL         1000                       //2500
-#define DELTA_MAX_SPEED         6000//51000 
+#define DELTA_MAX_SPEED         6000//12000 //6000//51000 
 #define DELTA_MAX_SPEED_BACK    3500 
 #define DELTA_MAX_SPEED_BACK_PAWN    4500
 #define DELTA_MAX_ACCEL         300//1000     
@@ -501,9 +501,9 @@ ISR(TIMER1_OVF_vect)
     if (cpt_asserv > 3) {
         if (motion_control_ON == 1) {
             do_motion_control();
-//            if (roboclaw_ON == 1)
-//                if ((transmit_status) == 1)
-//                    move_motors(ALPHADELTA);    // Update the motor speed
+            if (roboclaw_ON == 1)
+                if ((transmit_status) == 1)
+                    move_motors(ALPHADELTA);    // Update the motor speed
         } //else {
           //  if (roboclaw_ON == 1)
           //      move_motors(LEFTRIGHT); // Update the motor speed
@@ -671,7 +671,7 @@ void setup()
     
     // auto init
     color = 1;//-1;
-    //init_first_position(&maximus);
+    init_first_position(&maximus);
 
     // Disable motion control
     motion_control_ON = 0;
@@ -1407,11 +1407,12 @@ else {
 
         double dist = distance_coord(&maximus, goal.x, goal.y);
         //double max_possible_speed = 1050000 * dist / ang;
-        double max_possible_speed = 105000 * abs(dist) / abs(ang);      //35000
+        //double max_possible_speed = 105000 * abs(dist) / abs(ang);      //35000
+        double max_possible_speed = 125000 * abs(dist) / abs(ang);      //35000
         if (max_possible_speed < 70)
             max_possible_speed = 0;
         delta_motor.max_speed =
-            min(max_possible_speed, DELTA_MAX_SPEED - 1500);
+            min(max_possible_speed, DELTA_MAX_SPEED - 500); //1500
         set_new_command(&bot_command_delta, dist);
         prev_bot_command_delta.state = WAITING_BEGIN;
     } else {

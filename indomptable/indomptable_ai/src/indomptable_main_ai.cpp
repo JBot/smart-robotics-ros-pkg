@@ -75,10 +75,15 @@ class MainAI {
 
         ros::Subscriber pause_sub;
         ros::Subscriber resume_sub;
+
+        ros::Publisher release_pub;
+        ros::Subscriber pathimpossible_sub;
+
     private:
         void pathCallback(const std_msgs::Empty::ConstPtr & empty);
         void pauseCallback(const std_msgs::Empty::ConstPtr & empty);
         void resumeCallback(const std_msgs::Empty::ConstPtr & empty);
+        void pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty);
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
@@ -125,6 +130,12 @@ MainAI::MainAI()
 
     delet_pub = nh.advertise < geometry_msgs::PoseStamped > ("/indomptable/delet_objective", 5);
 
+    release_pub = nh.advertise < std_msgs::Empty > ("/release_objects", 5);
+
+    pathimpossible_sub = nh.subscribe < std_msgs::Empty > ("/goal_unreachable", 20, &MainAI::pathimpossibleCallback, this);
+
+
+
     final_objective.pose.position.x = 0.0;
     final_objective.pose.position.y = 0.0;
     final_objective.pose.position.z = 0.0;
@@ -148,9 +159,25 @@ MainAI::MainAI()
     tmp.y = 0.600;
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.12;
-    tmp.y = 0.06;
+    tmp.x = 0.07;
+    tmp.y = 0.0;
     tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = -0.15;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = 0.15;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
 
 
@@ -163,7 +190,7 @@ MainAI::MainAI()
     tmp.theta = -1.57079;
     totem_self_s.push_back(make_pair(ANGLE, tmp));
     tmp.x = color * (1.5 - 1.100);
-    tmp.y = 1.500;
+    tmp.y = 1.400;
     tmp.theta = 0.0;
     totem_self_s.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0.12;
@@ -208,11 +235,27 @@ MainAI::MainAI()
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
 
 
-    tmp.x = color * (1.5 - 0.250);
-    tmp.y = 0.8;
+    tmp.x = color * (1.5 - 0.220);
+    tmp.y = 0.90;
     tmp.theta = 0;
     release.push_back(make_pair(POSITION, tmp));
-
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -1.57079;
+    release.push_back(make_pair(ANGLE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = -0.150;
+    release.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = -0.150;
+    release.push_back(make_pair(RELEASE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = 0.150;
+    release.push_back(make_pair(DISTANCE, tmp));
+// RECALAGE !!!
 
     tmp.x = color * (1.5 - 0.640);
     tmp.y = 1.7;
@@ -282,6 +325,7 @@ void MainAI::main_loop(void)
 
     geometry_msgs::PoseStamped tmppose;
     std_msgs::Int32 tmpaction;
+    std_msgs::Empty tmprelease;
     indomptable_nav::GetRobotPose tmp_pose;
     indomptable_ai::GetObjective tmp_obj;
     indomptable_ai::UpdatePriority update_prio;
@@ -363,7 +407,7 @@ void MainAI::main_loop(void)
                         tmpaction.data = (current_list.front().second.theta * 1000);
                         alpha_pub.publish(tmpaction);
                         ROS_ERROR("Sending angle %d", tmpaction.data);
-                        usleep(3000000);
+                        usleep(1300000);
                         break;
                     case DISTANCE :
                         if (current_list.front().second.theta == 0.0) {
@@ -381,14 +425,14 @@ void MainAI::main_loop(void)
                             {
                                 ROS_ERROR("Failed to call service GetRobotPose");
                             }
-                            usleep(2000000);
+                            usleep(800000);
 
                         }
                         else {
                             tmpaction.data = current_list.front().second.theta * 1000;
                             delta_pub.publish(tmpaction);
                             ROS_ERROR("Sending distance %d", tmpaction.data);
-                            usleep(2000000);
+                            usleep(1000000);
                         }
                         break;
                     case OBJECT :
@@ -397,7 +441,8 @@ void MainAI::main_loop(void)
                         tmppose.pose.position.z = current_list.front().second.theta;
                         object_pub.publish(tmppose);
                         ROS_ERROR("Sending object %f %f %f", tmppose.pose.position.x, tmppose.pose.position.y, tmppose.pose.position.z);
-                        usleep(5000000);
+                        //usleep(5000000);
+                        usleep(50000);
                         //state += 2;
                         tmppose.pose.position.x = color*(1.500 - 0.250);
                         tmppose.pose.position.y = 0.800;
@@ -414,6 +459,11 @@ void MainAI::main_loop(void)
                             ROS_ERROR("Failed to call service UpdatePriority");
                         }
 
+                        break;
+                    case RELEASE :
+                        release_pub.publish(tmprelease);
+                        ROS_ERROR("Releasing objects");
+                        usleep(3000000);
                         break;
                     default :
                         break;
@@ -461,6 +511,14 @@ void MainAI::rotate(double heading, double attitude, double bank, geometry_msgs:
     pose->pose.orientation.x = c1c2 * s3 + s1s2 * c3;
     pose->pose.orientation.y = s1 * c2 * c3 + c1 * s2 * s3;
     pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
+}
+
+void MainAI::pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+    // Search another goal
+    if(state != 0b00000000) {
+        state = 0;
+    }
 }
 
 void MainAI::pathCallback(const std_msgs::Empty::ConstPtr & empty)

@@ -22,7 +22,7 @@ public:
     : it_(nh_)
   {
     image_pub_ = it_.advertise("/out/image_raw", 1);
-    image_sub_ = it_.subscribe("/camera/image_raw", 1, &ImageConverter::imageCb, this);
+    image_sub_ = it_.subscribe("/image_raw", 1, &ImageConverter::imageCb, this);
 
     //cv::namedWindow(WINDOW);
   }
@@ -61,9 +61,11 @@ public:
          // draw the circle outline
          circle( cv_ptr->image, center, radius, Scalar(0,0,255), 3, 8, 0 );
       }
+/*
     Canny( gray, gray, 16, 33, 3 );
     vector<Vec4i> lines;
     HoughLinesP( gray, lines, 1, CV_PI/180, 10.0, 240.0, 15.0 );
+*/
 
 /*    for( size_t i = 0; i < lines.size(); i++ )
     {
