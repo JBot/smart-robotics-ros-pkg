@@ -39,7 +39,7 @@ void delay_ms(uint16_t millis)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
 #define TICK_PER_M_LEFT 	(18205.6756)
 #define TICK_PER_M_RIGHT 	(18205.6756)
-#define DIAMETER 		0.2981// 0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
+#define DIAMETER 	        0.29478 // 0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
 
 #define DISTANCE_REAR_WHEELS    0.120
 
@@ -73,14 +73,14 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         4000//8000 //4000//20000
+#define ALPHA_MAX_SPEED         8000 //4000//20000
 #define ALPHA_MAX_ACCEL         200//300
-#define ALPHA_MAX_DECEL         1000                       //2500
-#define DELTA_MAX_SPEED         6000//12000 //6000//51000 
+#define ALPHA_MAX_DECEL         1000 //1000                       //2500
+#define DELTA_MAX_SPEED         12000 //6000//51000 
 #define DELTA_MAX_SPEED_BACK    3500 
 #define DELTA_MAX_SPEED_BACK_PAWN    4500
 #define DELTA_MAX_ACCEL         300//1000     
-#define DELTA_MAX_DECEL         2000
+#define DELTA_MAX_DECEL         1000 //2000
 
 /*
 #define ALPHA_MAX_SPEED         5000    //20000
@@ -1408,7 +1408,7 @@ else {
         double dist = distance_coord(&maximus, goal.x, goal.y);
         //double max_possible_speed = 1050000 * dist / ang;
         //double max_possible_speed = 105000 * abs(dist) / abs(ang);      //35000
-        double max_possible_speed = 125000 * abs(dist) / abs(ang);      //35000
+        double max_possible_speed = 625000 * abs(dist) / abs(ang);      //35000
         if (max_possible_speed < 70)
             max_possible_speed = 0;
         delta_motor.max_speed =
