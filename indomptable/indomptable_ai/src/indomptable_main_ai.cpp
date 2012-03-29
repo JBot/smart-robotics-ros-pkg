@@ -79,11 +79,16 @@ class MainAI {
         ros::Publisher release_pub;
         ros::Subscriber pathimpossible_sub;
 
+        ros::Subscriber start_sub;
+        ros::Subscriber color_sub;
+
     private:
         void pathCallback(const std_msgs::Empty::ConstPtr & empty);
         void pauseCallback(const std_msgs::Empty::ConstPtr & empty);
         void resumeCallback(const std_msgs::Empty::ConstPtr & empty);
         void pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty);
+        void startCallback(const std_msgs::Empty::ConstPtr & empty);
+        void colorCallback(const std_msgs::Int32::ConstPtr & my_int);
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
@@ -103,12 +108,14 @@ class MainAI {
         list<pair<uint32_t, geometry_msgs::Pose2D> > random_move; // TODO => random
 
         int color;
+	int started;
 };
 
 MainAI::MainAI()
 {
 
     color = 1;//-1;
+    started = 0;
 
     goal_pub = nh.advertise < geometry_msgs::PoseStamped > ("/move_base/goal_test", 5);
     object_pub = nh.advertise < geometry_msgs::PoseStamped > ("/object_pose", 5);
@@ -134,6 +141,8 @@ MainAI::MainAI()
 
     pathimpossible_sub = nh.subscribe < std_msgs::Empty > ("/goal_unreachable", 20, &MainAI::pathimpossibleCallback, this);
 
+    start_sub = nh.subscribe < std_msgs::Empty > ("/start_match", 20, &MainAI::startCallback, this);
+    color_sub = nh.subscribe < std_msgs::Int32 > ("/color", 20, &MainAI::colorCallback, this);
 
 
     final_objective.pose.position.x = 0.0;
@@ -333,6 +342,8 @@ void MainAI::main_loop(void)
     tmppose.pose.position.x = 0;
     tmppose.pose.position.y = 0;
 
+    if(started) {
+
     switch(state) {
         case 0b00000000 : // Next objective
 
@@ -491,6 +502,7 @@ void MainAI::main_loop(void)
             break;
     }
 
+    }
 
 }
 
@@ -547,6 +559,17 @@ void MainAI::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
         //state += 0b01000000;
     }
 }
+
+void MainAI::startCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+	started = 1;
+}
+
+void MainAI::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
+{
+	color = my_int->data;
+}
+
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.

@@ -95,8 +95,8 @@ right_elbow_controller:
     motor:
         id: 7
         init: 512
-        min: 8
-        max: 1016
+        min: 1
+        max: 1024
 
 right_wrist_controller:
     controller:

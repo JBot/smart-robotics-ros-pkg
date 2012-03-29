@@ -664,6 +664,13 @@ void setup()
     //write_RoboClaw_PID_M2(128, (signed long) 0x40, (signed long) 0x100, (signed long) 0x50, (signed long) 22000);
     delay(10);
   */  
+  
+  /*
+    while() { // color not choose  
+      nh.spinOnce();
+      delay(10);
+    }
+  */
     // Enable motion control for auto init
     alpha_and_theta = 0;
     motion_control_ON = 1;
@@ -815,8 +822,8 @@ void init_motors(void)
 void init_first_position(struct robot *my_robot)
 {
     // Put the robot in low speed mode
-    delta_motor.max_speed = 1500;
-    alpha_motor.max_speed = 1000;
+    delta_motor.max_speed = 3000;
+    alpha_motor.max_speed = 2000;
     // go back to touch the wall
     set_new_command(&bot_command_alpha, 0);
     set_new_command(&bot_command_delta, -1000);
@@ -838,9 +845,9 @@ void init_first_position(struct robot *my_robot)
     delay(100);
     // Go forward, turn, and go bachward to touch the other wall
     set_new_command(&bot_command_delta, 0.180);
-    delay(8000);
+    delay(4000);
     set_new_command(&bot_command_alpha, (color * PI / 2 * RAD2DEG));
-    delay(10000);
+    delay(5000);
     set_new_command(&bot_command_delta, -1000);
 
     while ((digitalRead(LEFT_REAR_SENSOR) == 0) || (digitalRead(RIGHT_REAR_SENSOR) == 0)) {
@@ -862,11 +869,11 @@ void init_first_position(struct robot *my_robot)
     set_new_command(&bot_command_alpha, 0);
     set_new_command(&bot_command_delta, 0);
 
-    delay(1000);
+    delay(500);
     // Go in the middle of the starting area
     set_new_command(&bot_command_delta, 0.200);
 
-    delay(8000);
+    delay(4000);
     // Set the speed to the maximum
     delta_motor.max_speed = DELTA_MAX_SPEED;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;

@@ -1,5 +1,8 @@
 <launch>
 
+  <node pkg="indomptable_ai" type="objective_manager" name="objective_manager" output="screen">
+  </node>
+
   <node pkg="indomptable_ai" type="trajectory_wrapper_indomptable" name="indomptable_trajectory_manager" output="screen">
   </node>
 
