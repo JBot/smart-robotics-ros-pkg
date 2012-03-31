@@ -37,8 +37,8 @@ left_elbow_controller:
     motor:
         id: 3
         init: 512
-        min: 20
-        max: 975
+        min: 1
+        max: 1020
 
 left_wrist_controller:
     controller:
@@ -51,8 +51,8 @@ left_wrist_controller:
     motor:
         id: 4
         init: 512
-        min: 70
-        max: 980
+        min: 60
+        max: 990
 
 
 
@@ -109,8 +109,8 @@ right_wrist_controller:
     motor:
         id: 8
         init: 512
-        min: 70
-        max: 980
+        min: 80
+        max: 990
 
 
 

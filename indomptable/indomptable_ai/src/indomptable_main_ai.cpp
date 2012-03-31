@@ -89,6 +89,7 @@ class MainAI {
         void pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty);
         void startCallback(const std_msgs::Empty::ConstPtr & empty);
         void colorCallback(const std_msgs::Int32::ConstPtr & my_int);
+	void fill_trees(void);
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
@@ -151,6 +152,15 @@ MainAI::MainAI()
 
     state = 0;
 
+
+
+
+    //usleep(2000000);
+}
+
+void MainAI::fill_trees(void)
+{
+
     geometry_msgs::Pose2D tmp;
     tmp.x = color * (1.5 - 0.970);
     tmp.y = 0.470;
@@ -165,24 +175,28 @@ MainAI::MainAI()
     tmp.theta = 1.57079;
     totem_self_n.push_back(make_pair(ANGLE, tmp));
     tmp.x = color * (1.5 - 1.100);
-    tmp.y = 0.600;
+    tmp.y = 0.605;
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0.07;
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
-    tmp.y = -0.15;
+    tmp.x = 0.140;
+    tmp.y = -0.140;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
-    tmp.y = 0.15;
+    tmp.x = 0.140;
+    tmp.y = 0.140;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.08;
     tmp.y = 0.0;
     tmp.theta = 0.0;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 0.052;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.08;
     tmp.y = 0.0;
@@ -202,9 +216,29 @@ MainAI::MainAI()
     tmp.y = 1.400;
     tmp.theta = 0.0;
     totem_self_s.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.12;
-    tmp.y = 0.06;
+    tmp.x = 0.07;
+    tmp.y = 0.0;
     tmp.theta = 0.072;
+    totem_self_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = -0.15;
+    tmp.theta = 0.072;
+    totem_self_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = 0.15;
+    tmp.theta = 0.072;
+    totem_self_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
+    totem_self_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 0.052;
+    totem_self_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
     totem_self_s.push_back(make_pair(OBJECT, tmp));
 
 
@@ -217,12 +251,32 @@ MainAI::MainAI()
     tmp.theta = 1.57079;
     totem_opp_n.push_back(make_pair(ANGLE, tmp));
     tmp.x = -color * (1.5 - 1.100);
-    tmp.y = 0.600;
+    tmp.y = 0.605;
     tmp.theta = 0.0;
     totem_opp_n.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.12;
-    tmp.y = 0.06;
+    tmp.x = 0.07;
+    tmp.y = 0.0;
     tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = -0.15;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = 0.15;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 0.052;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
 
 
@@ -238,9 +292,29 @@ MainAI::MainAI()
     tmp.y = 1.500;
     tmp.theta = 0.0;
     totem_opp_s.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.12;
-    tmp.y = 0.06;
+    tmp.x = 0.07;
+    tmp.y = 0.0;
     tmp.theta = 0.072;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = -0.15;
+    tmp.theta = 0.072;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.15;
+    tmp.y = 0.15;
+    tmp.theta = 0.072;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 0.052;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
 
 
@@ -306,6 +380,10 @@ MainAI::MainAI()
     tmp.y = (2.000 - 0.647);
     tmp.theta = 0;
     gold_middle.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.07;
+    tmp.y = 0.0;
+    tmp.theta = 0.062;
+    gold_middle.push_back(make_pair(OBJECT, tmp));
 
 
     tmp.x = -color * (1.500 - 0.250);
@@ -321,12 +399,10 @@ MainAI::MainAI()
 
 
 
-
-
-
     current_list = totem_self_n;
 
-    usleep(2000000);
+
+
 }
 
 void MainAI::main_loop(void)
@@ -567,7 +643,14 @@ void MainAI::startCallback(const std_msgs::Empty::ConstPtr & empty)
 
 void MainAI::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
 {
-	color = my_int->data;
+	if(my_int->data == 1) {
+		color = my_int->data;
+	}
+	else {
+		color = -1;
+	}
+
+	fill_trees();
 }
 
 

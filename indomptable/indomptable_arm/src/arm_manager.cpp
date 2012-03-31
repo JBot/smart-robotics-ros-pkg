@@ -151,6 +151,20 @@ void indomptableARM_manager::leftdoneCallback(const std_msgs::Int32::ConstPtr & 
             }
         }
 
+        // Totem down
+        if( (next_left.pose.position.z < 0.055) && (next_left.pose.position.z > 0.05) ) {
+
+            if((left_ready != 0) && (right_ready != 0)) {
+                left_pose_pub.publish(next_left);
+                right_pose_pub.publish(next_left);
+                next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
+                next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
+                left_ready = 0;
+                right_ready = 0;
+            }
+        }
+
+
     }
     else {
         if( (next_right.pose.position.x != 0.0) || (next_right.pose.position.y != 0.0) || (next_right.pose.position.z != 0.0) ) {
@@ -206,6 +220,20 @@ void indomptableARM_manager::rightdoneCallback(const std_msgs::Int32::ConstPtr &
                 right_ready = 0;
             }
         }
+
+        // Totem down
+        if( (next_right.pose.position.z < 0.055) && (next_right.pose.position.z > 0.05) ) {
+
+            if((left_ready != 0) && (right_ready != 0)) {
+                left_pose_pub.publish(next_right);
+                right_pose_pub.publish(next_right);
+                next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
+                next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
+                left_ready = 0;
+                right_ready = 0;
+            }
+        }
+
 
     }
     else {
@@ -348,6 +376,26 @@ void indomptableARM_manager::poseCallback(const geometry_msgs::PoseStamped::Cons
         }
     }
 
+    // Totem down
+    if( (pose->pose.position.z < 0.055) && (pose->pose.position.z > 0.05) ) {
+
+        if((left_ready != 0) && (right_ready != 0)) {
+            left_pose_pub.publish(tmp_pose);
+            right_pose_pub.publish(tmp_pose);
+            left_ready = 0;
+            right_ready = 0;
+            // Pause AI
+            std_msgs::Empty pause;
+            pause_AI_pub.publish(pause);
+        }
+        else {
+            next_left = tmp_pose;
+            next_right = tmp_pose;
+            // Pause AI
+            std_msgs::Empty pause;
+            pause_AI_pub.publish(pause);
+        }
+    }
 
 
 }

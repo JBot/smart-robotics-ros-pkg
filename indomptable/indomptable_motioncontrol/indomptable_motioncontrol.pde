@@ -74,13 +74,13 @@ void delay_ms(uint16_t millis)
 #define ERROR 			3
 
 #define ALPHA_MAX_SPEED         8000 //4000//20000
-#define ALPHA_MAX_ACCEL         200//300
+#define ALPHA_MAX_ACCEL         400//200//300
 #define ALPHA_MAX_DECEL         1000 //1000                       //2500
 #define DELTA_MAX_SPEED         12000 //6000//51000 
 #define DELTA_MAX_SPEED_BACK    3500 
 #define DELTA_MAX_SPEED_BACK_PAWN    4500
-#define DELTA_MAX_ACCEL         300//1000     
-#define DELTA_MAX_DECEL         1000 //2000
+#define DELTA_MAX_ACCEL         400//300//1000     
+#define DELTA_MAX_DECEL         1500 //2000
 
 /*
 #define ALPHA_MAX_SPEED         5000    //20000
@@ -279,7 +279,6 @@ ros::Publisher pub_xspeed("/xspeed", &xspeed);
 ros::Publisher pub_tspeed("/tspeed", &tspeed);
 
 geometry_msgs::Pose2D goal;
-geometry_msgs::PoseArray goals;
 int goals_index = 0;
 
 double x = 1.0;
@@ -410,6 +409,18 @@ void messageCbdelta_ros(const std_msgs::Int32 & msg)
 
 ros::Subscriber < std_msgs::Int32 > delta_ros("delta_ros", &messageCbdelta_ros);
 
+void colorCb(const std_msgs::Int32 & msg)
+{
+  if(msg.data == 1) {
+    color = 1;
+  }
+  else {
+    color = -1;
+  }
+
+}
+
+ros::Subscriber < std_msgs::Int32 > ros_color("color", &colorCb);
 
 
 
@@ -646,6 +657,7 @@ void setup()
     nh.subscribe(delta_ros);
     nh.advertise(ack_a);
     nh.advertise(ack_d);
+    nh.subscribe(ros_color);
 
 /*
     // Disable motion control
@@ -665,19 +677,19 @@ void setup()
     delay(10);
   */  
   
-  /*
-    while() { // color not choose  
+  color = 0;
+    while(color == 0) { // color not choose  
       nh.spinOnce();
       delay(10);
     }
-  */
+  
     // Enable motion control for auto init
     alpha_and_theta = 0;
     motion_control_ON = 1;
     roboclaw_ON = 1;
     
     // auto init
-    color = 1;//-1;
+    //color = 1;//-1;
     init_first_position(&maximus);
 
     // Disable motion control
@@ -1614,18 +1626,6 @@ void rotate(double heading, double attitude, double bank,
     pose->z = c1 * s2 * c3 - s1 * c2 * s3;
 }
 
-
-void goto_next_goal(void)
-{
-
-    if (goals_index < goals.poses_length) {
-        goal.x = goals.poses[goals_index].position.x;
-        goal.y = goals.poses[goals_index].position.y;
-        goals_index++;
-        goto_xy(goal.x, goal.y);
-    }
-
-}
 
 
 
