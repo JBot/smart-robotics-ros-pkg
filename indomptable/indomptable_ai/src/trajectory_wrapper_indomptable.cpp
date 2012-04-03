@@ -130,6 +130,15 @@ if( (status == 1) ){
 	    {  
 		    //ROS_INFO("Sum: %ld", get_path.response.plan);
 		    path_pub.publish(tmp_plan.response.plan);
+
+		    if(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty()) {
+			    // Goal unreachable
+			    std_msgs::Empty empty;
+			    pathimpossible_pub.publish(empty);
+
+			    return;
+		    }
+
 	    }   
 	    else
 	    {

@@ -134,13 +134,13 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = color*(1.500 - 0.640); // bottle
     tmp_obj.pose.position.y = 1.700;
     // Priority : 5
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 8) );
 
 
     tmp_obj.pose.position.x = color*(-1.500 + 0.640 + 0.477); // bottle
     tmp_obj.pose.position.y = 1.700;
     // Priority : 5
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 8) );
 
 
     tmp_obj.pose.position.x = color*(0); // gold
@@ -218,6 +218,10 @@ void ObjectiveManager::deletCallback(const geometry_msgs::PoseStamped::ConstPtr 
     while (!tmp_list.empty()) {
 
         if( (tmp_list.back().first.pose.position.x == pose->pose.position.x) && (tmp_list.back().first.pose.position.y == pose->pose.position.y) ) {
+
+	        if( (tmp_list.back().first.pose.position.x == (color*(1.500 - 0.250)) ) && (tmp_list.back().first.pose.position.y == 0.800) ) {
+			tmp_list2.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_list.back().first, 0) );
+		}
 
         }
         else {
@@ -316,7 +320,10 @@ void ObjectiveManager::loop(void)
             current_prio = (3.0) / (ObjectiveManager::compute_distance(tmp_plan.response.plan));
             if(current_prio < 10000000.0) {
                 // add it to the base priority
-                current_prio = current_prio + (double)iter->second;
+		if((double)iter->second > 0.0)
+                	current_prio = current_prio + (double)iter->second;
+		else 
+			current_prio = 0.0;
                 //ROS_ERROR("Prio tot : %f", current_prio);
                 if(current_prio > best_prio) {
                     best_prio = current_prio;
@@ -371,7 +378,7 @@ int main(int argc, char **argv)
     tf::TransformListener listener(ros::Duration(10));
 
     // Refresh rate
-    ros::Rate loop_rate(0.5);
+    ros::Rate loop_rate(2);
     float rotation = 0.0;
     while (ros::ok()) {
 

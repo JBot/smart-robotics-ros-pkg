@@ -166,6 +166,10 @@ void MainAI::fill_trees(void)
     tmp.y = 0.470;
     tmp.theta = 0;
     totem_self_n.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.07;
+    tmp.y = 0.0;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = color * (1.5 - 1.100);
     tmp.y = 0.500;
     tmp.theta = 0;
@@ -318,7 +322,7 @@ void MainAI::fill_trees(void)
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
 
 
-    tmp.x = color * (1.5 - 0.220);
+    tmp.x = color * (1.5 - 0.250);
     tmp.y = 0.90;
     tmp.theta = 0;
     release.push_back(make_pair(POSITION, tmp));
@@ -494,7 +498,7 @@ void MainAI::main_loop(void)
                         tmpaction.data = (current_list.front().second.theta * 1000);
                         alpha_pub.publish(tmpaction);
                         ROS_ERROR("Sending angle %d", tmpaction.data);
-                        usleep(1300000);
+                        usleep(1200000);
                         break;
                     case DISTANCE :
                         if (current_list.front().second.theta == 0.0) {
@@ -512,14 +516,14 @@ void MainAI::main_loop(void)
                             {
                                 ROS_ERROR("Failed to call service GetRobotPose");
                             }
-                            usleep(800000);
+                            usleep(700000);
 
                         }
                         else {
                             tmpaction.data = current_list.front().second.theta * 1000;
                             delta_pub.publish(tmpaction);
                             ROS_ERROR("Sending distance %d", tmpaction.data);
-                            usleep(1000000);
+                            usleep(800000);
                         }
                         break;
                     case OBJECT :
@@ -606,6 +610,7 @@ void MainAI::pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty)
     // Search another goal
     if(state != 0b00000000) {
         state = 0;
+	ROS_ERROR("Search another goal.");
     }
 }
 

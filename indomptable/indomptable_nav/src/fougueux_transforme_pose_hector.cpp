@@ -144,6 +144,8 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
                 listener.transformPose("/map", odom_pose, base_pose);
 		
 		base_pose.pose.position.y = base_pose.pose.position.y + cpt;
+		base_pose.pose.position.y = 3.0;
+		base_pose.pose.position.y = 3.0;
 		//cpt = cpt + 0.001;
 		//if(cpt > 0.5)
 		//	cpt = -0.01;

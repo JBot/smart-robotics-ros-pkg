@@ -169,6 +169,36 @@ void indomptableARM_manager::leftdoneCallback(const std_msgs::Int32::ConstPtr & 
     else {
         if( (next_right.pose.position.x != 0.0) || (next_right.pose.position.y != 0.0) || (next_right.pose.position.z != 0.0) ) {
 
+	// Try to take the objective of the other arm
+		
+        // Totem middle
+        if( (next_right.pose.position.z < 0.001) && (next_right.pose.position.z > -0.001) ) {
+                left_pose_pub.publish(next_right);
+                next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
+                left_ready = 0;
+        }
+
+        // Ground
+/*
+        if( (next_right.pose.position.z < 0.075) && (next_right.pose.position.z > 0.06) ) {
+            if(right_ready != 0) {
+                next_right.pose.position.y = next_right.pose.position.y + 0.060;
+                right_pose_pub.publish(next_right);
+                next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
+                right_ready = 0;
+                if( (next_left.pose.position.x != 0.0) || (next_left.pose.position.y != 0.0) || (next_left.pose.position.z != 0.0) ) {
+
+                }
+                else {
+                    std_msgs::Empty resume;
+                    resume_AI_pub.publish(resume);
+                }
+            }
+
+        }
+*/
+
+
         }
         else {
             std_msgs::Empty resume;
@@ -238,6 +268,34 @@ void indomptableARM_manager::rightdoneCallback(const std_msgs::Int32::ConstPtr &
     }
     else {
         if( (next_left.pose.position.x != 0.0) || (next_left.pose.position.y != 0.0) || (next_left.pose.position.z != 0.0) ) {
+
+
+        // Totem middle
+        if( (next_left.pose.position.z < 0.001) && (next_left.pose.position.z > -0.001) ) {
+                right_pose_pub.publish(next_left);
+                next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
+                right_ready = 0;
+        }
+
+        // Ground
+/*
+        if( (next_left.pose.position.z < 0.075) && (next_left.pose.position.z > 0.06) ) {
+            if(left_ready != 0) {
+                next_left.pose.position.y = next_left.pose.position.y - 0.060;
+                left_pose_pub.publish(next_left);
+                next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
+                left_ready = 0;
+                if( (next_right.pose.position.x != 0.0) || (next_right.pose.position.y != 0.0) || (next_right.pose.position.z != 0.0) ) {
+
+                }
+                else {
+                    std_msgs::Empty resume;
+                    resume_AI_pub.publish(resume);
+                }
+            }
+
+        }
+*/
 
         }
         else {
