@@ -160,7 +160,7 @@ MainAI::MainAI()
 
 void MainAI::fill_trees(void)
 {
-
+/*
     geometry_msgs::Pose2D tmp;
     tmp.x = color * (1.5 - 0.970);
     tmp.y = 0.470;
@@ -205,6 +205,41 @@ void MainAI::fill_trees(void)
     tmp.x = 0.08;
     tmp.y = 0.0;
     tmp.theta = -0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+*/
+    geometry_msgs::Pose2D tmp;
+    tmp.x = color * (1.5 - 0.600);
+    tmp.y = 1.0;
+    tmp.theta = 0;
+    totem_self_n.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1.57079 + (color * 1.57079);
+    totem_self_n.push_back(make_pair(ANGLE, tmp));
+    tmp.x = color * (1.5 - 0.705);
+    tmp.y = 1.000;
+    tmp.theta = 0.0;
+    totem_self_n.push_back(make_pair(DISTANCE, tmp));
+
+    tmp.x = 0.07;
+    tmp.y = 0.0;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.140;
+    tmp.y = -0.140;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.140;
+    tmp.y = 0.140;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 0.052;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
 
 

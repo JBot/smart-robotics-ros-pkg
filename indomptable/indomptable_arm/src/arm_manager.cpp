@@ -350,6 +350,24 @@ void indomptableARM_manager::poseCallback(const geometry_msgs::PoseStamped::Cons
      */
     // Totem middle
     if( (pose->pose.position.z < 0.001) && (pose->pose.position.z > -0.001) ) {
+        if((left_ready != 0) && (right_ready != 0)) {
+            left_pose_pub.publish(tmp_pose);
+            right_pose_pub.publish(tmp_pose);
+            left_ready = 0;
+            right_ready = 0;
+            // Pause AI
+            std_msgs::Empty pause;
+            pause_AI_pub.publish(pause);
+        }
+        else {
+            next_left = tmp_pose;
+            next_right = tmp_pose;
+            // Pause AI
+            std_msgs::Empty pause;
+            pause_AI_pub.publish(pause);
+        }
+
+/*
         if(left_ready != 0) {
             left_pose_pub.publish(tmp_pose);
             left_ready = 0;
@@ -370,6 +388,8 @@ void indomptableARM_manager::poseCallback(const geometry_msgs::PoseStamped::Cons
             std_msgs::Empty pause;
             pause_AI_pub.publish(pause);
         }
+*/
+
     }
 
     // Ground
