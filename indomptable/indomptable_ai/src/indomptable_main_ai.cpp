@@ -221,16 +221,16 @@ void MainAI::fill_trees(void)
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(DISTANCE, tmp));
 
+    tmp.x = 0.135;
+    tmp.y = -0.140;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.07;
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.140;
-    tmp.y = -0.140;
-    tmp.theta = 0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.140;
-    tmp.y = 0.140;
+    tmp.x = 0.130;
+    tmp.y = 0.130;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.0;
@@ -241,8 +241,12 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
 
-
+/*
     tmp.x = color * (1.5 - 1.100);
     tmp.y = 1.530;
     tmp.theta = 0;
@@ -279,7 +283,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = -0.072;
     totem_self_s.push_back(make_pair(OBJECT, tmp));
-
+*/
 
     tmp.x = -color * (1.5 - 1.100);
     tmp.y = 0.470;
@@ -297,7 +301,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
+/*    tmp.x = 0.15;
     tmp.y = -0.15;
     tmp.theta = 0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
@@ -317,7 +321,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = -0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
-
+*/
 
     tmp.x = -color * (1.5 - 1.100);
     tmp.y = 1.530;
@@ -335,7 +339,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
+/*    tmp.x = 0.15;
     tmp.y = -0.15;
     tmp.theta = 0.072;
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
@@ -355,7 +359,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = -0.072;
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
-
+*/
 
     tmp.x = color * (1.5 - 0.250);
     tmp.y = 0.90;
@@ -369,6 +373,10 @@ void MainAI::fill_trees(void)
     tmp.y = 0;
     tmp.theta = -0.150;
     release.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1.57079 + (color * (1.57079 + 1.57079/2));
+    release.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = -0.150;
@@ -478,7 +486,10 @@ void MainAI::main_loop(void)
                 current_list = random_move;
                 ROS_ERROR("Random");
             }
-            if( (tmppose.pose.position.x == color*(1.500 - 1.100)) && (tmppose.pose.position.y == 0.600) ) {
+            if( (tmppose.pose.position.x == color*(1.500 - 0.600)) && (tmppose.pose.position.y == 1.000) ) {
+//    tmp.x = color * (1.5 - 0.600);
+//    tmp.y = 1.0;
+
                 current_list = totem_self_n;
                 ROS_ERROR("Totem Self N");
             }
@@ -599,7 +610,7 @@ void MainAI::main_loop(void)
             else {
                 //update_prio.goal = final_objective;
                 delet_pub.publish(final_objective);
-                usleep(200000);
+                usleep(300000);
                 state = 0;
             }
             break;

@@ -16,10 +16,10 @@
 
   <node pkg="indomptable_nav" type="indomptable_transform_pose_hector" name="indomptable_pose_node" respawn="true" output="screen">
   </node>
-
+<!--
   <node pkg="indomptable_nav" type="fougueux_transform_pose_hector" name="fougueux_pose_node" respawn="true" output="screen">
   </node>
-
+-->
   <!-- Publish a static transform between the robot base and the map frame -->
   <node pkg="tf" type="static_transform_publisher" name="map_base_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />  
   <node pkg="tf" type="static_transform_publisher" name="map_base_broadcasterf" args="0 1.4 0 0 0 0 /map /base_link2 100" />
