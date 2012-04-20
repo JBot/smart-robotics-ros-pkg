@@ -98,7 +98,7 @@ void delay_ms(uint16_t millis)
 #define LEFT_REAR_SENSOR        43
 #define RIGHT_REAR_SENSOR       42
 
-
+#define START_PIN               40
 
 /***********************/
 /* Specific structures */
@@ -422,6 +422,8 @@ void colorCb(const std_msgs::Int32 & msg)
 
 ros::Subscriber < std_msgs::Int32 > ros_color("color", &colorCb);
 
+std_msgs::Empty start_message;
+ros::Publisher start_pub("start_match", &start_message);
 
 
 /***********************/
@@ -633,6 +635,7 @@ void setup()
 
     pinMode(LEFT_REAR_SENSOR, INPUT);
     pinMode(RIGHT_REAR_SENSOR, INPUT);
+    pinMode(START_PIN, INPUT);
 
 
     pinMode(9, OUTPUT);
@@ -658,7 +661,8 @@ void setup()
     nh.advertise(ack_a);
     nh.advertise(ack_d);
     nh.subscribe(ros_color);
-
+    nh.advertise(start_pub);
+    
 /*
     // Disable motion control
     motion_control_ON = 0;
@@ -699,6 +703,33 @@ void setup()
 
     motion_control_ON = 1;
     roboclaw_ON = 1;
+
+
+    while ( digitalRead(START_PIN) == 1 ) {
+      
+      t.header.frame_id = odom;
+      t.child_frame_id = base_link;
+  
+      t.transform.translation.x = maximus.pos_X;
+      t.transform.translation.y = maximus.pos_Y;
+  
+      t.transform.rotation = tf::createQuaternionFromYaw(maximus.theta);
+      t.header.stamp = nh.now();
+  
+      broadcaster.sendTransform(t);
+  
+      nh.spinOnce();
+      delay(10);
+  
+      nh.spinOnce();
+      delay(10);
+  
+      nh.spinOnce();
+      delay(10);
+        
+    }
+
+    start_pub.publish(&start_message);
     
 }
 

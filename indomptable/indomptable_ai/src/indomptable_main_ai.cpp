@@ -80,6 +80,7 @@ class MainAI {
         ros::Subscriber pathimpossible_sub;
 
         ros::Subscriber start_sub;
+        ros::Subscriber stop_sub;
         ros::Subscriber color_sub;
 
     private:
@@ -88,6 +89,7 @@ class MainAI {
         void resumeCallback(const std_msgs::Empty::ConstPtr & empty);
         void pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty);
         void startCallback(const std_msgs::Empty::ConstPtr & empty);
+        void stopCallback(const std_msgs::Empty::ConstPtr & empty);
         void colorCallback(const std_msgs::Int32::ConstPtr & my_int);
 	void fill_trees(void);
         ros::NodeHandle nh;
@@ -143,6 +145,7 @@ MainAI::MainAI()
     pathimpossible_sub = nh.subscribe < std_msgs::Empty > ("/goal_unreachable", 20, &MainAI::pathimpossibleCallback, this);
 
     start_sub = nh.subscribe < std_msgs::Empty > ("/start_match", 20, &MainAI::startCallback, this);
+    stop_sub = nh.subscribe < std_msgs::Empty > ("/stop_match", 20, &MainAI::stopCallback, this);
     color_sub = nh.subscribe < std_msgs::Int32 > ("/color", 20, &MainAI::colorCallback, this);
 
 
@@ -690,6 +693,11 @@ void MainAI::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
 void MainAI::startCallback(const std_msgs::Empty::ConstPtr & empty)
 {
 	started = 1;
+}
+
+void MainAI::stopCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+	started = 0;
 }
 
 void MainAI::colorCallback(const std_msgs::Int32::ConstPtr & my_int)

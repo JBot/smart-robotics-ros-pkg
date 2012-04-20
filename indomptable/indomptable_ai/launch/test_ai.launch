@@ -9,6 +9,8 @@
   <node pkg="indomptable_ai" type="indomptable_main_ai" name="indomptable_main_ai" output="screen">
   </node>
 
+  <node pkg="indomptable_ai" type="indomptable_timer_manager" name="indomptable_timer_manager" output="screen">
+  </node>
 
 </launch>
 
