@@ -82,6 +82,7 @@ class indomptableARM {
         ros::Publisher tibia_pub;
         ros::Publisher ankle_pub;
         ros::Publisher pump_pub;
+        ros::Publisher backdoor_pub;
 
         ros::ServiceClient client_shoulder_roll;
         ros::ServiceClient client_shoulder_lift;
@@ -203,6 +204,7 @@ indomptableARM::indomptableARM()
     tmp_string = input_name;
     tmp_string.append("_wrist_joint");
     ankle_pub = nh.advertise < std_msgs::Float64 > ("wrist_joint", 5);
+    backdoor_pub = nh.advertise < std_msgs::Float64 > ("backdoor_controller/command", 5);
 
     tmp_string = input_name;
     tmp_string.append("_pump");
@@ -325,6 +327,11 @@ indomptableARM::indomptableARM()
 
     waitState();
 
+    std_msgs::Float64 tmp_backdoor;
+
+    tmp_backdoor.data = -0.3;
+    backdoor_pub.publish(tmp_backdoor);
+
 }
 
 void indomptableARM::joint_publish(void)
@@ -383,6 +390,11 @@ void indomptableARM::pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback
 void indomptableARM::releaseCallback(const std_msgs::Empty::ConstPtr & empty)
 {
 
+    std_msgs::Float64 tmp_backdoor;
+
+    tmp_backdoor.data = 1;
+    backdoor_pub.publish(tmp_backdoor);
+
     LegIK((int)(100), (int)(180), (int)(0));
     DesAnkleAngle = -2.570796;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
@@ -423,6 +435,7 @@ void indomptableARM::releaseCallback(const std_msgs::Empty::ConstPtr & empty)
     system("aplay /home/jbot/Downloads/tada.wav &");
 
     usleep((ActualGaitSpeed)*SLEEP_COEFF);
+    usleep((ActualGaitSpeed)*SLEEP_COEFF);
 
     LegIK((int)(100), (int)(100), (int)(0));
     DesAnkleAngle = -1.5;
@@ -437,6 +450,9 @@ void indomptableARM::releaseCallback(const std_msgs::Empty::ConstPtr & empty)
     usleep((ActualGaitSpeed)*SLEEP_COEFF);
 
     waitState();
+
+    tmp_backdoor.data = -0.3;
+    backdoor_pub.publish(tmp_backdoor);
 
 }
 

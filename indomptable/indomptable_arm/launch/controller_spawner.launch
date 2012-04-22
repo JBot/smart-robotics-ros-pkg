@@ -17,5 +17,6 @@
                 right_shoulder_lift_controller
                 right_elbow_controller
                 right_wrist_controller"
+                backdoor_controller"
           output="screen"/>
 </launch>
