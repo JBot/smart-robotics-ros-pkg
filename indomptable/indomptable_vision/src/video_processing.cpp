@@ -5,6 +5,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "std_msgs/Int32.h"
+#include "geometry_msgs/PoseStamped.h"
 
 #include "indomptable_vision/ImageResult.h"
 
@@ -22,6 +23,10 @@
 #define STEP_MIN 5
 #define STEP_MAX 100 
 
+#define NO_TAKE 0 
+#define TAKE_AUTONOMOUSLY 1 
+
+#define MAX_CNT_OBJECT 40 
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
@@ -56,6 +61,7 @@ void getObjectColor(int event, int x, int y, int flags, void *param = NULL) {
     // Vars
     CvScalar pixel;
     int h = 0, s = 0, v = 0;
+    int i, j;
 
     if(event == CV_EVENT_LBUTTONUP) {
 
@@ -66,21 +72,28 @@ void getObjectColor(int event, int x, int y, int flags, void *param = NULL) {
         cvtColor(cv_ptr->image, hsv_mat, CV_BGR2HSV);
         hsv = &hsv_mat.operator IplImage();
 
-        // Get the selected pixel
-        pixel = cvGet2D(hsv, y, x);
+        for(i=x-1;i<x+2;i++) {
+            for(j=y-1;j<y+2;j++) {
+                // Get the selected pixel
+                pixel = cvGet2D(hsv, y, x);
+                h += (int)pixel.val[0];
+                s += (int)pixel.val[1];
+                v += (int)pixel.val[2];
+            }
+        }
 
         if(click_count == 0) {
             // Change the value of the tracked color with the color of the selected pixel
-            h_CD = (int)pixel.val[0];
-            s_CD = (int)pixel.val[1];
-            v_CD = (int)pixel.val[2];
+            h_CD = (int)(h/9);
+            s_CD = (int)(s/9);
+            v_CD = (int)(v/9);
             click_count++;
         }
         else {
             // Change the value of the tracked color with the color of the selected pixel
-            h_BAR = (int)pixel.val[0];
-            s_BAR = (int)pixel.val[1];
-            v_BAR = (int)pixel.val[2];
+            h_BAR = (int)(h/9);
+            s_BAR = (int)(s/9);
+            v_BAR = (int)(v/9);
             click_count = 0;
         }
 
@@ -101,6 +114,8 @@ class ImageConverter
 
     ros::ServiceServer image_result_service;
 
+    ros::Publisher object_pub;
+
     public:
 
     std_msgs::Int32 x_CD;
@@ -109,6 +124,8 @@ class ImageConverter
     std_msgs::Int32 y_BAR;
     std_msgs::Int32 type_obj;
 
+    int mode;
+    int nb_img_cnt; // Number of time an object is seen (To avoid taking an object with only 1 image)
 
     ImageConverter()
         : it_(nh_)
@@ -118,15 +135,20 @@ class ImageConverter
 
         image_result_service = nh_.advertiseService("/indomptable/image_result", &ImageConverter::imageResultService, this);
 
+        object_pub = nh_.advertise < geometry_msgs::PoseStamped > ("/object_pose", 5);
+
         objectPos = cvPoint(-1, -1);
-        h_CD = 0; s_CD = 0; v_CD = 0; tolerance_CD = 20;
-        h_BAR = 0; s_BAR = 0; v_BAR = 0; tolerance_BAR = 20;
+        h_CD = 0; s_CD = 0; v_CD = 0; tolerance_CD = 30;
+        h_BAR = 0; s_BAR = 0; v_BAR = 0; tolerance_BAR = 30;
 
         x_CD.data = -1;
         y_CD.data = -1;
         x_BAR.data = -1;
         y_BAR.data = -1;
         type_obj.data = 0;
+
+        mode = NO_TAKE;
+        nb_img_cnt = 0;
 
         // Create the windows
         cvNamedWindow("Camera output", CV_WINDOW_AUTOSIZE);
@@ -153,6 +175,14 @@ class ImageConverter
     {
         switch(req.type.data) {
 
+            case 0 :
+                mode = NO_TAKE;
+
+                res.type.data = type_obj.data;
+                res.x = x_CD;
+                res.y = y_CD;
+
+                break;
             case 1 :
                 res.type.data = 1;
                 res.x = x_CD;
@@ -160,12 +190,21 @@ class ImageConverter
                 ROS_ERROR("Requesting CD position: x:%d , y:%d", x_CD.data, y_CD.data);
                 break;
             case 2 :
+                res.type.data = 2;
+                res.x = x_BAR;
+                res.y = y_BAR;
 
                 ROS_ERROR("Requesting BAR position: x:%d , y:%d", x_BAR.data, y_BAR.data);
                 break;
             case 3 :
 
-                ROS_ERROR("Requesting any position: x:%d , y:%d / x:%d , y:%d", x_CD.data, y_CD.data, x_BAR.data, y_BAR.data);
+                mode = TAKE_AUTONOMOUSLY;
+
+                res.type.data = type_obj.data;
+                res.x = x_CD;
+                res.y = y_CD;
+
+                ROS_ERROR("Requesting any position: x:%f , y:%f / x:%f , y:%f", -((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0), (480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50), -((double)x_BAR.data)*278.0/640.0+(335.0*278.0/640.0), (480)*90.0/240.0 -((double)y_BAR.data)*90.0/240.0 + (50) );
                 break;
             default :
 
@@ -190,7 +229,7 @@ class ImageConverter
 
         // Create the hsv image
         hsv = cvCloneImage(image);
-        
+
         //cvCvtColor(image, hsv, CV_BGR2HSV);
         cvtColor(cv_ptr->image, hsv_mat, CV_BGR2HSV);
 
@@ -239,7 +278,7 @@ class ImageConverter
         cvReleaseImage(&hsv);
 
         // If there is no pixel, we return a center outside the image, else we return the center of gravity
-        if(*nbPixels > 30000) {
+        if(*nbPixels > 28000) {
             circle( cv_ptr->image, cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels))), 3, color, -1, 8, 0 );
             return cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels)));
         }
@@ -261,6 +300,7 @@ class ImageConverter
             return;
         }
 
+        geometry_msgs::PoseStamped tmppose;
 
         CvPoint objectNextPos;
         int nbPixels;
@@ -282,6 +322,73 @@ class ImageConverter
 
 
         imshow( "Camera output", cv_ptr->image );
+
+        if(mode == TAKE_AUTONOMOUSLY) {
+
+            if(type_obj.data > 0) {
+
+                switch(type_obj.data) {
+                    case 0 :
+                        nb_img_cnt = 0;
+                        break;
+                    case 1 : // Only CD is seen
+                        if(nb_img_cnt > MAX_CNT_OBJECT) { // Object seen X times
+                            tmppose.pose.position.x = ((480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50))/1000.0 - 0.02;
+                            tmppose.pose.position.y = (-((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
+                            tmppose.pose.position.z = 0.072;
+                            object_pub.publish(tmppose);
+                            ROS_ERROR("Taking CD : %f : %f", tmppose.pose.position.x, tmppose.pose.position.y);
+                            nb_img_cnt = 0;
+                        }
+                        else {
+                            nb_img_cnt++;
+                        }
+                        break;
+                    case 2 : // Only BAR is seen
+                        if(nb_img_cnt > MAX_CNT_OBJECT) { // Object seen X times
+                            tmppose.pose.position.x = ((480)*90.0/240.0 -((double)y_BAR.data)*90.0/240.0 + (50))/1000.0;
+                            tmppose.pose.position.y = (-((double)x_BAR.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
+                            tmppose.pose.position.z = 0.062;
+                            object_pub.publish(tmppose);
+                            ROS_ERROR("Taking BAR : %f : %f", tmppose.pose.position.x, tmppose.pose.position.y);
+                            nb_img_cnt = 0;
+                        }
+                        else {
+                            nb_img_cnt++;
+                        }
+                        break;
+
+                    case 3 : // Two different objects are seen
+                        if(nb_img_cnt > MAX_CNT_OBJECT) { // Object seen X times
+
+                            if(y_CD.data > y_BAR.data) {
+                                ROS_ERROR("Taking CD");
+                                nb_img_cnt = 0;
+                            }
+                            else {
+                                ROS_ERROR("Taking BAR");
+                                nb_img_cnt = 0;
+                            }
+
+                        }
+                        else {
+                            nb_img_cnt++;
+                        }
+                        break;
+                }
+
+            }
+            else {
+                nb_img_cnt = 0;
+            }
+
+        }
+        else {
+            nb_img_cnt = 0;
+        }
+
+
+
         /*
            Mat gray;
            cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
