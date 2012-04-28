@@ -400,7 +400,7 @@ void MainAI::fill_trees(void)
     bottle_1.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
-    tmp.theta = -0.150;
+    tmp.theta = -0.160;
     bottle_1.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -418,7 +418,7 @@ void MainAI::fill_trees(void)
     bottle_2.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
-    tmp.theta = -0.150;
+    tmp.theta = -0.160;
     bottle_2.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -547,7 +547,7 @@ void MainAI::main_loop(void)
                         tmpaction.data = (current_list.front().second.theta * 1000);
                         alpha_pub.publish(tmpaction);
                         ROS_ERROR("Sending angle %d", tmpaction.data);
-                        usleep(1200000);
+                        usleep(1300000);
                         break;
                     case DISTANCE :
                         if (current_list.front().second.theta == 0.0) {
@@ -603,7 +603,7 @@ void MainAI::main_loop(void)
                     case RELEASE :
                         release_pub.publish(tmprelease);
                         ROS_ERROR("Releasing objects");
-                        usleep(3000000);
+                        usleep(2900000);
                         break;
                     default :
                         break;
