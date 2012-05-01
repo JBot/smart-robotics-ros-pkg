@@ -35,6 +35,9 @@
 
 #define BAUDRATE B115200
 
+#define NB_STEP_SKIP	10//8
+#define MAX_DIST_SKIP	0.20//0.14
+
 class Pathwrapper {
   public:
     Pathwrapper();
@@ -51,15 +54,21 @@ class Pathwrapper {
 
     ros::Publisher pathdone_pub;
 
+    ros::Subscriber pause_sub_;
+    ros::Subscriber resume_sub_;
   private:
     void pathCallback(const nav_msgs::Path::ConstPtr & path);
     void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+    void pauseCallback(const std_msgs::Empty::ConstPtr & empty);
+    void resumeCallback(const std_msgs::Empty::ConstPtr & empty);
+
      ros::NodeHandle nh;
 
      nav_msgs::Path my_path;
      geometry_msgs::Pose2D final_pose;
 
     char cpt_send;
+    char pause;
 };
 
 Pathwrapper::Pathwrapper()
@@ -76,12 +85,20 @@ Pathwrapper::Pathwrapper()
 
     pathdone_pub = nh.advertise < std_msgs::Empty > ("/path_done", 50);
 
+
+    pause_sub_ = nh.subscribe < std_msgs::Empty > ("/pause_nav", 20, &Pathwrapper::pauseCallback, this);
+    resume_sub_ = nh.subscribe < std_msgs::Empty > ("/resume_nav", 20, &Pathwrapper::resumeCallback, this);
+
+    pause = 0;
+
     my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
 
     if (my_path.poses.std::vector < geometry_msgs::PoseStamped >::size() >
         (my_path.poses.std::vector < geometry_msgs::PoseStamped >::max_size() - 2)) {
         my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
     }
+
+
 
     final_pose.x = 0.0;
     final_pose.y = 0.14;
@@ -108,6 +125,16 @@ void Pathwrapper::rotate(double heading, double attitude, double bank, geometry_
     pose->pose.orientation.x = c1c2 * s3 + s1s2 * c3;
     pose->pose.orientation.y = s1 * c2 * c3 + c1 * s2 * s3;
     pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
+}
+
+void Pathwrapper::pauseCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+	pause = 1;
+}
+
+void Pathwrapper::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
+{
+	pause = 0;
 }
 
 void Pathwrapper::pathCallback(const nav_msgs::Path::ConstPtr & path)
@@ -161,6 +188,9 @@ void Pathwrapper::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose
 
 void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
+
+    if(!pause) {
+
         geometry_msgs::PoseStamped odom_pose;
         odom_pose.header.frame_id = "/base_link";
 
@@ -186,21 +216,15 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 		//ROS_INFO("%f %f %f %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y);
 
-		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < 0.14 ) {
+		if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < MAX_DIST_SKIP ) {
 
 			if( !(my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
-				if(my_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 8) {
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-					//ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
-					//		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+				if(my_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > NB_STEP_SKIP) {
 
-					while( (my_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 1) && (sqrt( pow(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x - base_pose.pose.position.x, 2) + pow(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y - base_pose.pose.position.y, 2) ) < 0.12) ) {
+					for(int loop=0; loop < (NB_STEP_SKIP-2); loop++)
+						my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+
+					while( (my_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > 1) && (sqrt( pow(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x - base_pose.pose.position.x, 2) + pow(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y - base_pose.pose.position.y, 2) ) < (MAX_DIST_SKIP-0.01)) ) {
 					
 						my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 
@@ -254,6 +278,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 		ROS_ERROR("Received an exception trying to transform a point from \"odom\" to \"base_link\": %s", ex.what());
 	}
 
+    }
 
 }
 

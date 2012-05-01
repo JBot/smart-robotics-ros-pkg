@@ -4,6 +4,6 @@ std_msgs/Int32 type
 ---
 
 std_msgs/Int32 type
-std_msgs/Int32 x
-std_msgs/Int32 y
+std_msgs/Float64 x
+std_msgs/Float64 y
 

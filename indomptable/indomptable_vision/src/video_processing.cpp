@@ -5,6 +5,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "std_msgs/Int32.h"
+#include "std_msgs/Float64.h"
 #include "geometry_msgs/PoseStamped.h"
 
 #include "indomptable_vision/ImageResult.h"
@@ -26,7 +27,7 @@
 #define NO_TAKE 0 
 #define TAKE_AUTONOMOUSLY 1 
 
-#define MAX_CNT_OBJECT 40 
+#define MAX_CNT_OBJECT 20 
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
@@ -118,10 +119,10 @@ class ImageConverter
 
     public:
 
-    std_msgs::Int32 x_CD;
-    std_msgs::Int32 y_CD;
-    std_msgs::Int32 x_BAR;
-    std_msgs::Int32 y_BAR;
+    std_msgs::Float64 x_CD;
+    std_msgs::Float64 y_CD;
+    std_msgs::Float64 x_BAR;
+    std_msgs::Float64 y_BAR;
     std_msgs::Int32 type_obj;
 
     int mode;
@@ -131,15 +132,16 @@ class ImageConverter
         : it_(nh_)
     {
         image_pub_ = it_.advertise("/out/image_raw", 1);
-        image_sub_ = it_.subscribe("/image_raw/uncompressed_jo", 1, &ImageConverter::imageCb, this);
+        //image_sub_ = it_.subscribe("/image_raw/uncompressed_jo", 1, &ImageConverter::imageCb, this);
+        image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &ImageConverter::imageCb, this);
 
         image_result_service = nh_.advertiseService("/indomptable/image_result", &ImageConverter::imageResultService, this);
 
         object_pub = nh_.advertise < geometry_msgs::PoseStamped > ("/object_pose", 5);
 
         objectPos = cvPoint(-1, -1);
-        h_CD = 0; s_CD = 0; v_CD = 0; tolerance_CD = 30;
-        h_BAR = 0; s_BAR = 0; v_BAR = 0; tolerance_BAR = 30;
+        h_CD = 0; s_CD = 0; v_CD = 0; tolerance_CD = 25;
+        h_BAR = 0; s_BAR = 0; v_BAR = 0; tolerance_BAR = 20;
 
         x_CD.data = -1;
         y_CD.data = -1;
@@ -179,30 +181,30 @@ class ImageConverter
                 mode = NO_TAKE;
 
                 res.type.data = type_obj.data;
-                res.x = x_CD;
-                res.y = y_CD;
+                res.x.data = x_CD.data;
+                res.y.data = y_CD.data;
 
                 break;
             case 1 :
-                res.type.data = 1;
-                res.x = x_CD;
-                res.y = y_CD;
-                ROS_ERROR("Requesting CD position: x:%d , y:%d", x_CD.data, y_CD.data);
+                res.type.data = type_obj.data & 0x1;
+                res.x.data = ((480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50))/1000.0 - 0.02;
+                res.y.data = (-((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
+                ROS_ERROR("Requesting CD position: x:%f , y:%f", x_CD.data, y_CD.data);
                 break;
             case 2 :
-                res.type.data = 2;
-                res.x = x_BAR;
-                res.y = y_BAR;
+                res.type.data = type_obj.data & 0x2;
+                res.x.data = ((480)*90.0/240.0 -((double)y_BAR.data)*90.0/240.0 + (50))/1000.0;
+                res.y.data = (-((double)x_BAR.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
 
-                ROS_ERROR("Requesting BAR position: x:%d , y:%d", x_BAR.data, y_BAR.data);
+                ROS_ERROR("Requesting BAR position: x:%f , y:%f", x_BAR.data, y_BAR.data);
                 break;
             case 3 :
 
                 mode = TAKE_AUTONOMOUSLY;
 
                 res.type.data = type_obj.data;
-                res.x = x_CD;
-                res.y = y_CD;
+                res.x.data = x_CD.data;
+                res.y.data = y_CD.data;
 
                 ROS_ERROR("Requesting any position: x:%f , y:%f / x:%f , y:%f", -((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0), (480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50), -((double)x_BAR.data)*278.0/640.0+(335.0*278.0/640.0), (480)*90.0/240.0 -((double)y_BAR.data)*90.0/240.0 + (50) );
                 break;
@@ -267,7 +269,6 @@ class ImageConverter
 
         // Show the result of the mask image
         //cvShowImage("GeckoGeek Mask", mask);
-        imshow( "Mask", mask_mat );
 
         // We release the memory of kernels
         //cvReleaseStructuringElement(&kernel);
@@ -278,8 +279,9 @@ class ImageConverter
         cvReleaseImage(&hsv);
 
         // If there is no pixel, we return a center outside the image, else we return the center of gravity
-        if(*nbPixels > 28000) {
+        if(*nbPixels > 15000) {
             circle( cv_ptr->image, cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels))), 3, color, -1, 8, 0 );
+	    imshow( "Mask", mask_mat );
             return cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels)));
         }
         else
@@ -379,7 +381,9 @@ class ImageConverter
 
             }
             else {
-                nb_img_cnt = 0;
+                nb_img_cnt--;
+		if(nb_img_cnt < 0)
+			nb_img_cnt = 0;
             }
 
         }

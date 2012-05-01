@@ -18,6 +18,7 @@
 #include "indomptable_nav/GetRobotPose.h"
 #include "indomptable_ai/GetObjective.h"
 #include "indomptable_ai/UpdatePriority.h"
+#include "indomptable_vision/ImageResult.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -41,11 +42,12 @@
 #include <utility>
 
 
-#define POSITION    0
-#define ANGLE       1
-#define DISTANCE    2
-#define OBJECT      3
-#define RELEASE     4
+#define POSITION    	0
+#define ANGLE       	1
+#define DISTANCE    	2
+#define OBJECT     	3
+#define RELEASE     	4
+#define FIND_OBJECT	5
 
 
 
@@ -82,6 +84,8 @@ class MainAI {
         ros::Subscriber start_sub;
         ros::Subscriber stop_sub;
         ros::Subscriber color_sub;
+
+        ros::ServiceClient get_image_result;
 
     private:
         void pathCallback(const std_msgs::Empty::ConstPtr & empty);
@@ -148,6 +152,7 @@ MainAI::MainAI()
     stop_sub = nh.subscribe < std_msgs::Empty > ("/stop_match", 20, &MainAI::stopCallback, this);
     color_sub = nh.subscribe < std_msgs::Int32 > ("/color", 20, &MainAI::colorCallback, this);
 
+    get_image_result = nh.serviceClient<indomptable_vision::ImageResult>("/indomptable/image_result");
 
     final_objective.pose.position.x = 0.0;
     final_objective.pose.position.y = 0.0;
@@ -232,21 +237,21 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.130;
+    /*tmp.x = 0.130;
     tmp.y = 0.130;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = 0.052;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));*/
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.08;
     tmp.y = 0.0;
     tmp.theta = 0.0;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = -0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
 
 /*
@@ -288,6 +293,36 @@ void MainAI::fill_trees(void)
     totem_self_s.push_back(make_pair(OBJECT, tmp));
 */
 
+
+    tmp.x = -color * (1.5 - 0.600);
+    tmp.y = 1.0;
+    tmp.theta = 0;
+    totem_opp_n.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1.57079 + (-color * 1.57079);
+    totem_opp_n.push_back(make_pair(ANGLE, tmp));
+    tmp.x = -color * (1.5 - 0.705);
+    tmp.y = 1.000;
+    tmp.theta = 0.0;
+    totem_opp_n.push_back(make_pair(DISTANCE, tmp));
+
+    tmp.x = 0.135;
+    tmp.y = -0.140;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.07;
+    tmp.y = 0.0;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+
+
+
+/*
     tmp.x = -color * (1.5 - 1.100);
     tmp.y = 0.470;
     tmp.theta = 0;
@@ -300,11 +335,18 @@ void MainAI::fill_trees(void)
     tmp.y = 0.605;
     tmp.theta = 0.0;
     totem_opp_n.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.07;
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+*/
+
+
+    /*tmp.x = 0.07;
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
-/*    tmp.x = 0.15;
+    tmp.x = 0.15;
     tmp.y = -0.15;
     tmp.theta = 0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
@@ -326,6 +368,8 @@ void MainAI::fill_trees(void)
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
 */
 
+
+/*
     tmp.x = -color * (1.5 - 1.100);
     tmp.y = 1.530;
     tmp.theta = 0;
@@ -335,14 +379,21 @@ void MainAI::fill_trees(void)
     tmp.theta = -1.57079;
     totem_opp_s.push_back(make_pair(ANGLE, tmp));
     tmp.x = -color * (1.5 - 1.100);
-    tmp.y = 1.500;
+    tmp.y = 1.400;
     tmp.theta = 0.0;
     totem_opp_s.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.07;
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
+    totem_opp_s.push_back(make_pair(OBJECT, tmp));
+*/
+
+
+/*    tmp.x = 0.07;
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
-/*    tmp.x = 0.15;
+    tmp.x = 0.15;
     tmp.y = -0.15;
     tmp.theta = 0.072;
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
@@ -368,7 +419,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.90;
     tmp.theta = 0;
     release.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0.0;
+/*    tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = -1.57079;
     release.push_back(make_pair(ANGLE, tmp));
@@ -376,9 +427,9 @@ void MainAI::fill_trees(void)
     tmp.y = 0;
     tmp.theta = -0.150;
     release.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.0;
+*/    tmp.x = 0.0;
     tmp.y = 0.0;
-    tmp.theta = 1.57079 + (color * (1.57079 + 1.57079/2));
+    tmp.theta = 1.57079 + (color * (1.57079 - 1.57079/2));
     release.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -400,7 +451,7 @@ void MainAI::fill_trees(void)
     bottle_1.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
-    tmp.theta = -0.160;
+    tmp.theta = -0.170;
     bottle_1.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -418,14 +469,14 @@ void MainAI::fill_trees(void)
     bottle_2.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
-    tmp.theta = -0.160;
+    tmp.theta = -0.170;
     bottle_2.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = 0.150;
     bottle_2.push_back(make_pair(DISTANCE, tmp));
 
-
+/*
     tmp.x = color * (0);
     tmp.y = (2.000 - 0.647);
     tmp.theta = 0;
@@ -434,12 +485,38 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.062;
     gold_middle.push_back(make_pair(OBJECT, tmp));
-
+*/
 
     tmp.x = -color * (1.500 - 0.250);
     tmp.y = 0.8;
     tmp.theta = 0;
     steal_opp.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 2; // Find BAR
+    steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
+
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 2; // Find BAR
+    steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
+
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 2; // Find BAR
+    steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
 
 
     tmp.x = color * (1.500 - 0.250);
@@ -464,6 +541,7 @@ void MainAI::main_loop(void)
     indomptable_nav::GetRobotPose tmp_pose;
     indomptable_ai::GetObjective tmp_obj;
     indomptable_ai::UpdatePriority update_prio;
+    indomptable_vision::ImageResult tmp_img_res;
     
     tmppose.pose.position.x = 0;
     tmppose.pose.position.y = 0;
@@ -490,9 +568,6 @@ void MainAI::main_loop(void)
                 ROS_ERROR("Random");
             }
             if( (tmppose.pose.position.x == color*(1.500 - 0.600)) && (tmppose.pose.position.y == 1.000) ) {
-//    tmp.x = color * (1.5 - 0.600);
-//    tmp.y = 1.0;
-
                 current_list = totem_self_n;
                 ROS_ERROR("Totem Self N");
             }
@@ -520,7 +595,7 @@ void MainAI::main_loop(void)
                 current_list = steal_opp;
                 ROS_ERROR("Steal");
             }
-            if( (tmppose.pose.position.x == -color*(1.500 - 1.100)) && (tmppose.pose.position.y == 0.600) ) {
+            if( (tmppose.pose.position.x == -color*(1.500 - 0.600)) && (tmppose.pose.position.y == 1.000) ) {
                 current_list = totem_opp_n;
                 ROS_ERROR("Totem Opp N");
             }
@@ -542,14 +617,18 @@ void MainAI::main_loop(void)
                         goal_pub.publish(tmppose);
                         ROS_ERROR("Sending pose %f %f", tmppose.pose.position.x, tmppose.pose.position.y);
                         state += 1;
+			current_list.pop_front();
                         break;
                     case ANGLE :
+			usleep(200000);
                         tmpaction.data = (current_list.front().second.theta * 1000);
                         alpha_pub.publish(tmpaction);
                         ROS_ERROR("Sending angle %d", tmpaction.data);
-                        usleep(1300000);
+			usleep(1400000);
+			current_list.pop_front();
                         break;
                     case DISTANCE :
+			usleep(200000);
                         if (current_list.front().second.theta == 0.0) {
 
                             if (get_pose.call(tmp_pose))
@@ -574,6 +653,7 @@ void MainAI::main_loop(void)
                             ROS_ERROR("Sending distance %d", tmpaction.data);
                             usleep(800000);
                         }
+			current_list.pop_front();
                         break;
                     case OBJECT :
                         tmppose.pose.position.x = current_list.front().second.x;
@@ -599,16 +679,83 @@ void MainAI::main_loop(void)
                             ROS_ERROR("Failed to call service UpdatePriority");
                         }
 
+			current_list.pop_front();
                         break;
                     case RELEASE :
                         release_pub.publish(tmprelease);
                         ROS_ERROR("Releasing objects");
-                        usleep(2900000);
+			current_list.pop_front();
+                        usleep(2500000);
+                        break;
+                    case FIND_OBJECT :
+
+                        usleep(200000);
+			if(current_list.front().second.theta == 1) { // Find CD
+                                        ROS_ERROR("Trying to find CD");
+				
+				tmp_img_res.request.type.data = 1;
+				if (get_image_result.call(tmp_img_res))
+				{   
+					if(tmp_img_res.response.type.data == 1) {
+						tmppose.pose.position.x = tmp_img_res.response.x.data;
+						tmppose.pose.position.y = tmp_img_res.response.y.data;
+						tmppose.pose.position.z = 0.072;
+						object_pub.publish(tmppose);
+						ROS_ERROR("Sending object %f %f %f", tmppose.pose.position.x, tmppose.pose.position.y, tmppose.pose.position.z);
+						usleep(3000000);
+						
+					}
+					else {
+						current_list.pop_front();
+                                        ROS_ERROR("NO CD");
+
+					}
+				}
+				else
+				{   
+                                        ROS_ERROR("Failed to call service ImageResult");
+					current_list.pop_front();
+				}
+
+				
+			}
+			else if(current_list.front().second.theta == 2) { // Find BAR
+                                        ROS_ERROR("Trying to find BAR");
+
+                                tmp_img_res.request.type.data = 2;
+                                if (get_image_result.call(tmp_img_res))
+                                {
+                                        if(tmp_img_res.response.type.data == 2) {
+                                                tmppose.pose.position.x = tmp_img_res.response.x.data;
+                                                tmppose.pose.position.y = tmp_img_res.response.y.data;
+                                                tmppose.pose.position.z = 0.062;
+                                                object_pub.publish(tmppose);
+                                                ROS_ERROR("Sending object %f %f %f", tmppose.pose.position.x, tmppose.pose.position.y, tmppose.pose.position.z);
+                                                usleep(3000000);
+
+                                        }
+                                        else {
+                                                current_list.pop_front();
+                                        ROS_ERROR("No BAR");
+
+                                        }
+                                }
+                                else
+                                {
+                                        ROS_ERROR("Failed to call service ImageResult");
+					current_list.pop_front();
+                                }
+
+
+			} 
+			else {
+				current_list.pop_front();
+			}
                         break;
                     default :
+			current_list.pop_front();
                         break;
                 }
-                current_list.pop_front();
             }
             else {
                 //update_prio.goal = final_objective;

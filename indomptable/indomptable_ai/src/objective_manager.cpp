@@ -156,17 +156,17 @@ ObjectiveManager::ObjectiveManager()
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 1) );
 
 
-    tmp_obj.pose.position.x = -color*(1.500 - 1.100); // totem opp
-    tmp_obj.pose.position.y = 0.600;
+    tmp_obj.pose.position.x = -color*(1.500 - 0.600); // totem opp
+    tmp_obj.pose.position.y = 1.000;
     // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 4) );
 
-
+/*
     tmp_obj.pose.position.x = -color*(1.500 - 1.100); // totem opp
     tmp_obj.pose.position.y = 1.400;
     // Priority : 8
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
-
+*/
 
 
 

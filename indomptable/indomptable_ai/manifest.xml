@@ -19,6 +19,7 @@
   <depend package="move_base_msgs"/>
   <depend package="actionlib"/>
   <depend package="indomptable_nav"/>
+  <depend package="indomptable_vision"/>
 
 </package>
 

@@ -47,84 +47,84 @@ int main(int argc, char** argv){
       cloud.channels[0].values[3] = 199;
 
     // Totem
-      cloud.points[4].x = 0.400 + 0.125;
-      cloud.points[4].y = 1.000 - 0.125;
+      cloud.points[4].x = 0.400 + 0.13;
+      cloud.points[4].y = 1.000 - 0.13;
       cloud.points[4].z = 0;
       cloud.channels[0].values[4] = 199;
 
-      cloud.points[5].x = 0.400 + 0.125;
+      cloud.points[5].x = 0.400 + 0.13;
       cloud.points[5].y = 1.000;
       cloud.points[5].z = 0;
       cloud.channels[0].values[5] = 199;
 
-      cloud.points[6].x = 0.400 + 0.125;
-      cloud.points[6].y = 1.000 + 0.125;
+      cloud.points[6].x = 0.400 + 0.13;
+      cloud.points[6].y = 1.000 + 0.13;
       cloud.points[6].z = 0;
       cloud.channels[0].values[6] = 199;
 
       cloud.points[7].x = 0.400;
-      cloud.points[7].y = 1.000 + 0.125;
+      cloud.points[7].y = 1.000 + 0.13;
       cloud.points[7].z = 0;
       cloud.channels[0].values[7] = 199;
 
-      cloud.points[8].x = 0.400 - 0.125;
-      cloud.points[8].y = 1.000 + 0.125;
+      cloud.points[8].x = 0.400 - 0.13;
+      cloud.points[8].y = 1.000 + 0.13;
       cloud.points[8].z = 0;
       cloud.channels[0].values[8] = 199;
 
-      cloud.points[9].x = 0.400 - 0.125;
+      cloud.points[9].x = 0.400 - 0.13;
       cloud.points[9].y = 1.000;
       cloud.points[9].z = 0;
       cloud.channels[0].values[9] = 199;
 
-      cloud.points[10].x = 0.400 - 0.125;
-      cloud.points[10].y = 1.000 - 0.125;
+      cloud.points[10].x = 0.400 - 0.13;
+      cloud.points[10].y = 1.000 - 0.13;
       cloud.points[10].z = 0;
       cloud.channels[0].values[10] = 199;
 
       cloud.points[11].x = 0.400;
-      cloud.points[11].y = 1.000 - 0.125;
+      cloud.points[11].y = 1.000 - 0.13;
       cloud.points[11].z = 0;
       cloud.channels[0].values[11] = 199;
 
     // Totem
-      cloud.points[12].x = -0.400 + 0.125;
-      cloud.points[12].y = 1.000 - 0.125;
+      cloud.points[12].x = -0.400 + 0.13;
+      cloud.points[12].y = 1.000 - 0.13;
       cloud.points[12].z = 0;
       cloud.channels[0].values[12] = 199;
 
-      cloud.points[13].x = -0.400 + 0.125;
+      cloud.points[13].x = -0.400 + 0.13;
       cloud.points[13].y = 1.000;
       cloud.points[13].z = 0;
       cloud.channels[0].values[13] = 199;
 
-      cloud.points[14].x = -0.400 + 0.125;
-      cloud.points[14].y = 1.000 + 0.125;
+      cloud.points[14].x = -0.400 + 0.13;
+      cloud.points[14].y = 1.000 + 0.13;
       cloud.points[14].z = 0;
       cloud.channels[0].values[14] = 199;
 
       cloud.points[15].x = -0.400;
-      cloud.points[15].y = 1.000 + 0.125;
+      cloud.points[15].y = 1.000 + 0.13;
       cloud.points[15].z = 0;
       cloud.channels[0].values[15] = 199;
 
-      cloud.points[16].x = -0.400 - 0.125;
-      cloud.points[16].y = 1.000 + 0.125;
+      cloud.points[16].x = -0.400 - 0.13;
+      cloud.points[16].y = 1.000 + 0.13;
       cloud.points[16].z = 0;
       cloud.channels[0].values[16] = 199;
 
-      cloud.points[17].x = -0.400 - 0.125;
+      cloud.points[17].x = -0.400 - 0.13;
       cloud.points[17].y = 1.000;
       cloud.points[17].z = 0;
       cloud.channels[0].values[17] = 199;
 
-      cloud.points[18].x = -0.400 - 0.125;
-      cloud.points[18].y = 1.000 - 0.125;
+      cloud.points[18].x = -0.400 - 0.13;
+      cloud.points[18].y = 1.000 - 0.13;
       cloud.points[18].z = 0;
       cloud.channels[0].values[18] = 199;
 
       cloud.points[19].x = -0.400;
-      cloud.points[19].y = 1.000 - 0.125;
+      cloud.points[19].y = 1.000 - 0.13;
       cloud.points[19].z = 0;
       cloud.channels[0].values[19] = 199;
 

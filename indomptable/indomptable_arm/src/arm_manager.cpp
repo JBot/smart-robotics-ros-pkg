@@ -113,12 +113,25 @@ void indomptableARM_manager::leftdoneCallback(const std_msgs::Int32::ConstPtr & 
 
         // Totem middle
         if( (next_left.pose.position.z < 0.001) && (next_left.pose.position.z > -0.001) ) {
-            if(left_ready != 0) {
+/*            if(left_ready != 0) {
                 left_pose_pub.publish(next_left);
                 next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
                 left_ready = 0;
             }
         }
+        // Totem up
+        if( (next_left.pose.position.z < -0.07) && (next_left.pose.position.z > -0.075) ) {
+*/
+            if((left_ready != 0) && (right_ready != 0)) {
+                left_pose_pub.publish(next_left);
+                right_pose_pub.publish(next_left);
+                next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
+                next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
+                left_ready = 0;
+                right_ready = 0;
+            }
+        }
+
 
         // Ground
         if( (next_left.pose.position.z < 0.075) && (next_left.pose.position.z > 0.06) ) {
@@ -170,14 +183,14 @@ void indomptableARM_manager::leftdoneCallback(const std_msgs::Int32::ConstPtr & 
         if( (next_right.pose.position.x != 0.0) || (next_right.pose.position.y != 0.0) || (next_right.pose.position.z != 0.0) ) {
 
 	// Try to take the objective of the other arm
-		
+/*		
         // Totem middle
         if( (next_right.pose.position.z < 0.001) && (next_right.pose.position.z > -0.001) ) {
                 left_pose_pub.publish(next_right);
                 next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
                 left_ready = 0;
         }
-
+*/
         // Ground
 /*
         if( (next_right.pose.position.z < 0.075) && (next_right.pose.position.z > 0.06) ) {
@@ -202,7 +215,8 @@ void indomptableARM_manager::leftdoneCallback(const std_msgs::Int32::ConstPtr & 
         }
         else {
             std_msgs::Empty resume;
-            resume_AI_pub.publish(resume);
+		if ( (right_ready != 0) && (left_ready != 0) )
+			resume_AI_pub.publish(resume);
         }
     }
 }
@@ -213,12 +227,25 @@ void indomptableARM_manager::rightdoneCallback(const std_msgs::Int32::ConstPtr &
 
         // Totem middle
         if( (next_right.pose.position.z < 0.001) && (next_right.pose.position.z > -0.001) ) {
-            if(right_ready != 0) {
+/*            if(right_ready != 0) {
                 right_pose_pub.publish(next_right);
                 next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
                 right_ready = 0;
             }
         }
+        // Totem up
+        if( (next_right.pose.position.z < -0.07) && (next_right.pose.position.z > -0.075) ) {
+*/
+            if((left_ready != 0) && (right_ready != 0)) {
+                left_pose_pub.publish(next_right);
+                right_pose_pub.publish(next_right);
+                next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
+                next_right.pose.position.x = 0.0; next_right.pose.position.y = 0.0; next_right.pose.position.z = 0.0;
+                left_ready = 0;
+                right_ready = 0;
+            }
+        }
+
 
         // Ground
         if( (next_right.pose.position.z < 0.075) && (next_right.pose.position.z > 0.06) ) {
@@ -269,14 +296,14 @@ void indomptableARM_manager::rightdoneCallback(const std_msgs::Int32::ConstPtr &
     else {
         if( (next_left.pose.position.x != 0.0) || (next_left.pose.position.y != 0.0) || (next_left.pose.position.z != 0.0) ) {
 
-
+/*
         // Totem middle
         if( (next_left.pose.position.z < 0.001) && (next_left.pose.position.z > -0.001) ) {
                 right_pose_pub.publish(next_left);
                 next_left.pose.position.x = 0.0; next_left.pose.position.y = 0.0; next_left.pose.position.z = 0.0;
                 right_ready = 0;
         }
-
+*/
         // Ground
 /*
         if( (next_left.pose.position.z < 0.075) && (next_left.pose.position.z > 0.06) ) {
@@ -300,7 +327,8 @@ void indomptableARM_manager::rightdoneCallback(const std_msgs::Int32::ConstPtr &
         }
         else {
             std_msgs::Empty resume;
-            resume_AI_pub.publish(resume);
+		if ( (right_ready != 0) && (left_ready != 0) )
+            		resume_AI_pub.publish(resume);
         }
     }
 
@@ -315,39 +343,6 @@ void indomptableARM_manager::poseCallback(const geometry_msgs::PoseStamped::Cons
     //usleep(5000000); // For debug only
 
     geometry_msgs::PoseStamped tmp_pose = *pose;
-    /*
-       if( ((int)(pose->pose.position.y * 1000)) != 0 ) {
-    //	takeGround((int)(pose->pose.position.x * 1000), (int)(pose->pose.position.y * 1000));
-    if(left_ready != 0) {
-    tmp_pose.pose.position.y = -tmp_pose.pose.position.y;
-    left_pose_pub.publish(tmp_pose);
-    left_ready = 0;
-    }
-    else if(right_ready != 0) {
-    right_pose_pub.publish(tmp_pose);
-    right_ready = 0;
-    }
-
-    }
-    else {
-    if( ((int)(pose->pose.position.z * 1000)) == 0 ) {
-    //		takeBARinTotem();
-    left_pose_pub.publish(tmp_pose);
-    left_ready = 0;
-    }
-    else {
-    //		takeCDinTotem((int)(pose->pose.position.z * 1000));
-
-    if((left_ready != 0) && (right_ready != 0)) {
-    left_pose_pub.publish(tmp_pose);
-    right_pose_pub.publish(tmp_pose);
-    left_ready = 0;
-    right_ready = 0;
-    }
-
-    }
-    }
-     */
     // Totem middle
     if( (pose->pose.position.z < 0.001) && (pose->pose.position.z > -0.001) ) {
         if((left_ready != 0) && (right_ready != 0)) {
@@ -366,31 +361,8 @@ void indomptableARM_manager::poseCallback(const geometry_msgs::PoseStamped::Cons
             std_msgs::Empty pause;
             pause_AI_pub.publish(pause);
         }
-
-/*
-        if(left_ready != 0) {
-            left_pose_pub.publish(tmp_pose);
-            left_ready = 0;
-            // Pause AI
-            std_msgs::Empty pause;
-            pause_AI_pub.publish(pause);
-        }
-        else if(right_ready != 0) {
-            right_pose_pub.publish(tmp_pose);
-            right_ready = 0;
-            // Pause AI
-            std_msgs::Empty pause;
-            pause_AI_pub.publish(pause);
-        }
-        else {
-            next_left = tmp_pose;
-            // Pause AI
-            std_msgs::Empty pause;
-            pause_AI_pub.publish(pause);
-        }
-*/
-
     }
+
 
     // Ground
     if( (pose->pose.position.z < 0.075) && (pose->pose.position.z > 0.06) ) {

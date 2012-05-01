@@ -117,7 +117,7 @@ if( (status == 1) ){
             ROS_ERROR("Failed to call service GetRobotPose");
     }
 
-    if( sqrt( pow(final_pose.pose.position.x - tmp_pose.response.pose.pose.position.x, 2) + pow(final_pose.pose.position.y - tmp_pose.response.pose.pose.position.y, 2) ) < 0.14 ) {
+    if( sqrt( pow(final_pose.pose.position.x - tmp_pose.response.pose.pose.position.x, 2) + pow(final_pose.pose.position.y - tmp_pose.response.pose.pose.position.y, 2) ) < 0.20 ) {
 
 	status = 0;
 
@@ -128,7 +128,12 @@ if( (status == 1) ){
 	    tmp_plan.request.tolerance = 0.01;
 	    if (get_path.call(tmp_plan))
 	    {  
+
 		    //ROS_INFO("Sum: %ld", get_path.response.plan);
+		    if(!(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty())) {
+			    tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::pop_back();
+			    tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::push_back(final_pose);
+		    }
 		    path_pub.publish(tmp_plan.response.plan);
 
 		    if(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty()) {

@@ -612,7 +612,13 @@ void indomptableARM::takeCDinTotem(signed int height){
 
     releaseObject();
 
+	move.data = 50;
+
+	straight_move_pub.publish(move);
+
     waitState();
+
+
 
 }
 
@@ -1286,7 +1292,7 @@ void indomptableARM::releaseObject(void){
     ServoDriver();
 
     waitMoveEnd();
-
+*/
     LegIK((int)(100), (int)((30)), (int)(0));
     DesAnkleAngle = -2.7;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
@@ -1298,7 +1304,7 @@ void indomptableARM::releaseObject(void){
     ServoDriver();
 
     waitMoveEnd();
-*/
+
     LegIK((int)(40), (int)((60)), (int)(0));
     DesAnkleAngle = -2.9;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   

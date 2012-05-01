@@ -39,7 +39,7 @@ void delay_ms(uint16_t millis)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
 #define TICK_PER_M_LEFT 	(18205.6756)
 #define TICK_PER_M_RIGHT 	(18205.6756)
-#define DIAMETER 	        0.29478 // 0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
+#define DIAMETER 	        0.2951 //0.29478 // 0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
 
 #define DISTANCE_REAR_WHEELS    0.120
 
@@ -73,25 +73,13 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         8000 //4000//20000
-#define ALPHA_MAX_ACCEL         400//200//300
-#define ALPHA_MAX_DECEL         1000 //1000                       //2500
-#define DELTA_MAX_SPEED         12000 //6000//51000 
-#define DELTA_MAX_SPEED_BACK    3500 
-#define DELTA_MAX_SPEED_BACK_PAWN    4500
-#define DELTA_MAX_ACCEL         400//300//1000     
-#define DELTA_MAX_DECEL         1500 //2000
+#define ALPHA_MAX_SPEED         11000//8000 
+#define ALPHA_MAX_ACCEL         800//500//400
+#define ALPHA_MAX_DECEL         1600//1200//1000 
+#define DELTA_MAX_SPEED         20000//16000//12000  
+#define DELTA_MAX_ACCEL         1000//600//400     
+#define DELTA_MAX_DECEL         2200//1700//1500 
 
-/*
-#define ALPHA_MAX_SPEED         5000    //20000
-#define ALPHA_MAX_ACCEL         500     //300
-#define ALPHA_MAX_DECEL         2500    //2500
-#define DELTA_MAX_SPEED         7000    //51000
-#define DELTA_MAX_SPEED_BACK    3500
-#define DELTA_MAX_SPEED_BACK_PAWN    4500
-#define DELTA_MAX_ACCEL         400     //1000
-#define DELTA_MAX_DECEL         3000
-*/
 //#define PATH_FOLLOWING          1
 
 
@@ -704,9 +692,18 @@ void setup()
     motion_control_ON = 1;
     roboclaw_ON = 1;
 
+    if ( digitalRead(START_PIN) == 0 ) {
 
+      while ( digitalRead(START_PIN) == 0 ) {
+
+         delay(30);
+  
+      }
+
+    }
+    
     while ( digitalRead(START_PIN) == 1 ) {
-      
+     
       t.header.frame_id = odom;
       t.child_frame_id = base_link;
   
@@ -730,6 +727,7 @@ void setup()
     }
 
     start_pub.publish(&start_message);
+    start_pub.publish(&start_message);
     
 }
 
@@ -748,7 +746,7 @@ void loop()
     broadcaster.sendTransform(t);
 
     nh.spinOnce();
-    delay(10);
+    delay(5);
 
     nh.spinOnce();
     delay(10);
@@ -839,9 +837,9 @@ void init_motors(void)
     alpha_motor.cur_speed = 0;
     alpha_motor.last_error = 0;
     alpha_motor.error_sum = 0;
-    alpha_motor.kP = 100; //150;       //230;
+    alpha_motor.kP = 60;//50; //100; 
     alpha_motor.kI = 0;
-    alpha_motor.kD = 166; //250;       //340;
+    alpha_motor.kD = 100;//88; //166; 
     alpha_motor.accel = ALPHA_MAX_ACCEL;
     alpha_motor.decel = ALPHA_MAX_DECEL;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;
@@ -887,7 +885,7 @@ void init_first_position(struct robot *my_robot)
     set_new_command(&bot_command_delta, 0);
     delay(100);
     // Go forward, turn, and go bachward to touch the other wall
-    set_new_command(&bot_command_delta, 0.180);
+    set_new_command(&bot_command_delta, 0.150);
     delay(4000);
     set_new_command(&bot_command_alpha, (color * PI / 2 * RAD2DEG));
     delay(5000);
@@ -914,7 +912,12 @@ void init_first_position(struct robot *my_robot)
 
     delay(500);
     // Go in the middle of the starting area
-    set_new_command(&bot_command_delta, 0.200);
+    set_new_command(&bot_command_delta, 0.170);
+// FOR TEST
+//    set_new_command(&bot_command_delta, 2.5);
+
+//    delay(20000);
+
 
     delay(4000);
     // Set the speed to the maximum

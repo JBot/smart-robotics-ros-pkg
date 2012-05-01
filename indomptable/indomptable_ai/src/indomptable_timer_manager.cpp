@@ -31,6 +31,7 @@ class TimerManager {
 
         ros::Subscriber start_sub_;
         ros::Publisher stop_pub;
+        ros::Publisher stop_nav_pub;
 
     private:
         void startCallback(const std_msgs::Empty::ConstPtr & empty);
@@ -44,6 +45,7 @@ TimerManager::TimerManager()
 {
     start_sub_ = nh.subscribe < std_msgs::Empty > ("/start_match", 5, &TimerManager::startCallback, this);
     stop_pub = nh.advertise < std_msgs::Empty > ("/stop_match", 5);
+    stop_nav_pub = nh.advertise < std_msgs::Empty > ("/pause_nav", 5);
 
     state = 0;
     starting_date = ros::Time::now();
@@ -68,8 +70,9 @@ void TimerManager::main_loop(void)
     if(state == 1) {
         ros::Time current_date = ros::Time::now();
 
-        if( (current_date.toSec() - starting_date.toSec()) > 88 /* > 90 secondes */) {
+        if( (current_date.toSec() - starting_date.toSec()) > 89 /* > 90 secondes */) {
             stop_pub.publish(tmprelease);
+            stop_nav_pub.publish(tmprelease);
             ROS_ERROR("Stop!");
         }
     }
