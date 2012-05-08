@@ -73,10 +73,10 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         11000//8000 
+#define ALPHA_MAX_SPEED         9500//11000//8000 
 #define ALPHA_MAX_ACCEL         800//500//400
 #define ALPHA_MAX_DECEL         1600//1200//1000 
-#define DELTA_MAX_SPEED         20000//16000//12000  
+#define DELTA_MAX_SPEED         18000//20000//16000//12000  
 #define DELTA_MAX_ACCEL         1000//600//400     
 #define DELTA_MAX_DECEL         2200//1700//1500 
 

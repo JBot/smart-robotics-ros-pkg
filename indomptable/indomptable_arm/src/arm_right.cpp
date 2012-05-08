@@ -2,6 +2,7 @@
 #include "std_msgs/String.h"
 #include "std_msgs/Float64.h"
 #include "std_msgs/Int32.h"
+#include "std_msgs/Int8.h"
 #include "std_msgs/Empty.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -77,6 +78,7 @@ class indomptableARM {
 
         ros::Subscriber pose_sub_;
         ros::Subscriber pump_sub_;
+        ros::Subscriber deltafeedback_sub_;
         ros::Publisher coxa_pub;
         ros::Publisher femur_pub;
         ros::Publisher tibia_pub;
@@ -113,6 +115,7 @@ class indomptableARM {
     private:
         void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
         void pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback);
+        void deltaCallback(const std_msgs::Int8::ConstPtr & deltafeedback);
         void releaseCallback(const std_msgs::Empty::ConstPtr & empty);
         void LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed int IKFeetPosZ);
         void ServoDriver();
@@ -136,6 +139,7 @@ class indomptableARM {
 
         std_msgs::Int32 des_pump;
         int pump_ok;
+        int delta_ok;
 
 
 
@@ -213,6 +217,7 @@ indomptableARM::indomptableARM()
     tmp_string.append("_pump_feedback");
     pump_sub_ = nh.subscribe < std_msgs::Int32 > ("pump_feedback", 5, &indomptableARM::pumpCallback, this);
 
+    deltafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("delta_feedback", 5, &indomptableARM::deltaCallback, this);
 
 
     release_sub = nh.subscribe < std_msgs::Empty > ("release_objects", 5, &indomptableARM::releaseCallback, this);
@@ -280,6 +285,7 @@ indomptableARM::indomptableARM()
 
     des_pump.data = 0;
     pump_ok = 0;
+    delta_ok = 0;
 
     usleep(1000000);
 
@@ -385,6 +391,11 @@ void indomptableARM::pumpCallback(const std_msgs::Int32::ConstPtr & pumpfeedback
     else 
         pump_ok = 0;
 
+}
+
+void indomptableARM::deltaCallback(const std_msgs::Int8::ConstPtr & deltafeedback)
+{
+    delta_ok = deltafeedback->data;
 }
 
 void indomptableARM::releaseCallback(const std_msgs::Empty::ConstPtr & empty)
@@ -502,10 +513,25 @@ void indomptableARM::LegIK(signed int IKFeetPosX, signed int IKFeetPosY, signed 
 
 void indomptableARM::takeCDinTotem(signed int height){
 
-	std_msgs::Int32 move;
-	move.data = -70;
+    std_msgs::Int32 move;
+    move.data = -70;
 
+    delta_ok = 0;
+    straight_move_pub.publish(move);
+    usleep(50000);
+    ros::spinOnce();
+    usleep(50000);
+    ros::spinOnce();
+    while(delta_ok == 0) {
 	straight_move_pub.publish(move);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+    }
+
+
+
 /*
     	LegIK((int)(180), (int)(-(52)), (int)(40));
         DesAnkleAngle = -1.570796;
@@ -548,9 +574,23 @@ void indomptableARM::takeCDinTotem(signed int height){
 
     usleep(500000);
 
-	move.data = 70;
+    move.data = 70;
 
-	straight_move_pub.publish(move);
+    delta_ok = 0;
+    straight_move_pub.publish(move);
+    usleep(50000);
+    ros::spinOnce();
+    usleep(50000);
+    ros::spinOnce();
+    while(delta_ok == 0) {
+        straight_move_pub.publish(move);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+    }
+
+
 /*
     LegIK((int)(215), (int)(-(52)), (int)(20));
     DesAnkleAngle = -1.570796;
@@ -593,9 +633,22 @@ void indomptableARM::takeCDinTotem(signed int height){
     waitMoveEnd();
     //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
 
-	move.data = -50;
+    move.data = -50;
 
-	straight_move_pub.publish(move);
+    delta_ok = 0;
+    straight_move_pub.publish(move);
+    usleep(50000);
+    ros::spinOnce();
+    usleep(50000);
+    ros::spinOnce();
+    while(delta_ok == 0) {
+        straight_move_pub.publish(move);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+    }
+
 
     LegIK((int)(180), (int)(-(12)), (int)(0));
     DesAnkleAngle = -1.570796;
@@ -612,9 +665,23 @@ void indomptableARM::takeCDinTotem(signed int height){
 
     releaseObject();
 
-	move.data = 50;
+    move.data = 50;
 
-	straight_move_pub.publish(move);
+    delta_ok = 0;
+    straight_move_pub.publish(move);
+    usleep(50000);
+    ros::spinOnce();
+    usleep(50000);
+    ros::spinOnce();
+    while(delta_ok == 0) {
+        straight_move_pub.publish(move);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+    }
+
+
 
     waitState();
 
@@ -758,9 +825,22 @@ void indomptableARM::takeBARinTotem2(void){
 // avancage
 
     std_msgs::Int32 move;
-    move.data = 150;
+    move.data = 160;
 
+    delta_ok = 0;
     straight_move_pub.publish(move);
+    usleep(50000);
+    ros::spinOnce();
+    usleep(50000);
+    ros::spinOnce();
+    while(delta_ok == 0) {
+        straight_move_pub.publish(move);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+    }
+
 
     waitMoveEnd();
     waitMoveEnd();
@@ -867,7 +947,20 @@ void indomptableARM::takeBARinTotem2(void){
 // reculage
     move.data = -150;
 
+    delta_ok = 0;
     straight_move_pub.publish(move);
+    usleep(50000);
+    ros::spinOnce();
+    usleep(50000);
+    ros::spinOnce();
+    while(delta_ok == 0) {
+        straight_move_pub.publish(move);
+        usleep(50000);
+        ros::spinOnce();
+        usleep(50000);
+        ros::spinOnce();
+    }
+
 
     waitMoveEnd();
 

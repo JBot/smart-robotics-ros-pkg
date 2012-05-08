@@ -187,8 +187,10 @@ class ImageConverter
                 break;
             case 1 :
                 res.type.data = type_obj.data & 0x1;
-                res.x.data = ((480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50))/1000.0 - 0.02;
-                res.y.data = (-((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
+                res.x.data = ((288)*90.0/144.0 -((double)y_CD.data)*90.0/144.0 + (50))/1000.0 - 0.02;
+                res.y.data = (-((double)x_CD.data)*250.0/352.0+(167.0*278.0/352.0))/1000.0 + 0.015;
+                //res.x.data = ((480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50))/1000.0 - 0.02;
+                //res.y.data = (-((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
                 ROS_ERROR("Requesting CD position: x:%f , y:%f", x_CD.data, y_CD.data);
                 break;
             case 2 :
@@ -306,14 +308,41 @@ class ImageConverter
 
         CvPoint objectNextPos;
         int nbPixels;
+/*
         objectNextPos = binarisation(&cv_ptr->image.operator IplImage(), &nbPixels, h_CD, s_CD, v_CD, tolerance_CD, Scalar(0,255,0));
         x_CD.data = objectNextPos.x;
         y_CD.data = objectNextPos.y;
+*/
+	Mat gray;
+	cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
+        // smooth it, otherwise a lot of false circles may be detected
+        GaussianBlur( gray, gray, Size(9, 9), 2, 2 );
+        vector<Vec3f> circles;
+        HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, 200, 200, 100, 50 );
+        cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
+	type_obj.data = 0;
+        for( size_t i = 0; i < circles.size(); i++ )
+        {
+                Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+                int radius = cvRound(circles[i][2]);
+                // draw the circle center
+                circle( cv_ptr->image, center, 3, Scalar(0,255,0), -1, 8, 0 );
+                // draw the circle outline
+                circle( cv_ptr->image, center, radius, Scalar(0,0,255), 3, 8, 0 );
+
+		x_CD.data = cvRound(circles[i][0]);
+		y_CD.data = cvRound(circles[i][1]);
+
+		type_obj.data = 1;
+
+        }
+
+/*
         if(x_CD.data < 1)
             type_obj.data = 0;
         else 
             type_obj.data = 1;
-
+*/
         objectNextPos = binarisation(&cv_ptr->image.operator IplImage(), &nbPixels, h_BAR, s_BAR, v_BAR, tolerance_BAR, Scalar(0,0,255));
         x_BAR.data = objectNextPos.x;
         y_BAR.data = objectNextPos.y;
@@ -335,8 +364,8 @@ class ImageConverter
                         break;
                     case 1 : // Only CD is seen
                         if(nb_img_cnt > MAX_CNT_OBJECT) { // Object seen X times
-                            tmppose.pose.position.x = ((480)*90.0/240.0 -((double)y_CD.data)*90.0/240.0 + (50))/1000.0 - 0.02;
-                            tmppose.pose.position.y = (-((double)x_CD.data)*278.0/640.0+(335.0*278.0/640.0))/1000.0;
+                            tmppose.pose.position.x = ((288)*90.0/144.0 -((double)y_CD.data)*90.0/144.0 + (50))/1000.0 - 0.02;
+                            tmppose.pose.position.y = (-((double)x_CD.data)*250.0/352.0+(167.0*278.0/352.0))/1000.0 + 0.015;
                             tmppose.pose.position.z = 0.072;
                             object_pub.publish(tmppose);
                             ROS_ERROR("Taking CD : %f : %f", tmppose.pose.position.x, tmppose.pose.position.y);
@@ -393,8 +422,8 @@ class ImageConverter
 
 
 
-        /*
-           Mat gray;
+        
+        /*   Mat gray;
            cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
         // smooth it, otherwise a lot of false circles may be detected
         GaussianBlur( gray, gray, Size(9, 9), 2, 2 );
@@ -403,12 +432,12 @@ class ImageConverter
         cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
         for( size_t i = 0; i < circles.size(); i++ )
         {
-        Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-        int radius = cvRound(circles[i][2]);
-        // draw the circle center
-        circle( cv_ptr->image, center, 3, Scalar(0,255,0), -1, 8, 0 );
-        // draw the circle outline
-        circle( cv_ptr->image, center, radius, Scalar(0,0,255), 3, 8, 0 );
+		Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+		int radius = cvRound(circles[i][2]);
+		// draw the circle center
+		circle( cv_ptr->image, center, 3, Scalar(0,255,0), -1, 8, 0 );
+		// draw the circle outline
+		circle( cv_ptr->image, center, radius, Scalar(0,0,255), 3, 8, 0 );
         }*/
         /*
            Canny( gray, gray, 16, 33, 3 );

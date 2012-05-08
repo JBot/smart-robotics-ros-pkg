@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Int32.h"
+#include "std_msgs/Int8.h"
 #include "std_msgs/Empty.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseArray.h"
@@ -87,6 +88,9 @@ class MainAI {
 
         ros::ServiceClient get_image_result;
 
+	ros::Subscriber deltafeedback_sub_;
+	ros::Subscriber alphafeedback_sub_;
+
     private:
         void pathCallback(const std_msgs::Empty::ConstPtr & empty);
         void pauseCallback(const std_msgs::Empty::ConstPtr & empty);
@@ -96,6 +100,12 @@ class MainAI {
         void stopCallback(const std_msgs::Empty::ConstPtr & empty);
         void colorCallback(const std_msgs::Int32::ConstPtr & my_int);
 	void fill_trees(void);
+
+	void deltaCallback(const std_msgs::Int8::ConstPtr & deltafeedback);
+	void alphaCallback(const std_msgs::Int8::ConstPtr & alphafeedback);
+	int delta_ok;
+	int alpha_ok;
+
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
@@ -153,6 +163,12 @@ MainAI::MainAI()
     color_sub = nh.subscribe < std_msgs::Int32 > ("/color", 20, &MainAI::colorCallback, this);
 
     get_image_result = nh.serviceClient<indomptable_vision::ImageResult>("/indomptable/image_result");
+
+    deltafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("delta_feedback", 5, &MainAI::deltaCallback, this);
+    alphafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("alpha_feedback", 5, &MainAI::alphaCallback, this);
+    delta_ok = 0;
+    alpha_ok = 0;
+
 
     final_objective.pose.position.x = 0.0;
     final_objective.pose.position.y = 0.0;
@@ -302,7 +318,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 1.57079 + (-color * 1.57079);
     totem_opp_n.push_back(make_pair(ANGLE, tmp));
-    tmp.x = -color * (1.5 - 0.705);
+    tmp.x = -color * (1.5 - 0.710);
     tmp.y = 1.000;
     tmp.theta = 0.0;
     totem_opp_n.push_back(make_pair(DISTANCE, tmp));
@@ -532,6 +548,19 @@ void MainAI::fill_trees(void)
 
 }
 
+void MainAI::deltaCallback(const std_msgs::Int8::ConstPtr & deltafeedback)
+{
+    delta_ok = deltafeedback->data;
+}
+
+void MainAI::alphaCallback(const std_msgs::Int8::ConstPtr & alphafeedback)
+{
+    alpha_ok = alphafeedback->data;
+}
+
+
+
+
 void MainAI::main_loop(void)
 {
 
@@ -622,7 +651,23 @@ void MainAI::main_loop(void)
                     case ANGLE :
 			usleep(200000);
                         tmpaction.data = (current_list.front().second.theta * 1000);
-                        alpha_pub.publish(tmpaction);
+                        //alpha_pub.publish(tmpaction);
+
+			alpha_ok = 0;
+			alpha_pub.publish(tmpaction);
+			usleep(50000);
+			ros::spinOnce();
+			usleep(50000);
+			ros::spinOnce();
+			while(alpha_ok == 0) {
+				alpha_pub.publish(tmpaction);
+				usleep(50000);
+				ros::spinOnce();
+				usleep(50000);
+				ros::spinOnce();
+			}
+
+
                         ROS_ERROR("Sending angle %d", tmpaction.data);
 			usleep(1400000);
 			current_list.pop_front();
@@ -637,7 +682,22 @@ void MainAI::main_loop(void)
                                 tmppose.pose.position.x = tmp_pose.response.pose.pose.position.x;
                                 tmppose.pose.position.y = tmp_pose.response.pose.pose.position.y;
                                 tmpaction.data = (sqrt( pow(current_list.front().second.x - tmppose.pose.position.x, 2) + pow(current_list.front().second.y - tmppose.pose.position.y, 2)) * 1000) ;
-                                delta_pub.publish(tmpaction);
+                                
+				delta_ok = 0;
+				delta_pub.publish(tmpaction);
+				usleep(50000);
+				ros::spinOnce();
+				usleep(50000);
+				ros::spinOnce();
+				while(delta_ok == 0) {
+					delta_pub.publish(tmpaction);
+					usleep(50000);
+					ros::spinOnce();
+					usleep(50000);
+					ros::spinOnce();
+				}
+
+
                                 ROS_ERROR("Sending distance %d", tmpaction.data);
                             }
                             else

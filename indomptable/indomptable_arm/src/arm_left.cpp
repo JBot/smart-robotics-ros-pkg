@@ -1584,7 +1584,7 @@ void indomptableARM::ServoDriver(void){
 
 
 
-    tmp.data = -CoxaAngle;
+    tmp.data = -CoxaAngle + 0.01;
     coxa_pub.publish(tmp);
     tmp.data = FemurAngle;
     femur_pub.publish(tmp);
