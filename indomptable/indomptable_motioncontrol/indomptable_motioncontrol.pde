@@ -384,14 +384,16 @@ void messageCbdelta_ros(const std_msgs::Int32 & msg)
     set_new_command(&bot_command_alpha, 0);
     set_new_command(&bot_command_delta, 0);
     alpha_and_theta = 0;
-    //x = msg.data - 1.0;
+    //x = msg.data - 1.0
     double dist = (((double)msg.data) / 1000.0);
 
     set_new_command(&bot_command_delta, dist );
     //set_new_command(&bot_command_alpha, msg.data / 1000);
     //set_new_command(&bot_command_delta, 0);    
-    val.data = 1;
-    ack_d.publish(&val);
+    if(fabs(dist) > 0.005) {
+      val.data = 1;
+      ack_d.publish(&val);
+    }
 
 }
 

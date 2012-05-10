@@ -153,7 +153,7 @@ class ImageConverter
         nb_img_cnt = 0;
 
         // Create the windows
-        cvNamedWindow("Camera output", CV_WINDOW_AUTOSIZE);
+/*        cvNamedWindow("Camera output", CV_WINDOW_AUTOSIZE);
         cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
         cvMoveWindow("Camera output", 0, 100);
         cvMoveWindow("Mask", 650, 100);
@@ -161,7 +161,7 @@ class ImageConverter
 
         // Mouse event to select the tracked color on the original image
         cvSetMouseCallback("Camera output", getObjectColor);
-
+*/
         //cv::namedWindow(WINDOW);
     }
 
@@ -283,7 +283,7 @@ class ImageConverter
         // If there is no pixel, we return a center outside the image, else we return the center of gravity
         if(*nbPixels > 15000) {
             circle( cv_ptr->image, cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels))), 3, color, -1, 8, 0 );
-	    imshow( "Mask", mask_mat );
+//	    imshow( "Mask", mask_mat );
             return cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels)));
         }
         else
@@ -352,7 +352,7 @@ class ImageConverter
             type_obj.data = type_obj.data + 2;
 
 
-        imshow( "Camera output", cv_ptr->image );
+//        imshow( "Camera output", cv_ptr->image );
 
         if(mode == TAKE_AUTONOMOUSLY) {
 

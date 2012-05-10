@@ -707,7 +707,7 @@ void indomptableARM::takeBARinTotem(void){
 void indomptableARM::takeBARinTotem2(void){
 
     //LegIK((int)(170), (int)(70), (int)(120));
-    LegIK((int)(170), (int)(60), (int)(140));
+    LegIK((int)(150), (int)(60), (int)(140));
     DesAnkleAngle = -1.0;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
@@ -723,7 +723,7 @@ void indomptableARM::takeBARinTotem2(void){
     waitMoveEnd();
     waitMoveEnd();
 
-    usleep(2500000);
+    usleep(2000000);
 
     //LegIK((int)(220), (int)(70), (int)(120));
     LegIK((int)(220), (int)(60), (int)(140));

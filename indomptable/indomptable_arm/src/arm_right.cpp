@@ -821,14 +821,14 @@ void indomptableARM::takeBARinTotem2(void){
     ros::spinOnce();
     usleep(50000);
     ros::spinOnce();
-/*    while(delta_ok == 0) {
+    while(delta_ok == 0) {
         straight_move_pub.publish(move);
         usleep(50000);
         ros::spinOnce();
         usleep(50000);
         ros::spinOnce();
     }
-*/
+
 
     waitMoveEnd();
     waitMoveEnd();
@@ -934,7 +934,12 @@ void indomptableARM::takeBARinTotem2(void){
     //waitMoveEnd();
     usleep(250000);
 
-    usleep(2500000);
+
+
+    usleep(2000000);
+
+
+
 
     //LegIK((int)(60), (int)(140), (int)(-70));
     LegIK((int)(60), (int)(130), (int)(-70));
@@ -958,13 +963,13 @@ void indomptableARM::takeBARinTotem2(void){
     ros::spinOnce();
     usleep(50000);
     ros::spinOnce();
-/*    while(delta_ok == 0) {
+    while(delta_ok == 0) {
         straight_move_pub.publish(move);
         usleep(50000);
         ros::spinOnce();
         usleep(50000);
         ros::spinOnce();
-    }*/
+    }
 
 
     waitMoveEnd();

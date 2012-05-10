@@ -164,8 +164,8 @@ MainAI::MainAI()
 
     get_image_result = nh.serviceClient<indomptable_vision::ImageResult>("/indomptable/image_result");
 
-    deltafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("delta_feedback", 5, &MainAI::deltaCallback, this);
-    alphafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("alpha_feedback", 5, &MainAI::alphaCallback, this);
+    deltafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("delta_feedback", 1, &MainAI::deltaCallback, this);
+    alphafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("alpha_feedback", 1, &MainAI::alphaCallback, this);
     delta_ok = 0;
     alpha_ok = 0;
 
@@ -703,6 +703,7 @@ void MainAI::main_loop(void)
                             else
                             {
                                 ROS_ERROR("Failed to call service GetRobotPose");
+				system("aplay /home/jbot/Downloads/tada.wav &");
                             }
                             usleep(700000);
 
