@@ -723,7 +723,7 @@ void indomptableARM::takeBARinTotem2(void){
     waitMoveEnd();
     waitMoveEnd();
 
-    usleep(2000000);
+    usleep(1800000);
 
     //LegIK((int)(220), (int)(70), (int)(120));
     LegIK((int)(220), (int)(60), (int)(140));

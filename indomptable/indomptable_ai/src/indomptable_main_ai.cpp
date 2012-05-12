@@ -184,53 +184,6 @@ MainAI::MainAI()
 
 void MainAI::fill_trees(void)
 {
-/*
-    geometry_msgs::Pose2D tmp;
-    tmp.x = color * (1.5 - 0.970);
-    tmp.y = 0.470;
-    tmp.theta = 0;
-    totem_self_n.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0.07;
-    tmp.y = 0.0;
-    tmp.theta = 0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = color * (1.5 - 1.100);
-    tmp.y = 0.500;
-    tmp.theta = 0;
-    totem_self_n.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = 1.57079;
-    totem_self_n.push_back(make_pair(ANGLE, tmp));
-    tmp.x = color * (1.5 - 1.100);
-    tmp.y = 0.605;
-    tmp.theta = 0.0;
-    totem_self_n.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.07;
-    tmp.y = 0.0;
-    tmp.theta = 0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.140;
-    tmp.y = -0.140;
-    tmp.theta = 0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.140;
-    tmp.y = 0.140;
-    tmp.theta = 0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.08;
-    tmp.y = 0.0;
-    tmp.theta = 0.0;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = 0.052;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.08;
-    tmp.y = 0.0;
-    tmp.theta = -0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-*/
     geometry_msgs::Pose2D tmp;
     tmp.x = color * (1.5 - 0.600);
     tmp.y = 1.0;
@@ -253,14 +206,6 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
-    /*tmp.x = 0.130;
-    tmp.y = 0.130;
-    tmp.theta = 0.072;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = 0.052;
-    totem_self_n.push_back(make_pair(OBJECT, tmp));*/
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = -0.072;
@@ -270,44 +215,6 @@ void MainAI::fill_trees(void)
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
 
-/*
-    tmp.x = color * (1.5 - 1.100);
-    tmp.y = 1.530;
-    tmp.theta = 0;
-    totem_self_s.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = -1.57079;
-    totem_self_s.push_back(make_pair(ANGLE, tmp));
-    tmp.x = color * (1.5 - 1.100);
-    tmp.y = 1.400;
-    tmp.theta = 0.0;
-    totem_self_s.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.07;
-    tmp.y = 0.0;
-    tmp.theta = 0.072;
-    totem_self_s.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
-    tmp.y = -0.15;
-    tmp.theta = 0.072;
-    totem_self_s.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
-    tmp.y = 0.15;
-    tmp.theta = 0.072;
-    totem_self_s.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.08;
-    tmp.y = 0.0;
-    tmp.theta = 0.0;
-    totem_self_s.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = 0.052;
-    totem_self_s.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.08;
-    tmp.y = 0.0;
-    tmp.theta = -0.072;
-    totem_self_s.push_back(make_pair(OBJECT, tmp));
-*/
 
 
     tmp.x = -color * (1.5 - 0.600);
@@ -335,55 +242,6 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.0;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
-
-
-
-/*
-    tmp.x = -color * (1.5 - 1.100);
-    tmp.y = 0.470;
-    tmp.theta = 0;
-    totem_opp_n.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = 1.57079;
-    totem_opp_n.push_back(make_pair(ANGLE, tmp));
-    tmp.x = -color * (1.5 - 1.100);
-    tmp.y = 0.605;
-    tmp.theta = 0.0;
-    totem_opp_n.push_back(make_pair(DISTANCE, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = -0.072;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-*/
-
-
-    /*tmp.x = 0.07;
-    tmp.y = 0.0;
-    tmp.theta = 0.072;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
-    tmp.y = -0.15;
-    tmp.theta = 0.072;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.15;
-    tmp.y = 0.15;
-    tmp.theta = 0.072;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.08;
-    tmp.y = 0.0;
-    tmp.theta = 0.0;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = 0.052;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.08;
-    tmp.y = 0.0;
-    tmp.theta = -0.072;
-    totem_opp_n.push_back(make_pair(OBJECT, tmp));
-*/
-
 
 /*
     tmp.x = -color * (1.5 - 1.100);
@@ -435,15 +293,7 @@ void MainAI::fill_trees(void)
     tmp.y = 0.90;
     tmp.theta = 0;
     release.push_back(make_pair(POSITION, tmp));
-/*    tmp.x = 0.0;
-    tmp.y = 0.0;
-    tmp.theta = -1.57079;
-    release.push_back(make_pair(ANGLE, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = -0.150;
-    release.push_back(make_pair(DISTANCE, tmp));
-*/    tmp.x = 0.0;
+    tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = 1.57079 + (color * (1.57079 - 1.57079/2));
     release.push_back(make_pair(ANGLE, tmp));
@@ -492,16 +342,24 @@ void MainAI::fill_trees(void)
     tmp.theta = 0.150;
     bottle_2.push_back(make_pair(DISTANCE, tmp));
 
-/*
+
     tmp.x = color * (0);
-    tmp.y = (2.000 - 0.647);
+    tmp.y = (2.000 - 0.347);
     tmp.theta = 0;
     gold_middle.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0.07;
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = -1.57079;
+    gold_middle.push_back(make_pair(ANGLE, tmp));
+    tmp.x = 0;
+    tmp.y = 0;
+    tmp.theta = 0.130;
+    gold_middle.push_back(make_pair(DISTANCE, tmp));
+    tmp.x = 0.12;
     tmp.y = 0.0;
     tmp.theta = 0.062;
     gold_middle.push_back(make_pair(OBJECT, tmp));
-*/
+
 
     tmp.x = -color * (1.500 - 0.250);
     tmp.y = 0.8;
@@ -600,10 +458,6 @@ void MainAI::main_loop(void)
                 current_list = totem_self_n;
                 ROS_ERROR("Totem Self N");
             }
-            if( (tmppose.pose.position.x == color*(1.500 - 1.100)) && (tmppose.pose.position.y == 1.400) ) {
-                current_list = totem_self_s;
-                ROS_ERROR("Totem Self S");
-            }
             if( (tmppose.pose.position.x == color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) ) {
                 current_list = release;
                 ROS_ERROR("Release");
@@ -616,7 +470,7 @@ void MainAI::main_loop(void)
                 current_list = bottle_2;
                 ROS_ERROR("Bottle 2");
             }
-            if( (tmppose.pose.position.x == color*(0)) && (tmppose.pose.position.y == (2.000 - 0.647)) ) {
+            if( (tmppose.pose.position.x == color*(0)) && (tmppose.pose.position.y == (2.000 - 0.347)) ) {
                 current_list = gold_middle;
                 ROS_ERROR("Gold");
             }
@@ -628,9 +482,9 @@ void MainAI::main_loop(void)
                 current_list = totem_opp_n;
                 ROS_ERROR("Totem Opp N");
             }
-            if( (tmppose.pose.position.x == -color*(1.500 - 1.100)) && (tmppose.pose.position.y == 1.400) ) {
+            if( (tmppose.pose.position.x == 0) && (tmppose.pose.position.y == 0.400) ) {
                 current_list = totem_opp_s;
-                ROS_ERROR("Totem Opp S");
+                ROS_ERROR("MAP");
             }
 
             //current_list = totem_self_n;
@@ -669,7 +523,7 @@ void MainAI::main_loop(void)
 
 
                         ROS_ERROR("Sending angle %d", tmpaction.data);
-			usleep(1400000);
+			usleep(1200000);
 			current_list.pop_front();
                         break;
                     case DISTANCE :
@@ -724,6 +578,11 @@ void MainAI::main_loop(void)
                         ROS_ERROR("Sending object %f %f %f", tmppose.pose.position.x, tmppose.pose.position.y, tmppose.pose.position.z);
                         //usleep(5000000);
                         usleep(50000);
+
+			if(tmppose.pose.position.z == 0.062) {
+				usleep(1000000);
+			}
+
                         //state += 2;
                         tmppose.pose.position.x = color*(1.500 - 0.250);
                         tmppose.pose.position.y = 0.800;
@@ -746,7 +605,7 @@ void MainAI::main_loop(void)
                         release_pub.publish(tmprelease);
                         ROS_ERROR("Releasing objects");
 			current_list.pop_front();
-                        usleep(2500000);
+                        usleep(2200000);
                         break;
                     case FIND_OBJECT :
 
@@ -817,11 +676,17 @@ void MainAI::main_loop(void)
 			current_list.pop_front();
                         break;
                 }
+
+		if(current_list.size() < 2) { // One more element => delet the objective
+			delet_pub.publish(final_objective);
+		}
+
+
             }
             else {
                 //update_prio.goal = final_objective;
-                delet_pub.publish(final_objective);
-                usleep(300000);
+                //delet_pub.publish(final_objective);
+                //usleep(300000);
                 state = 0;
             }
             break;

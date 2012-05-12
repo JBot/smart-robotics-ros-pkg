@@ -936,7 +936,7 @@ void indomptableARM::takeBARinTotem2(void){
 
 
 
-    usleep(2000000);
+    usleep(1800000);
 
 
 

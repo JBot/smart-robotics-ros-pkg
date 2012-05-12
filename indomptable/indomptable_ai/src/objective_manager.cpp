@@ -117,14 +117,8 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = color*(1.500 - 0.600); // totem self
     tmp_obj.pose.position.y = 1.000; 
    // Priority : 20
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 20) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 1) );
 
-/*
-    tmp_obj.pose.position.x = color*(1.500 - 1.100); // totem self
-    tmp_obj.pose.position.y = 1.400;
-    // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 8) );
-*/
 
     tmp_obj.pose.position.x = color*(1.500 - 0.250); // release
     tmp_obj.pose.position.y = 0.800;
@@ -145,9 +139,9 @@ ObjectiveManager::ObjectiveManager()
 
 
     tmp_obj.pose.position.x = color*(0); // gold
-    tmp_obj.pose.position.y = 2.000 - 0.647;
+    tmp_obj.pose.position.y = 2.000 - 0.347;
     // Priority : 3
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 2) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 50) ); // TO CHANGE
 
 
     tmp_obj.pose.position.x = -color*(1.500 - 0.250); // steal
@@ -162,9 +156,9 @@ ObjectiveManager::ObjectiveManager()
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 4) );
 
 /*
-    tmp_obj.pose.position.x = -color*(1.500 - 1.100); // totem opp
-    tmp_obj.pose.position.y = 1.400;
-    // Priority : 8
+    tmp_obj.pose.position.x = 0; // MAP
+    tmp_obj.pose.position.y = 0.400;
+    // Priority : 3
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
 */
 
