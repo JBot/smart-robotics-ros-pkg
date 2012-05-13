@@ -198,8 +198,14 @@ void MainAI::fill_trees(void)
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(DISTANCE, tmp));
 
+/*
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 0.052;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+*/
     tmp.x = 0.135;
-    tmp.y = -0.140;
+    tmp.y = -0.145;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.07;
@@ -238,6 +244,10 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 0.072;
     totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    totem_opp_n.push_back(make_pair(FIND_OBJECT, tmp));
     tmp.x = 0.08;
     tmp.y = 0.0;
     tmp.theta = 0.0;
@@ -588,7 +598,7 @@ void MainAI::main_loop(void)
                         tmppose.pose.position.y = 0.800;
                         tmppose.pose.position.z = 0.0;
                         update_prio.request.goal = tmppose;
-                        tmpaction.data = 1;
+                        tmpaction.data = 2;
                         update_prio.request.prio = tmpaction;
 
                         if (update_objective.call(update_prio))
@@ -605,7 +615,7 @@ void MainAI::main_loop(void)
                         release_pub.publish(tmprelease);
                         ROS_ERROR("Releasing objects");
 			current_list.pop_front();
-                        usleep(2200000);
+                        usleep(2100000);
                         break;
                     case FIND_OBJECT :
 
@@ -766,6 +776,7 @@ void MainAI::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
 void MainAI::startCallback(const std_msgs::Empty::ConstPtr & empty)
 {
 	started = 1;
+	system("gst-launch-0.10 filesrc location=/home/jbot/Documents/robo_theme.mp3 ! mad ! audioconvert ! audioresample ! alsasink &");
 }
 
 void MainAI::stopCallback(const std_msgs::Empty::ConstPtr & empty)

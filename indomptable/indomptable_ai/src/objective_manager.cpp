@@ -58,11 +58,16 @@ class ObjectiveManager {
         ros::Subscriber delet_sub;
         ros::ServiceServer update_prio_service;
 
+        ros::Subscriber color_sub;
+
+
     private:
         double compute_distance(nav_msgs::Path path_to_compute);
         bool getObjective(indomptable_ai::GetObjective::Request  &req, indomptable_ai::GetObjective::Response &res );
         bool updateObjective(indomptable_ai::UpdatePriority::Request  &req, indomptable_ai::UpdatePriority::Response &res );
         void deletCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+        void fill_trees(void);
+        void colorCallback(const std_msgs::Int32::ConstPtr & my_int);
 
         ros::NodeHandle nh;
 
@@ -93,6 +98,8 @@ ObjectiveManager::ObjectiveManager()
 
     update_prio_service = nh.advertiseService("/indomptable/update_priority", &ObjectiveManager::updateObjective, this);
 
+    color_sub = nh.subscribe < std_msgs::Int32 > ("/color", 20, &ObjectiveManager::colorCallback, this);
+
 
     my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
 
@@ -110,6 +117,16 @@ ObjectiveManager::ObjectiveManager()
     best_objective.pose.position.y = 0.0;
     best_objective.pose.position.z = 0.0;
 
+
+
+
+
+
+}
+
+void ObjectiveManager::fill_trees(void)
+{   
+
     geometry_msgs::PoseStamped tmp_obj;
     tmp_obj.header.frame_id = "/map";
     tmp_obj.pose.position.z = 0;
@@ -117,8 +134,7 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = color*(1.500 - 0.600); // totem self
     tmp_obj.pose.position.y = 1.000; 
    // Priority : 20
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 1) );
-
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 20) );
 
     tmp_obj.pose.position.x = color*(1.500 - 0.250); // release
     tmp_obj.pose.position.y = 0.800;
@@ -135,13 +151,13 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = color*(-1.500 + 0.640 + 0.477); // bottle
     tmp_obj.pose.position.y = 1.700;
     // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 8) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 6) );
 
 
     tmp_obj.pose.position.x = color*(0); // gold
     tmp_obj.pose.position.y = 2.000 - 0.347;
     // Priority : 3
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 50) ); // TO CHANGE
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) ); // TO CHANGE
 
 
     tmp_obj.pose.position.x = -color*(1.500 - 0.250); // steal
@@ -153,7 +169,7 @@ ObjectiveManager::ObjectiveManager()
     tmp_obj.pose.position.x = -color*(1.500 - 0.600); // totem opp
     tmp_obj.pose.position.y = 1.000;
     // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 4) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
 
 /*
     tmp_obj.pose.position.x = 0; // MAP
@@ -161,11 +177,21 @@ ObjectiveManager::ObjectiveManager()
     // Priority : 3
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
 */
-
-
-
-
 }
+
+void ObjectiveManager::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
+{
+        if(my_int->data == 1) {
+                color = my_int->data;
+        }
+        else { 
+                color = -1;
+        }
+
+        fill_trees();
+}
+
+
 
 bool ObjectiveManager::getObjective(indomptable_ai::GetObjective::Request  &req,
         indomptable_ai::GetObjective::Response &res )

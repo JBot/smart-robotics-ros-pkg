@@ -896,7 +896,7 @@ void indomptableARM::takeBARinTotem2(void){
 
 void indomptableARM::takeCDinTotemDown(void){
 
-        LegIK((int)(180), (int)((125)), (int)(-40));
+        LegIK((int)(180), (int)((115)), (int)(-40));
         DesAnkleAngle = -0.90;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -925,7 +925,7 @@ void indomptableARM::takeCDinTotemDown(void){
         ros::spinOnce();
     }
 
-    LegIK((int)(180), (int)((125)), (int)(0));
+    LegIK((int)(180), (int)((115)), (int)(0));
     DesAnkleAngle = -0.90;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
@@ -937,7 +937,7 @@ void indomptableARM::takeCDinTotemDown(void){
 
     usleep(300000);
 
-    LegIK((int)(178), (int)((160)), (int)(0));
+    LegIK((int)(178), (int)((160)), (int)(20));
     DesAnkleAngle = -0.90;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;

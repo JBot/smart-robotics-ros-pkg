@@ -445,7 +445,30 @@ void indomptableARM::releaseCallback(const std_msgs::Empty::ConstPtr & empty)
 
     system("aplay /home/jbot/Downloads/tada.wav &");
 
+    LegIK((int)(50), (int)(30), (int)(0));
+    DesAnkleAngle = -3.1;
+    CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+    FemurAngle = -IKFemurAngle;
+    TibiaAngle = (1.570796 - IKTibiaAngle);
+    AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+    RollAngle = -IKCoxaAngle;
+    ActualGaitSpeed = 300;
+    ServoDriver();
+
+
     usleep((ActualGaitSpeed)*SLEEP_COEFF);
+
+    LegIK((int)(70), (int)(50), (int)(0));
+    DesAnkleAngle = -3.1;
+    CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+    FemurAngle = -IKFemurAngle;
+    TibiaAngle = (1.570796 - IKTibiaAngle);
+    AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+    RollAngle = -IKCoxaAngle;
+    ActualGaitSpeed = 300;
+    ServoDriver();
+
+
     usleep((ActualGaitSpeed)*SLEEP_COEFF);
 
     LegIK((int)(100), (int)(100), (int)(0));
@@ -562,7 +585,7 @@ void indomptableARM::takeCDinTotem(signed int height){
         ros::spinOnce();
     }
 
-    LegIK((int)(220), (int)(-(52)), (int)(20));
+    LegIK((int)(220), (int)(-(52)), (int)(-20));
     DesAnkleAngle = -1.570796;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
@@ -620,7 +643,7 @@ void indomptableARM::takeCDinTotem(signed int height){
     //usleep((ActualGaitSpeed+50+50)*SLEEP_COEFF);
 
     //LegIK((int)(230), (int)((2)), (int)(0));
-    LegIK((int)(220), (int)((2)), (int)(20));
+    LegIK((int)(220), (int)((2)), (int)(-20));
     DesAnkleAngle = -1.570796;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
@@ -1028,7 +1051,7 @@ void indomptableARM::takeBARinTotem2(void){
 
 void indomptableARM::takeCDinTotemDown(void){
 
-        LegIK((int)(180), (int)((125)), (int)(40));
+        LegIK((int)(180), (int)((115)), (int)(40));
         DesAnkleAngle = -0.90;
         CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
         FemurAngle = -IKFemurAngle;
@@ -1057,7 +1080,7 @@ void indomptableARM::takeCDinTotemDown(void){
         ros::spinOnce();
     }
 
-    LegIK((int)(180), (int)((125)), (int)(0));
+    LegIK((int)(180), (int)((115)), (int)(0));
     DesAnkleAngle = -0.90;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
@@ -1069,7 +1092,7 @@ void indomptableARM::takeCDinTotemDown(void){
 
     usleep(300000);
 
-    LegIK((int)(178), (int)((160)), (int)(0));
+    LegIK((int)(178), (int)((160)), (int)(-20));
     DesAnkleAngle = -0.90;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
