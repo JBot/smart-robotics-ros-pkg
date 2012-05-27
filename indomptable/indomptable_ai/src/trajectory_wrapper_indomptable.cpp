@@ -100,7 +100,7 @@ void TrajectoryManager::recompute_path(void)
 {
 
 if( (status == 1) ){
-   if(cpt > 50) { // 50
+   if(cpt > 40) { // 50
     nav_msgs::GetPlan tmp_plan;
 
     indomptable_nav::GetRobotPose tmp_pose;
@@ -117,7 +117,7 @@ if( (status == 1) ){
             ROS_ERROR("Failed to call service GetRobotPose");
     }
 
-    if( sqrt( pow(final_pose.pose.position.x - tmp_pose.response.pose.pose.position.x, 2) + pow(final_pose.pose.position.y - tmp_pose.response.pose.pose.position.y, 2) ) < 0.20 ) {
+    if( sqrt( pow(final_pose.pose.position.x - tmp_pose.response.pose.pose.position.x, 2) + pow(final_pose.pose.position.y - tmp_pose.response.pose.pose.position.y, 2) ) < 0.22 ) {
 
 	status = 0;
 

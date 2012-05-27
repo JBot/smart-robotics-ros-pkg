@@ -320,7 +320,7 @@ ros::Subscriber < std_msgs::Int32 > ss("right_pump", &messageCbright);
 void positionCb(const geometry_msgs::Pose2D & goal_msg)
 {
 
-    alpha_and_theta = 1;
+    
     goal.x = goal_msg.x;
     goal.y = goal_msg.y;
 
@@ -330,7 +330,7 @@ void positionCb(const geometry_msgs::Pose2D & goal_msg)
 //        maximus.pos_Y = goal_msg.y;
 
     goto_xy(goal_msg.x, goal_msg.y);
-
+    alpha_and_theta = 1;
 }
 
 ros::Subscriber < geometry_msgs::Pose2D > pose_sub("indomptable_goal",
@@ -887,7 +887,7 @@ void init_first_position(struct robot *my_robot)
     set_new_command(&bot_command_delta, 0);
     delay(100);
     // Go forward, turn, and go bachward to touch the other wall
-    set_new_command(&bot_command_delta, 0.150);
+    set_new_command(&bot_command_delta, 0.140);
     delay(4000);
     set_new_command(&bot_command_alpha, (color * PI / 2 * RAD2DEG));
     delay(5000);
@@ -914,7 +914,7 @@ void init_first_position(struct robot *my_robot)
 
     delay(500);
     // Go in the middle of the starting area
-    set_new_command(&bot_command_delta, 0.170);
+    set_new_command(&bot_command_delta, 0.155);
 // FOR TEST
 //    set_new_command(&bot_command_delta, 2.5);
 

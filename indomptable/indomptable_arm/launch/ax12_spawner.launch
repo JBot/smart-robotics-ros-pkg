@@ -10,7 +10,7 @@
                     port_name: "/dev/ttyACM1"
                     baud_rate: 1000000
                     min_motor_id: 1
-                    max_motor_id: 10
+                    max_motor_id: 12
                     update_rate: 10
         </rosparam>
     </node>

@@ -369,7 +369,7 @@ class ImageConverter
                             tmppose.pose.position.z = 0.072;
                             object_pub.publish(tmppose);
                             ROS_ERROR("Taking CD : %f : %f", tmppose.pose.position.x, tmppose.pose.position.y);
-                            nb_img_cnt = 0;
+                            nb_img_cnt = -40;
                         }
                         else {
                             nb_img_cnt++;

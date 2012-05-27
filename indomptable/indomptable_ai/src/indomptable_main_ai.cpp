@@ -126,6 +126,7 @@ class MainAI {
 
         int color;
 	int started;
+	int cpt_objects;
 };
 
 MainAI::MainAI()
@@ -177,7 +178,7 @@ MainAI::MainAI()
     state = 0;
 
 
-
+    cpt_objects = 0;
 
     //usleep(2000000);
 }
@@ -204,10 +205,12 @@ void MainAI::fill_trees(void)
     tmp.theta = 0.052;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
 */
+/*
     tmp.x = 0.135;
     tmp.y = -0.145;
     tmp.theta = 0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
+*/
     tmp.x = 0.07;
     tmp.y = 0.0;
     tmp.theta = 0.072;
@@ -299,7 +302,7 @@ void MainAI::fill_trees(void)
     totem_opp_s.push_back(make_pair(OBJECT, tmp));
 */
 
-    tmp.x = color * (1.5 - 0.250);
+    tmp.x = color * (1.5 - 0.280);
     tmp.y = 0.90;
     tmp.theta = 0;
     release.push_back(make_pair(POSITION, tmp));
@@ -371,7 +374,7 @@ void MainAI::fill_trees(void)
     gold_middle.push_back(make_pair(OBJECT, tmp));
 
 
-    tmp.x = -color * (1.500 - 0.250);
+    tmp.x = -color * (1.500 - 0.290);
     tmp.y = 0.8;
     tmp.theta = 0;
     steal_opp.push_back(make_pair(POSITION, tmp));
@@ -401,6 +404,19 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = 2; // Find BAR
     steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
+
+    tmp.x = 0.100;
+    tmp.y = -0.06;
+    tmp.theta = 0.072;
+    steal_opp.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.100;
+    tmp.y = 0.06;
+    tmp.theta = 0.072;
+    steal_opp.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.80;
+    tmp.y = 0.0;
+    tmp.theta = 0.072;
+    steal_opp.push_back(make_pair(OBJECT, tmp));
 
 
     tmp.x = color * (1.500 - 0.250);
@@ -626,17 +642,19 @@ void MainAI::main_loop(void)
 				tmp_img_res.request.type.data = 1;
 				if (get_image_result.call(tmp_img_res))
 				{   
-					if(tmp_img_res.response.type.data == 1) {
+					if((tmp_img_res.response.type.data == 1) && (cpt_objects != 3)) {
 						tmppose.pose.position.x = tmp_img_res.response.x.data;
 						tmppose.pose.position.y = tmp_img_res.response.y.data;
 						tmppose.pose.position.z = 0.072;
 						object_pub.publish(tmppose);
 						ROS_ERROR("Sending object %f %f %f", tmppose.pose.position.x, tmppose.pose.position.y, tmppose.pose.position.z);
 						usleep(3000000);
+						cpt_objects++;
 						
 					}
 					else {
 						current_list.pop_front();
+						cpt_objects = 0;
                                         ROS_ERROR("NO CD");
 
 					}
@@ -645,6 +663,7 @@ void MainAI::main_loop(void)
 				{   
                                         ROS_ERROR("Failed to call service ImageResult");
 					current_list.pop_front();
+						cpt_objects = 0;
 				}
 
 				
@@ -666,7 +685,8 @@ void MainAI::main_loop(void)
                                         }
                                         else {
                                                 current_list.pop_front();
-                                        ROS_ERROR("No BAR");
+						ROS_ERROR("No BAR");
+						cpt_objects = 0;
 
                                         }
                                 }
@@ -674,12 +694,14 @@ void MainAI::main_loop(void)
                                 {
                                         ROS_ERROR("Failed to call service ImageResult");
 					current_list.pop_front();
+					cpt_objects = 0;
                                 }
 
 
 			} 
 			else {
 				current_list.pop_front();
+				cpt_objects = 0;
 			}
                         break;
                     default :
@@ -748,6 +770,7 @@ void MainAI::pathimpossibleCallback(const std_msgs::Empty::ConstPtr & empty)
 
 void MainAI::pathCallback(const std_msgs::Empty::ConstPtr & empty)
 {
+    usleep(400000);
     if(state & 0b00000001) {
         state -= 1;
     }
@@ -776,7 +799,7 @@ void MainAI::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
 void MainAI::startCallback(const std_msgs::Empty::ConstPtr & empty)
 {
 	started = 1;
-	system("gst-launch-0.10 filesrc location=/home/jbot/Documents/robo_theme.mp3 ! mad ! audioconvert ! audioresample ! alsasink &");
+	//system("gst-launch-0.10 filesrc location=/home/jbot/Documents/robo_theme.mp3 ! mad ! audioconvert ! audioresample ! alsasink &");
 }
 
 void MainAI::stopCallback(const std_msgs::Empty::ConstPtr & empty)

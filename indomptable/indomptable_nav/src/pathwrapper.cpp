@@ -80,7 +80,7 @@ Pathwrapper::Pathwrapper()
     //path_sub_ = nh.subscribe < nav_msgs::Path > ("/move_base/TrajectoryPlannerROS/global_plan", 20, &MaximusPath::pathCallback, this);
     path_sub_ = nh.subscribe < nav_msgs::Path > ("/my_indomptable_path", 20, &Pathwrapper::pathCallback, this);
 
-    pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/indomptable_goal", 50);
+    pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/indomptable_goal", 1);
     poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);
 
     pathdone_pub = nh.advertise < std_msgs::Empty > ("/path_done", 50);
@@ -255,7 +255,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					usleep(100000);
 					int i = 0;
 					double test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
-					while( ( test > 0.02) && ( i < 30 ) ) {
+					while( ( test > 0.02) && ( i < 35 ) ) {
 						usleep(100000);
 						ros::Time now = ros::Time::now();
 						listener.waitForTransform("/odom", "/base_link", now, ros::Duration(5.0));
@@ -265,6 +265,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
 						ROS_ERROR("i : %d / dist : %f", i, test);
 					}
+					usleep(300000);
 					std_msgs::Empty empty;
 					Pathwrapper::pathdone_pub.publish(empty);
 				}

@@ -134,31 +134,31 @@ void ObjectiveManager::fill_trees(void)
     tmp_obj.pose.position.x = color*(1.500 - 0.600); // totem self
     tmp_obj.pose.position.y = 1.000; 
    // Priority : 20
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 20) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 60) );
 
     tmp_obj.pose.position.x = color*(1.500 - 0.250); // release
     tmp_obj.pose.position.y = 0.800;
     // Priority : 1
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) ); // TO CHANGE
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 30) ); // TO CHANGE
 
 
     tmp_obj.pose.position.x = color*(1.500 - 0.640); // bottle
     tmp_obj.pose.position.y = 1.700;
     // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 8) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 25) );
 
 
     tmp_obj.pose.position.x = color*(-1.500 + 0.640 + 0.477); // bottle
     tmp_obj.pose.position.y = 1.700;
     // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 6) );
+    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 25) );
 
-
+/*
     tmp_obj.pose.position.x = color*(0); // gold
     tmp_obj.pose.position.y = 2.000 - 0.347;
     // Priority : 3
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 5) ); // TO CHANGE
-
+*/
 
     tmp_obj.pose.position.x = -color*(1.500 - 0.250); // steal
     tmp_obj.pose.position.y = 0.800;
@@ -171,12 +171,12 @@ void ObjectiveManager::fill_trees(void)
     // Priority : 8
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
 
-/*
+
     tmp_obj.pose.position.x = 0; // MAP
     tmp_obj.pose.position.y = 0.400;
     // Priority : 3
     objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 3) );
-*/
+
 }
 
 void ObjectiveManager::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
