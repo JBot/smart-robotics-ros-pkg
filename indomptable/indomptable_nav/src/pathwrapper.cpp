@@ -13,6 +13,8 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
+#include <indomptable_nav/ArduGoal.h>
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -42,6 +44,7 @@ class Pathwrapper {
   public:
     Pathwrapper();
     void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
+    double getHeadingFromQuat(geometry_msgs::Quaternion pose);
     void compute_next_pathpoint(tf::TransformListener& listener);
 
     // Goal suscriber
@@ -51,6 +54,7 @@ class Pathwrapper {
 
     ros::Publisher pose2D_pub;
     ros::Publisher poseArray_pub;
+    ros::Publisher arduGoal_pub;
 
     ros::Publisher pathdone_pub;
 
@@ -66,6 +70,7 @@ class Pathwrapper {
 
      nav_msgs::Path my_path;
      geometry_msgs::Pose2D final_pose;
+     indomptable_nav::ArduGoal final_ardugoal;
 
     char cpt_send;
     char pause;
@@ -82,6 +87,7 @@ Pathwrapper::Pathwrapper()
 
     pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/indomptable_goal", 1);
     poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);
+    arduGoal_pub = nh.advertise < indomptable_nav::ArduGoal > ("/indomptable_ardugoal", 1);
 
     pathdone_pub = nh.advertise < std_msgs::Empty > ("/path_done", 50);
 
@@ -104,6 +110,12 @@ Pathwrapper::Pathwrapper()
     final_pose.y = 0.14;
     final_pose.theta = 0.0;
 
+    final_ardugoal.x = 0.0;
+    final_ardugoal.y = 0.0;
+    final_ardugoal.theta = 0.0;
+    final_ardugoal.last = 0;
+
+
     cpt_send = 0;
 }
 
@@ -125,6 +137,13 @@ void Pathwrapper::rotate(double heading, double attitude, double bank, geometry_
     pose->pose.orientation.x = c1c2 * s3 + s1s2 * c3;
     pose->pose.orientation.y = s1 * c2 * c3 + c1 * s2 * s3;
     pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
+}
+
+double Pathwrapper::getHeadingFromQuat(geometry_msgs::Quaternion pose)
+{
+
+    return atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z);
+
 }
 
 void Pathwrapper::pauseCallback(const std_msgs::Empty::ConstPtr & empty)
@@ -234,6 +253,14 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					ROS_INFO("%f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
 					Pathwrapper::pose2D_pub.publish(final_pose);
 
+                    
+                    final_ardugoal.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+                    final_ardugoal.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+                    final_ardugoal.theta = getHeadingFromQuat(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.orientation);
+                    final_ardugoal.last = 0;
+
+                    arduGoal_pub.publish(final_ardugoal);
+
 					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 				}
 				else {
@@ -246,6 +273,13 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					final_pose.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
 					final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
 					Pathwrapper::pose2D_pub.publish(final_pose);
+
+                    final_ardugoal.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+                    final_ardugoal.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+                    final_ardugoal.theta = getHeadingFromQuat(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.orientation);
+                    final_ardugoal.last = 1;
+
+                    arduGoal_pub.publish(final_ardugoal);
 
 
 					my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());

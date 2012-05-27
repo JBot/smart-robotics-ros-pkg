@@ -213,6 +213,10 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
     if (get_path.call(tmp_plan))
     {
 	    //ROS_INFO("Sum: %ld", get_path.response.plan);
+        if(!(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty())) {
+            tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::pop_back();
+            tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::push_back(final_pose);
+        }
 	path_pub.publish(tmp_plan.response.plan);
 	
 	if(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty()) {

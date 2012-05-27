@@ -523,6 +523,7 @@ void MainAI::main_loop(void)
                         tmppose.header.frame_id = "/map";
                         tmppose.pose.position.x = current_list.front().second.x;
                         tmppose.pose.position.y = current_list.front().second.y;
+                        rotate(0.0, current_list.front().second.theta, 0.0, &tmppose);
                         goal_pub.publish(tmppose);
                         ROS_ERROR("Sending pose %f %f", tmppose.pose.position.x, tmppose.pose.position.y);
                         state += 1;

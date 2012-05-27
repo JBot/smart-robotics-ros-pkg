@@ -16,6 +16,9 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 
+#include <indomptable_nav/ArduGoal.h>
+
+
 #include <stdio.h>
 // Other includes
 #include <avr/io.h>
@@ -192,7 +195,8 @@ int global_cpt = 0;
 
 uint8_t cpt_asserv = 0;
 int alpha_and_theta = 0;
-
+int last_goal = 0;
+double desired_last_theta = 0;
 
 double ticks_per_m = TOTAL_TICKS / WHEEL_PERIMETER;
 double m_per_tick = WHEEL_PERIMETER / TOTAL_TICKS;
@@ -316,7 +320,7 @@ void messageCbright(const std_msgs::Int32 & msg)
 
 ros::Subscriber < std_msgs::Int32 > ss("right_pump", &messageCbright);
 
-
+/*
 void positionCb(const geometry_msgs::Pose2D & goal_msg)
 {
 
@@ -335,6 +339,31 @@ void positionCb(const geometry_msgs::Pose2D & goal_msg)
 
 ros::Subscriber < geometry_msgs::Pose2D > pose_sub("indomptable_goal",
                                                    &positionCb);
+*/
+
+//////////////////
+// NEW POSITION //
+//////////////////
+void positionCb(const indomptable_nav::ArduGoal & goal_msg)
+{
+
+    
+    goal.x = goal_msg.x;
+    goal.y = goal_msg.y;
+    desired_last_theta = goal_msg.theta * RAD2DEG;
+//        maximus.theta += angle_coord(&maximus, goal_msg.x, goal_msg.y);
+
+//        maximus.pos_X = goal_msg.x;
+//        maximus.pos_Y = goal_msg.y;
+
+    goto_xy(goal_msg.x, goal_msg.y);
+    last_goal = goal_msg.last;
+    alpha_and_theta = 1;
+}
+
+ros::Subscriber < indomptable_nav::ArduGoal > pose_sub("indomptable_ardugoal",
+                                                   &positionCb);
+
 
 /*
 void messageCbSpeed(const geometry_msgs::Twist& msg) {
@@ -1478,6 +1507,11 @@ else {
             set_new_command(&bot_command_delta, dist);
 
             prev_bot_command_delta.state = PROCESSING_COMMAND;
+        }
+        
+        if( (last_goal == 1) && (bot_command_delta.state == COMMAND_DONE)) {
+            set_new_command(&bot_command_alpha, desired_last_theta);
+            last_goal = 0;
         }
     }
     delta_motor.des_speed =
