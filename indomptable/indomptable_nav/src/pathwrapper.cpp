@@ -141,8 +141,21 @@ void Pathwrapper::rotate(double heading, double attitude, double bank, geometry_
 
 double Pathwrapper::getHeadingFromQuat(geometry_msgs::Quaternion pose)
 {
-
-    return atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z);
+    double tmp = 0.0;
+    tmp = asin(2*pose.x*pose.y + 2*pose.z*pose.w);
+    ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z));
+    ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, asin(2*pose.x*pose.y + 2*pose.z*pose.w));
+    //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.x*pose.w-2*pose.y*pose.z , 1 - 2*pose.x*pose.x - 2*pose.z*pose.z));
+    if( fabs(atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z)) < 0.1) {
+        return tmp;
+    }
+    else {
+	if(tmp >= 0)
+        	return 3.1415926 - tmp;
+	else 
+        	return -3.1415926 - tmp;
+    }
+    //return atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z);
 
 }
 

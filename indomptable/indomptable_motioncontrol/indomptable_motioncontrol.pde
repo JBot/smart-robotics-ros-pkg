@@ -350,7 +350,7 @@ void positionCb(const indomptable_nav::ArduGoal & goal_msg)
     
     goal.x = goal_msg.x;
     goal.y = goal_msg.y;
-    desired_last_theta = goal_msg.theta * RAD2DEG;
+    desired_last_theta = goal_msg.theta;
 //        maximus.theta += angle_coord(&maximus, goal_msg.x, goal_msg.y);
 
 //        maximus.pos_X = goal_msg.x;
@@ -1476,8 +1476,7 @@ else {
 
 
     // PID angle
-    alpha_motor.des_speed =
-        compute_position_PID(&bot_command_alpha, &alpha_motor);
+    alpha_motor.des_speed = compute_position_PID(&bot_command_alpha, &alpha_motor);
 
     // PID distance
     if ((bot_command_alpha.state == WAITING_BEGIN) || (bot_command_alpha.state == PROCESSING_COMMAND)) {        // If alpha motor have not finished its movement 
@@ -1510,9 +1509,21 @@ else {
         }
         
         if( (last_goal == 1) && (bot_command_delta.state == COMMAND_DONE)) {
-            set_new_command(&bot_command_alpha, desired_last_theta);
+
+          double angletodo = desired_last_theta - maximus.theta;
+   
+          if (angletodo > PI)
+            angletodo = angletodo - 2 * PI;
+          if (angletodo < -PI)
+            angletodo = 2 * PI + angletodo;
+
+          set_new_command(&bot_command_alpha, angletodo * RAD2DEG );
+            
+          //set_new_command(&bot_command_alpha, desired_last_theta);
             last_goal = 0;
+            alpha_and_theta = 0;
         }
+        
     }
     delta_motor.des_speed =
         compute_position_PID(&bot_command_delta, &delta_motor);
