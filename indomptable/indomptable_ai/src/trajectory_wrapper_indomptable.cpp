@@ -100,7 +100,7 @@ void TrajectoryManager::recompute_path(void)
 {
 
 if( (status == 1) ){
-   if(cpt > 40) { // 50
+   if(cpt > 30) { // 40 // 50
     nav_msgs::GetPlan tmp_plan;
 
     indomptable_nav::GetRobotPose tmp_pose;
