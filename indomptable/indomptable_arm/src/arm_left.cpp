@@ -435,6 +435,8 @@ void indomptableARM::releaseCallback(const std_msgs::Empty::ConstPtr & empty)
     ServoDriver();
 
     usleep((ActualGaitSpeed)*SLEEP_COEFF);
+    usleep((ActualGaitSpeed)*SLEEP_COEFF);
+    usleep((ActualGaitSpeed)*SLEEP_COEFF);
 
 
     waitState();

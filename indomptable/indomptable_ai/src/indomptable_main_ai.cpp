@@ -188,12 +188,12 @@ void MainAI::fill_trees(void)
     geometry_msgs::Pose2D tmp;
     tmp.x = color * (1.5 - 0.600);
     tmp.y = 1.0;
-    tmp.theta = 0;
+    tmp.theta = 1.57079 + (color * 1.57079);
     totem_self_n.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = 1.57079 + (color * 1.57079);
-    totem_self_n.push_back(make_pair(ANGLE, tmp));
+    //totem_self_n.push_back(make_pair(ANGLE, tmp));
     tmp.x = color * (1.5 - 0.705);
     tmp.y = 1.000;
     tmp.theta = 0.0;
@@ -228,12 +228,12 @@ void MainAI::fill_trees(void)
 
     tmp.x = -color * (1.5 - 0.600);
     tmp.y = 1.0;
-    tmp.theta = 0;
+    tmp.theta = 1.57079 + (-color * 1.57079);
     totem_opp_n.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = 1.57079 + (-color * 1.57079);
-    totem_opp_n.push_back(make_pair(ANGLE, tmp));
+    //totem_opp_n.push_back(make_pair(ANGLE, tmp));
     tmp.x = -color * (1.5 - 0.710);
     tmp.y = 1.000;
     tmp.theta = 0.0;
@@ -304,12 +304,12 @@ void MainAI::fill_trees(void)
 
     tmp.x = color * (1.5 - 0.280);
     tmp.y = 0.90;
-    tmp.theta = 0;
+    tmp.theta = 1.57079 + (color * (1.57079 - 1.57079/2));
     release.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = 1.57079 + (color * (1.57079 - 1.57079/2));
-    release.push_back(make_pair(ANGLE, tmp));
+    //release.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = -0.150;
@@ -322,12 +322,12 @@ void MainAI::fill_trees(void)
 
     tmp.x = color * (1.5 - 0.640);
     tmp.y = 1.7;
-    tmp.theta = 0;
+    tmp.theta = -1.57079;
     bottle_1.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = -1.57079;
-    bottle_1.push_back(make_pair(ANGLE, tmp));
+    //bottle_1.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = -0.170;
@@ -340,12 +340,12 @@ void MainAI::fill_trees(void)
 
     tmp.x = color * (-1.500 + 0.640 + 0.477);
     tmp.y = 1.7;
-    tmp.theta = 0;
+    tmp.theta = -1.57079;
     bottle_2.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = -1.57079;
-    bottle_2.push_back(make_pair(ANGLE, tmp));
+    //bottle_2.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = -0.170;
@@ -358,12 +358,12 @@ void MainAI::fill_trees(void)
 
     tmp.x = color * (0);
     tmp.y = (2.000 - 0.347);
-    tmp.theta = 0;
+    tmp.theta = -1.57079;
     gold_middle.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = -1.57079;
-    gold_middle.push_back(make_pair(ANGLE, tmp));
+    //gold_middle.push_back(make_pair(ANGLE, tmp));
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = 0.130;
