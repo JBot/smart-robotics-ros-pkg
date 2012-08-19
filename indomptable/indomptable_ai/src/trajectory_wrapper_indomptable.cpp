@@ -53,6 +53,7 @@ class TrajectoryManager {
 
     ros::Subscriber pathdone_sub_;
     ros::Publisher pathimpossible_pub;
+     int cpt_pathimp;
   private:
     void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
     void pathDoneCallback(const std_msgs::Empty::ConstPtr & pose);
@@ -60,7 +61,6 @@ class TrajectoryManager {
 
      int status; // 0 = pause ; 1 = checking path
      int cpt;
-
      nav_msgs::Path my_path;
      geometry_msgs::PoseStamped final_pose;
 
@@ -71,6 +71,7 @@ TrajectoryManager::TrajectoryManager()
 
     status = 0;	
     cpt = 0;
+    cpt_pathimp = 0;
     // Goal suscriber
     goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base/goal_test", 20, &TrajectoryManager::goalCallback, this);
 
@@ -100,7 +101,7 @@ void TrajectoryManager::recompute_path(void)
 {
 
 if( (status == 1) ){
-   if(cpt > 30) { // 40 // 50
+   if(cpt > 20) { // 30 // 40 // 50
     nav_msgs::GetPlan tmp_plan;
 
     indomptable_nav::GetRobotPose tmp_pose;
@@ -140,8 +141,19 @@ if( (status == 1) ){
 			    // Goal unreachable
 			    std_msgs::Empty empty;
 			    pathimpossible_pub.publish(empty);
-
+			    if(cpt_pathimp == 3) {
+			    	status = 0;
+				cpt_pathimp = 0;
+			    }
+			    else  {
+				status = 1;
+				cpt_pathimp++;
+			    }
 			    return;
+		    }
+		    else {
+			cpt_pathimp = 0;
+
 		    }
 
 	    }   
@@ -225,6 +237,9 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
 		pathimpossible_pub.publish(empty);
 
 		return;
+	}
+	else {
+
 	}
     }
     else

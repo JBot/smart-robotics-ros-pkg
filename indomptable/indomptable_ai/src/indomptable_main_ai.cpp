@@ -219,12 +219,24 @@ void MainAI::fill_trees(void)
     tmp.y = 0.0;
     tmp.theta = -0.072;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    totem_self_n.push_back(make_pair(FIND_OBJECT, tmp));
     tmp.x = 0.08;
     tmp.y = 0.0;
     tmp.theta = 0.0;
     totem_self_n.push_back(make_pair(OBJECT, tmp));
-
-
+/*
+    tmp.x = 0.135;
+    tmp.y = -0.145;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.135;
+    tmp.y = 0.145;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+*/
 
     tmp.x = -color * (1.5 - 0.600);
     tmp.y = 1.0;
@@ -314,10 +326,15 @@ void MainAI::fill_trees(void)
     tmp.y = 0;
     tmp.theta = -0.150;
     release.push_back(make_pair(RELEASE, tmp));
-    tmp.x = 0;
+    tmp.x = color * (1.5 - 0.420);
+    tmp.y = 0.90;
+    tmp.theta = 1.57079 + (color * (1.57079));
+    release.push_back(make_pair(POSITION, tmp));
+/*    tmp.x = 0;
     tmp.y = 0;
     tmp.theta = 0.150;
     release.push_back(make_pair(DISTANCE, tmp));
+*/
 // RECALAGE !!!
 
     tmp.x = color * (1.5 - 0.640);
@@ -357,7 +374,7 @@ void MainAI::fill_trees(void)
 
 
     tmp.x = color * (0);
-    tmp.y = (2.000 - 0.347);
+    tmp.y = (2.000 - 0.377);
     tmp.theta = -1.57079;
     gold_middle.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
@@ -367,16 +384,16 @@ void MainAI::fill_trees(void)
     tmp.x = 0;
     tmp.y = 0;
     tmp.theta = 0.130;
-    gold_middle.push_back(make_pair(DISTANCE, tmp));
+    //gold_middle.push_back(make_pair(DISTANCE, tmp));
     tmp.x = 0.12;
     tmp.y = 0.0;
     tmp.theta = 0.062;
-    gold_middle.push_back(make_pair(OBJECT, tmp));
+    //gold_middle.push_back(make_pair(OBJECT, tmp));
 
 
     tmp.x = -color * (1.500 - 0.290);
     tmp.y = 0.8;
-    tmp.theta = 0;
+    tmp.theta = 1.57079 + (color * (1.57079));
     steal_opp.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
     tmp.y = 0.0;
@@ -396,6 +413,11 @@ void MainAI::fill_trees(void)
     tmp.theta = 2; // Find BAR
     steal_opp.push_back(make_pair(FIND_OBJECT, tmp));
 
+    tmp.x = -color * (1.500 - 0.290);
+    tmp.y = 0.9;
+    tmp.theta = 1.57079;
+    steal_opp.push_back(make_pair(ANGLE, tmp));
+
     tmp.x = 0.0;
     tmp.y = 0.0;
     tmp.theta = 1; // Find CD
@@ -411,10 +433,6 @@ void MainAI::fill_trees(void)
     steal_opp.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.100;
     tmp.y = 0.06;
-    tmp.theta = 0.072;
-    steal_opp.push_back(make_pair(OBJECT, tmp));
-    tmp.x = 0.80;
-    tmp.y = 0.0;
     tmp.theta = 0.072;
     steal_opp.push_back(make_pair(OBJECT, tmp));
 
@@ -554,7 +572,7 @@ void MainAI::main_loop(void)
 			current_list.pop_front();
                         break;
                     case DISTANCE :
-			usleep(200000);
+			usleep(300000);
                         if (current_list.front().second.theta == 0.0) {
 
                             if (get_pose.call(tmp_pose))

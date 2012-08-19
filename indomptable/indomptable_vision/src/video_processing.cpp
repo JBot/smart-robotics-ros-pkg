@@ -27,7 +27,7 @@
 #define NO_TAKE 0 
 #define TAKE_AUTONOMOUSLY 1 
 
-#define MAX_CNT_OBJECT 20 
+#define MAX_CNT_OBJECT 3 //20 
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
@@ -369,7 +369,8 @@ class ImageConverter
                             tmppose.pose.position.z = 0.072;
                             object_pub.publish(tmppose);
                             ROS_ERROR("Taking CD : %f : %f", tmppose.pose.position.x, tmppose.pose.position.y);
-                            nb_img_cnt = -40;
+                            nb_img_cnt = 0;
+			    usleep(2000000);
                         }
                         else {
                             nb_img_cnt++;

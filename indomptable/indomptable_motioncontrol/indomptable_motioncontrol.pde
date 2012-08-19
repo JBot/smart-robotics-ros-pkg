@@ -1602,7 +1602,7 @@ long compute_position_PID(struct RobotCommand *cmd,
     } else {
 //        if ((cmd->state == PROCESSING_COMMAND) && (abs(err) < 0.006)
 //            && (abs(errDif) < 0.005)) {                        // 2 before
-        if ((cmd->state == PROCESSING_COMMAND) && (abs(err) < 20)) {    // 2 before
+        if ((cmd->state == PROCESSING_COMMAND) && (abs(err) < 10)) {    // 2 before
             cmd->state = COMMAND_DONE;
             //pub_move_done.publish(&movement_done);
         }

@@ -523,6 +523,8 @@ void indomptableARM::takeCDinTotem(signed int height){
         ros::spinOnce();
     }
 
+    usleep(250000);
+
     LegIK((int)(220), (int)(-(52)), (int)(0));
     DesAnkleAngle = -1.570796;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
@@ -567,7 +569,7 @@ void indomptableARM::takeCDinTotem(signed int height){
     //usleep((ActualGaitSpeed+50+50)*SLEEP_COEFF);
 
     //LegIK((int)(230), (int)((2)), (int)(0));
-    LegIK((int)(220), (int)((2)), (int)(20));
+    LegIK((int)(220), (int)((2)), (int)(0));
     DesAnkleAngle = -1.570796;
     CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
     FemurAngle = -IKFemurAngle;
@@ -579,6 +581,46 @@ void indomptableARM::takeCDinTotem(signed int height){
 
     waitMoveEnd();
     //usleep((ActualGaitSpeed+50)*SLEEP_COEFF);
+
+    LegIK((int)(220), (int)(-(52)), (int)(0));
+    DesAnkleAngle = -1.570796;
+    CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+    FemurAngle = -IKFemurAngle;
+    TibiaAngle = (1.570796 - IKTibiaAngle);
+    AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+    RollAngle = -IKCoxaAngle;
+    ActualGaitSpeed = 300;
+    ServoDriver();
+
+    waitMoveEnd();
+
+    LegIK((int)(220), (int)(-(52)), (int)(40));
+    DesAnkleAngle = -1.570796;
+    CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+    FemurAngle = -IKFemurAngle;
+    TibiaAngle = (1.570796 - IKTibiaAngle);
+    AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+    RollAngle = -IKCoxaAngle;
+    ActualGaitSpeed = 300;
+    ServoDriver();
+
+    waitMoveEnd();
+
+    LegIK((int)(220), (int)((2)), (int)(40));
+    DesAnkleAngle = -1.570796;
+    CoxaAngle  = IKCoxaAngle ; //Angle for the basic setup for the front leg   
+    FemurAngle = -IKFemurAngle;
+    TibiaAngle = (1.570796 - IKTibiaAngle);
+    AnkleAngle = -FemurAngle + TibiaAngle + DesAnkleAngle;
+    RollAngle = -IKCoxaAngle;
+    ActualGaitSpeed = 300;
+    ServoDriver();
+
+    waitMoveEnd();
+
+
+
+// Reculage
 
     LegIK((int)(180), (int)(-(52)), (int)(0));
     DesAnkleAngle = -1.570796;
