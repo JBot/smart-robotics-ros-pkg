@@ -19,7 +19,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
-#rosbuild_gensrv()
+rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
@@ -28,7 +28,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
-rosbuild_add_executable(convertROStoROS src/convertROStoROS.cpp)
-rosbuild_add_executable(captureCVtoROS src/captureCVtoROS.cpp)
-rosbuild_add_executable(facedetect src/facedetect.cpp)
-rosbuild_add_executable(colordetect src/colordetect.cpp)
+rosbuild_add_executable(objective_manager src/objective_manager.cpp)

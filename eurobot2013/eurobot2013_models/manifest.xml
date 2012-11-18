@@ -1,0 +1,22 @@
+<package>
+  <description brief="eurobot2013_models">
+
+     eurobot2013_models
+
+  </description>
+  <author>joffrey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/eurobot2013_models</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="tf"/>
+  <depend package="rviz"/>
+  <depend package="robot_state_publisher"/>
+  <depend package="joint_state_publisher"/>
+
+</package>
+
+

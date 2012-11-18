@@ -1,0 +1,104 @@
+<launch>
+
+
+    <!-- !!DUMMY ROBOTS!! -->
+
+    <node pkg="tf" type="static_transform_publisher" name="ballista_base_broadcaster" args="1 1 0 0 0 0 /map /base_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="celoxia_base_broadcaster" args="-1 1 0 0 0 0 /map /celoxia_base_link 100" />
+
+
+
+    <!-- !!MODELS!! -->
+
+    <!-- Load the URDF/Xacro model of our field -->
+    <param name="field_description" command="$(find xacro)/xacro.py '$(find eurobot2013_models)/urdf/field.urdf.xacro'" />
+
+    <!-- Publish the field state -->
+    <node name="field_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+    <param name="publish_frequency" value="20.0"/>
+    <remap from="robot_description" to="field_description" />
+    </node>
+
+    <!-- Load the URDF/Xacro model of our ROBOT1 -->
+    <param name="ballista_description" command="$(find xacro)/xacro.py '$(find eurobot2013_models)/urdf/ballista.urdf.xacro'" />
+
+    <!-- Publish the field state -->
+    <node name="ballista_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+    <param name="publish_frequency" value="20.0"/>
+    <remap from="robot_description" to="ballista_description" />
+    </node>
+
+    
+    <!-- !!EXTERNAL DEVICES!! -->
+
+<!--
+    <node pkg="rosserial_python" type="serial_node.py" name="ballista_serial_odometry" respawn="true" output="screen">
+      <param name="baud" value="115200" />
+      <param name="port" value="/dev/ttyUSB0" />
+    </node>
+
+
+-->
+
+    <node pkg="hokuyo_node" type="hokuyo_node" name="laser_publisher" output="screen">
+        <param name="frame_id" value="base_laser" />
+        <param name="port" value="/dev/ttyACM0" />
+        <!-- <param name="min_ang" value="-1.92" />
+        <param name="max_ang" value="1.95" /> -->
+        <param name="min_ang" value="-1.72" />
+        <param name="max_ang" value="1.75" />
+    </node>
+
+
+
+
+    <!-- !!BALLISTA ARM!! -->
+
+
+
+    <!-- !!BALLISTA NAV!! -->
+
+    <node pkg="tf" type="static_transform_publisher" name="map_base_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+
+    <node pkg="ballista_nav" type="ballista_transform_pose" name="ballista_pose_node" respawn="true" output="screen">
+    </node>
+
+    <node pkg="map_server" type="map_server" name="eurobot_map" args="$(find ballista_nav)/map2013.yaml" respawn="true" output="screen">
+    </node>
+
+    <node pkg="ballista_nav" type="pathwrapper" name="pathwrapper" respawn="true" output="screen">
+    </node>
+
+
+
+
+    <!-- !!CELOXIA NAV!! -->
+
+    <node pkg="celoxia_nav" type="celoxia_transform_pose" name="celoxia_pose_node" respawn="true" output="screen">
+    </node>
+
+
+
+    <!-- !!BALLISTA AI!! -->
+
+    <node pkg="ballista_ai" type="objective_manager" name="objective_manager" respawn="true" output="screen">
+    </node>
+
+
+    <!-- !!BALLISTA VISION!! -->
+
+    <node pkg="uvc_camera" type="camera_node" name="uvc_camera" output="screen">
+    <param name="width" type="int" value="640" />
+    <param name="height" type="int" value="480" />
+    <param name="fps" type="int" value="30" />
+    <param name="frame" type="string" value="wide_stereo" />
+    <param name="device" type="string" value="/dev/video0" />
+    <param name="skip_frames" type="int" value="0" />
+    </node>
+
+    <node pkg="ballista_vision" type="ballista_vision_ros" name="vision" respawn="true" output="screen">
+    </node>
+
+
+
+</launch>
