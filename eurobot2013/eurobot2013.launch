@@ -84,6 +84,12 @@
     <node pkg="ballista_ai" type="objective_manager" name="objective_manager" respawn="true" output="screen">
     </node>
 
+    <node pkg="ballista_ai" type="trajectory_wrapper_ballista" name="trajectory_wrapper_ballista" respawn="true" output="screen">
+    </node>
+
+    <node pkg="ballista_ai" type="timer_manager" name="timer_manager" respawn="true" output="screen">
+    </node>
+
 
     <!-- !!BALLISTA VISION!! -->
 

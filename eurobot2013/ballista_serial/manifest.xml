@@ -18,6 +18,7 @@
   <depend package="tf"/>
   <depend package="move_base_msgs"/>
   <depend package="actionlib"/>
+  <depend package="indomptable_nav"/>
 
 </package>
 

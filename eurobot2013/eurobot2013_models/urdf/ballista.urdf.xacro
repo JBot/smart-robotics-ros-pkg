@@ -209,7 +209,7 @@
  	<link name="world" />
  	-->
 
-	<xacro:my_box name="base_link" lwh="0.24 0.32 0.003" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="base_link" lwh="0.24 0.3 0.003" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_box>
 	
@@ -221,15 +221,23 @@
 		<xacro:black1 />
 	</xacro:my_cylinder>
 	
-	<xacro:my_box name="first_level" lwh="0.24 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="first_level" lwh="0.24 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-	<xacro:my_box name="netbook_level" lwh="0.2 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="second_level" lwh="0.12 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
-	<xacro:my_box name="top_level" lwh="0.24 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+	<xacro:my_box name="third_level" lwh="0.12 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+	<xacro:my_box name="netbook_level" lwh="0.2 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+	<xacro:my_box name="top_level" lwh="0.24 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
                 <xacro:grey2 />
         </xacro:my_box>
 
@@ -253,8 +261,8 @@
 	
  	<!-- ============================   Arms   ============================ -->
 
-
 	<xacro:macro name="arm" params="side reflect">
+    <!--
 	
                 <xacro:my_box name="${side}_shoulder_roll_link" lwh="0.05 0.03 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
@@ -292,61 +300,8 @@
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-
-
-<!--
-		<xacro:my_box name="${side}_shoulder_link" lwh="0.025 0.04 0.05" xyz="0 ${reflect*0.02} 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
-			<xacro:bracket_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_shoulder_pan_link" lwh="0.03 0.058 0.03" xyz="0 ${reflect*0.012} 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-			<xacro:ax12_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_shoulder_lift_link" lwh="0.03 0.03 0.052" xyz="0 ${reflect*0.009} -0.018" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-			<xacro:ax12_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_upper_arm_bracket_link" lwh="0.03 0.03 0.005" xyz="0 0 0" rpy="0 0 0" mass="0.02" material="Gazebo/WhiteEmissive">
-			<xacro:bracket_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_arm_roll_link" lwh="0.05 0.03 0.03" xyz="-0.013 ${reflect*0.009} 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-			<xacro:ax12_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_upper_elbow_bracket_link" lwh="0.03 0.022 0.005" xyz="0 0 0" rpy="0 0 0" mass="0.02" material="Gazebo/WhiteEmissive">
-			<xacro:bracket_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_elbow_servo_link" lwh="0.03 0.03 0.05" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-			<xacro:ax12_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_elbow_link" lwh="0.05 0.025 0.038" xyz="0 0 -0.021" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
-			<xacro:bracket_color />
-		</xacro:my_box>
-	
-		<xacro:my_cylinder name="${side}_lower_arm_link" l="0.092" r="0.006" xyz="0.0015 0 -0.048" rpy="0 0 0" mass="0.2" material="Gazebo/Chrome">
-			<xacro:grey1 />
-		</xacro:my_cylinder>
-		
-		<xacro:my_box name="${side}_wrist_bracket_link" lwh="0.05 0.025 0.038" xyz="0 0 -0.021" rpy="0 0 0" mass="0.02" material="Gazebo/WhiteEmissive">
-			<xacro:bracket_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_wrist_link" lwh="0.03 0.03 0.05" xyz="0 0 -0.016" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
-			<xacro:ax12_color />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_hand_link" lwh="0.03 0.01 0.064" xyz="0 0 -0.032" rpy="0 0 0" mass="0.1" material="Gazebo/WhiteEmissive">
-			<xacro:grey1 />
-		</xacro:my_box>
-		
-		<xacro:my_box name="${side}_finger_link" lwh="0.01 0.01 0.005" xyz="0 0 0" rpy="0 0 0" mass="0.001" material="Gazebo/WhiteEmissive">
-			<xacro:black1 />
-		</xacro:my_box>
 -->
+
 	</xacro:macro>
 	
 	<xacro:arm side="left" reflect="1" />
@@ -355,22 +310,25 @@
 	
 	<!-- =================== Joint Definitions ==================== -->
 	
-	<!--
-	<joint name="base_world_link" type="continuous">
-    	<parent link="world"/>
-    	<child link="base_link"/>
-    	<axis xyz="0 0 0"/>
-    	<origin rpy="0 0 0" xyz="0 0 0"/>
-    	<dynamics damping="0.05"/>
-  	</joint>
-  	-->
 
 	<joint name="first_level_joint" type="fixed">
     	<parent link="base_link" />
     	<child link="first_level" />
-    	<origin xyz="0 0 0.1" rpy="0 0 0" />
+    	<origin xyz="0 0 0.011" rpy="0 0 0" />
 	</joint>
 	
+	<joint name="second_level_joint" type="fixed">
+    	<parent link="first_level" />
+    	<child link="second_level" />
+    	<origin xyz="0.06 0 0.07" rpy="0 0 0" />
+	</joint>
+
+	<joint name="third_level_joint" type="fixed">
+    	<parent link="first_level" />
+    	<child link="third_level" />
+    	<origin xyz="0.06 0 0.17" rpy="0 0 0" />
+	</joint>
+
 	<joint name="netbook_level_joint" type="fixed">
     	<parent link="base_link" />
     	<child link="netbook_level" />
@@ -384,9 +342,9 @@
 	</joint>
 	
 	<joint name="base_laser_bottom_joint" type="fixed">
-    	<parent link="base_link" />
+    	<parent link="second_level" />
     	<child link="base_laser_bottom" />
-    	<origin xyz="0.081 0 0.022" rpy="0 0 -0.02" />
+    	<origin xyz="0.03 0 0.022" rpy="0 0 -0.02" />
 	</joint>
 	
 	<joint name="base_laser_joint" type="fixed">
@@ -410,16 +368,17 @@
         <joint name="left_panel_joint" type="fixed">
         <parent link="base_link" />
         <child link="left_panel" />
-        <origin xyz="0 0.155 0.17" rpy="0 0 0" />
+        <origin xyz="0 0.15 0.17" rpy="0 0 0" />
         </joint>
 
         <joint name="right_panel_joint" type="fixed">
         <parent link="base_link" />
         <child link="right_panel" />
-        <origin xyz="0 -0.155 0.17" rpy="0 0 0" />
+        <origin xyz="0 -0.15 0.17" rpy="0 0 0" />
         </joint>
 
 
+<!--        
 
 
         <joint name="left_shoulder_joint" type="fixed">
@@ -454,23 +413,6 @@
         <dynamics damping="0.0"/>
         </joint>
 
-<!--
-        <joint name="left_shoulder_joint2" type="fixed">
-        <parent link="left_shoulder_link" />
-        <child link="left_shoulder_lift_link" />
-        <origin xyz="0.051 0 0" rpy="0 0 0" />
-        <axis xyz="1 0 0" />
-        </joint>
-
-        <joint name="left_shoulder_lift_joint" type="revolute">
-        <parent link="left_shoulder_lift_link" />
-        <child link="left_shoulder_link2" />
-        <origin xyz="0.01 0 0" rpy="0 0 0" />
-        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
-        <axis xyz="0 1 0" />
-        <dynamics damping="0.0"/>
-        </joint>
--->
         <joint name="left_elbow_servo_joint" type="fixed">
         <parent link="left_shoulder_lift_link" />
         <child link="left_elbow_servo_link" />
@@ -584,6 +526,7 @@
         </joint>
 
 
+-->
 
 <!--        
  	<joint name="left_shoulder_joint" type="fixed">
