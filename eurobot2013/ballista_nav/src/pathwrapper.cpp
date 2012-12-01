@@ -125,7 +125,7 @@ Pathwrapper::Pathwrapper()
 
     pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/ballista_goal", 1);
     poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);
-    arduGoal_pub = nh.advertise < ballista_nav::ArduGoal > ("/ballista_ardugoal", 1);
+    arduGoal_pub = nh.advertise < ballista_nav::ArduGoal > ("/ardugoal", 1);
 
     pathdone_pub = nh.advertise < std_msgs::Empty > ("/path_done", 50);
 

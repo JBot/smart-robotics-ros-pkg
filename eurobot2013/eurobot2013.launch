@@ -3,7 +3,9 @@
 
     <!-- !!DUMMY ROBOTS!! -->
 
+<!--
     <node pkg="tf" type="static_transform_publisher" name="ballista_base_broadcaster" args="1 1 0 0 0 0 /map /base_link 100" />
+-->
     <node pkg="tf" type="static_transform_publisher" name="celoxia_base_broadcaster" args="-1 1 0 0 0 0 /map /celoxia_base_link 100" />
 
 
