@@ -68,6 +68,30 @@ class BallistaSerial {
         ros::Publisher ardugoal_out;
         ros::Subscriber ardugoal_in;
 
+        ros::Subscriber rightfinger;
+        ros::Publisher rightfinger_out;
+        ros::Subscriber rightfinger_in;
+
+        ros::Subscriber leftfinger;
+        ros::Publisher leftfinger_out;
+        ros::Subscriber leftfinger_in;
+
+        ros::Subscriber rightuppump;
+        ros::Publisher rightuppump_out;
+        ros::Subscriber rightuppump_in;
+
+        ros::Subscriber rightdownpump;
+        ros::Publisher rightdownpump_out;
+        ros::Subscriber rightdownpump_in;
+
+        ros::Subscriber leftuppump;
+        ros::Publisher leftuppump_out;
+        ros::Subscriber leftuppump_in;
+
+        ros::Subscriber leftdownpump;
+        ros::Publisher leftdownpump_out;
+        ros::Subscriber leftdownpump_in;
+
 
 
 
@@ -105,6 +129,28 @@ class BallistaSerial {
         void ardugoal_cb(const indomptable_nav::ArduGoal::ConstPtr & my_var);
         void ardugoal_in_cb(const indomptable_nav::ArduGoal::ConstPtr & my_var);
 
+        void rightfinger_cb(const std_msgs::Int32::ConstPtr & my_var);
+        void rightfinger_in_cb(const std_msgs::Int32::ConstPtr & my_var);
+
+        void leftfinger_cb(const std_msgs::Int32::ConstPtr & my_var);
+        void leftfinger_in_cb(const std_msgs::Int32::ConstPtr & my_var);
+
+        void rightuppump_cb(const std_msgs::Int32::ConstPtr & my_var);
+        void rightuppump_in_cb(const std_msgs::Int32::ConstPtr & my_var);
+
+        void rightdownpump_cb(const std_msgs::Int32::ConstPtr & my_var);
+        void rightdownpump_in_cb(const std_msgs::Int32::ConstPtr & my_var);
+
+        void leftuppump_cb(const std_msgs::Int32::ConstPtr & my_var);
+        void leftuppump_in_cb(const std_msgs::Int32::ConstPtr & my_var);
+
+        void leftdownpump_cb(const std_msgs::Int32::ConstPtr & my_var);
+        void leftdownpump_in_cb(const std_msgs::Int32::ConstPtr & my_var);
+
+
+
+
+
         ros::NodeHandle nh;
 
     
@@ -125,6 +171,24 @@ class BallistaSerial {
 
         indomptable_nav::ArduGoal ardugoal_value;
         int ardugoal_flag;
+
+        std_msgs::Int32 rightfinger_value;
+        int rightfinger_flag;
+
+        std_msgs::Int32 leftfinger_value;
+        int leftfinger_flag;
+
+        std_msgs::Int32 rightuppump_value;
+        int rightuppump_flag;
+
+        std_msgs::Int32 rightdownpump_value;
+        int rightdownpump_flag;
+
+        std_msgs::Int32 leftuppump_value;
+        int leftuppump_flag;
+
+        std_msgs::Int32 leftdownpump_value;
+        int leftdownpump_flag;
 
 
 
@@ -157,12 +221,44 @@ BallistaSerial::BallistaSerial()
     ardugoal_out = nh.advertise < indomptable_nav::ArduGoal > ("/ardugoal_out", 2);
     ardugoal_in = nh.subscribe < indomptable_nav::ArduGoal > ("/ardugoal_in", 2, &BallistaSerial::ardugoal_in_cb, this);
 
+    rightfinger = nh.subscribe < std_msgs::Int32 > ("/right_finger", 2, &BallistaSerial::rightfinger_cb, this);
+    rightfinger_out = nh.advertise < std_msgs::Int32 > ("/right_finger_out", 2);
+    rightfinger_in = nh.subscribe < std_msgs::Int32 > ("/right_finger_in", 2, &BallistaSerial::rightfinger_in_cb, this);
+
+    leftfinger = nh.subscribe < std_msgs::Int32 > ("/left_finger", 2, &BallistaSerial::leftfinger_cb, this);
+    leftfinger_out = nh.advertise < std_msgs::Int32 > ("/left_finger_out", 2);
+    leftfinger_in = nh.subscribe < std_msgs::Int32 > ("/left_finger_in", 2, &BallistaSerial::leftfinger_in_cb, this);
+
+    rightuppump = nh.subscribe < std_msgs::Int32 > ("/right_up_pump", 2, &BallistaSerial::rightuppump_cb, this);
+    rightuppump_out = nh.advertise < std_msgs::Int32 > ("/right_up_pump_out", 2);
+    rightuppump_in = nh.subscribe < std_msgs::Int32 > ("/right_up_pump_in", 2, &BallistaSerial::rightuppump_in_cb, this);
+
+    rightdownpump = nh.subscribe < std_msgs::Int32 > ("/right_down_pump", 2, &BallistaSerial::rightdownpump_cb, this);
+    rightdownpump_out = nh.advertise < std_msgs::Int32 > ("/right_down_pump_out", 2);
+    rightdownpump_in = nh.subscribe < std_msgs::Int32 > ("/right_down_pump_in", 2, &BallistaSerial::rightdownpump_in_cb, this);
+
+    leftuppump = nh.subscribe < std_msgs::Int32 > ("/left_up_pump", 2, &BallistaSerial::leftuppump_cb, this);
+    leftuppump_out = nh.advertise < std_msgs::Int32 > ("/left_up_pump_out", 2);
+    leftuppump_in = nh.subscribe < std_msgs::Int32 > ("/left_up_pump_in", 2, &BallistaSerial::leftuppump_in_cb, this);
+
+    leftdownpump = nh.subscribe < std_msgs::Int32 > ("/left_down_pump", 2, &BallistaSerial::leftdownpump_cb, this);
+    leftdownpump_out = nh.advertise < std_msgs::Int32 > ("/left_down_pump_out", 2);
+    leftdownpump_in = nh.subscribe < std_msgs::Int32 > ("/left_down_pump_in", 2, &BallistaSerial::leftdownpump_in_cb, this);
+
+
+
     cmd_vel_flag = 1;
     enable_motors_flag = 1;
     color_flag = 1;
     alpha_flag = 1;
     delta_flag = 1;
     ardugoal_flag = 1;
+    rightfinger_flag = 1;
+    leftfinger_flag = 1;
+    rightuppump_flag = 1;
+    rightdownpump_flag = 1;
+    leftuppump_flag = 1;
+    leftdownpump_flag = 1;
 
 
 
@@ -451,9 +547,7 @@ void BallistaSerial::delta_cb(const std_msgs::Int32::ConstPtr & my_var)
             usleep(10000);
             ros::spinOnce();
         }
-
     }
-
 }
 
 void BallistaSerial::delta_in_cb(const std_msgs::Int32::ConstPtr & my_var)
@@ -533,8 +627,347 @@ void BallistaSerial::ardugoal_in_cb(const indomptable_nav::ArduGoal::ConstPtr & 
 }
 
 
+void BallistaSerial::rightfinger_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
 
+    if(rightfinger_flag == 0) {
+        ROS_ERROR("Cant send data");
+        rightfinger_value.data = my_var->data;
 
+    }
+    else {
+        ROS_ERROR("Receiving rightfinger : %d", my_var->data);
+        rightfinger_value.data = my_var->data;
+        rightfinger_flag = 0;
+        rightfinger_out.publish(rightfinger_value);
+
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        while( rightfinger_flag == 0 ){
+            rightfinger_out.publish(rightfinger_value);
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+        }
+    }
+}   
+
+void BallistaSerial::rightfinger_in_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+    ROS_ERROR("Receiving rightfinger_in : %d ", my_var->data);
+    if( ( fabs(my_var->data - rightfinger_value.data) < 0.002 ) ) {
+        ROS_ERROR("Receive MATCH");
+        rightfinger_flag = 1;
+    }
+}
+
+void BallistaSerial::leftfinger_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+
+    if(leftfinger_flag == 0) {
+        ROS_ERROR("Cant send data");
+        leftfinger_value.data = my_var->data;
+
+    }
+    else {
+        ROS_ERROR("Receiving leftfinger : %d", my_var->data);
+        leftfinger_value.data = my_var->data;
+        leftfinger_flag = 0;
+        leftfinger_out.publish(leftfinger_value);
+
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        while( leftfinger_flag == 0 ){
+            leftfinger_out.publish(leftfinger_value);
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+        }
+    }
+}   
+
+void BallistaSerial::leftfinger_in_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+    ROS_ERROR("Receiving leftfinger_in : %d ", my_var->data);
+    if( ( fabs(my_var->data - leftfinger_value.data) < 0.002 ) ) {
+        ROS_ERROR("Receive MATCH");
+        leftfinger_flag = 1;
+    }
+}
+
+void BallistaSerial::rightuppump_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+
+    if(rightuppump_flag == 0) {
+        ROS_ERROR("Cant send data");
+        rightuppump_value.data = my_var->data;
+
+    }
+    else {
+        ROS_ERROR("Receiving rightuppump : %d", my_var->data);
+        rightuppump_value.data = my_var->data;
+        rightuppump_flag = 0;
+        rightuppump_out.publish(rightuppump_value);
+
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        while( rightuppump_flag == 0 ){
+            rightuppump_out.publish(rightuppump_value);
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+        }
+    }
+}   
+
+void BallistaSerial::rightuppump_in_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+    ROS_ERROR("Receiving rightuppump_in : %d ", my_var->data);
+    if( ( fabs(my_var->data - rightuppump_value.data) < 0.002 ) ) {
+        ROS_ERROR("Receive MATCH");
+        rightuppump_flag = 1;
+    }
+}
+
+void BallistaSerial::rightdownpump_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+
+    if(rightdownpump_flag == 0) {
+        ROS_ERROR("Cant send data");
+        rightdownpump_value.data = my_var->data;
+
+    }
+    else {
+        ROS_ERROR("Receiving rightdownpump : %d", my_var->data);
+        rightdownpump_value.data = my_var->data;
+        rightdownpump_flag = 0;
+        rightdownpump_out.publish(rightdownpump_value);
+
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        while( rightdownpump_flag == 0 ){
+            rightdownpump_out.publish(rightdownpump_value);
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+        }
+    }
+}   
+
+void BallistaSerial::rightdownpump_in_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+    ROS_ERROR("Receiving rightdownpump_in : %d ", my_var->data);
+    if( ( fabs(my_var->data - rightdownpump_value.data) < 0.002 ) ) {
+        ROS_ERROR("Receive MATCH");
+        rightdownpump_flag = 1;
+    }
+}
+
+void BallistaSerial::leftuppump_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+
+    if(leftuppump_flag == 0) {
+        ROS_ERROR("Cant send data");
+        leftuppump_value.data = my_var->data;
+
+    }
+    else {
+        ROS_ERROR("Receiving leftuppump : %d", my_var->data);
+        leftuppump_value.data = my_var->data;
+        leftuppump_flag = 0;
+        leftuppump_out.publish(leftuppump_value);
+
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        while( leftuppump_flag == 0 ){
+            leftuppump_out.publish(leftuppump_value);
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+        }
+    }
+}   
+
+void BallistaSerial::leftuppump_in_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+    ROS_ERROR("Receiving leftuppump_in : %d ", my_var->data);
+    if( ( fabs(my_var->data - leftuppump_value.data) < 0.002 ) ) {
+        ROS_ERROR("Receive MATCH");
+        leftuppump_flag = 1;
+    }
+}
+
+void BallistaSerial::leftdownpump_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+
+    if(leftdownpump_flag == 0) {
+        ROS_ERROR("Cant send data");
+        leftdownpump_value.data = my_var->data;
+
+    }
+    else {
+        ROS_ERROR("Receiving leftdownpump : %d", my_var->data);
+        leftdownpump_value.data = my_var->data;
+        leftdownpump_flag = 0;
+        leftdownpump_out.publish(leftdownpump_value);
+
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        usleep(10000);
+        ros::spinOnce();
+        while( leftdownpump_flag == 0 ){
+            leftdownpump_out.publish(leftdownpump_value);
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+            usleep(10000);
+            ros::spinOnce();
+        }
+    }
+}   
+
+void BallistaSerial::leftdownpump_in_cb(const std_msgs::Int32::ConstPtr & my_var)
+{
+    ROS_ERROR("Receiving leftdownpump_in : %d ", my_var->data);
+    if( ( fabs(my_var->data - leftdownpump_value.data) < 0.002 ) ) {
+        ROS_ERROR("Receive MATCH");
+        leftdownpump_flag = 1;
+    }
+}
 
 
 

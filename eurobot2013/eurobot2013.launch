@@ -62,10 +62,13 @@
 
     <node pkg="tf" type="static_transform_publisher" name="map_base_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
 
-    <node pkg="ballista_nav" type="ballista_transform_pose" name="ballista_pose_node" respawn="true" output="screen">
+    <node pkg="map_server" type="map_server" name="eurobot_map" args="$(find ballista_nav)/map2013.yaml" respawn="true" output="screen">
     </node>
 
-    <node pkg="map_server" type="map_server" name="eurobot_map" args="$(find ballista_nav)/map2013.yaml" respawn="true" output="screen">
+    <node pkg="eurobot_obstacles" type="pc_eurobot_obstacles" name="eurobot_obstacles" respawn="true" output="screen">
+    </node>
+
+    <node pkg="ballista_nav" type="ballista_transform_pose" name="ballista_pose_node" respawn="true" output="screen">
     </node>
 
     <node pkg="ballista_nav" type="pathwrapper" name="pathwrapper" respawn="true" output="screen">
@@ -92,6 +95,8 @@
     <node pkg="ballista_ai" type="timer_manager" name="timer_manager" respawn="true" output="screen">
     </node>
 
+    <node pkg="ballista_ai" type="ballista_main_ai" name="ballista_main_ai" respawn="true" output="screen">
+    </node>
 
     <!-- !!BALLISTA VISION!! -->
 
@@ -106,6 +111,15 @@
 
     <node pkg="ballista_vision" type="ballista_vision_ros" name="vision" respawn="true" output="screen">
     </node>
+
+
+    <!-- !!BALLISTA VISION!! -->
+
+    <node pkg="ballista_serial" type="ballista_serial" name="ballista_serial" respawn="true" output="screen">
+    </node>
+
+
+
 
 
 
