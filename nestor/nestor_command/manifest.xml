@@ -1,0 +1,19 @@
+<package>
+  <description brief="nestor_command">
+
+     nestor_command
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nestor_command</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="rostweet_msgs"/>
+
+</package>
+
+
