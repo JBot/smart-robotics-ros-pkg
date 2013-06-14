@@ -1,0 +1,8 @@
+<launch>
+  <master auto="start"/>
+
+  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="NESTOR_pathplanner" output="screen">
+
+    <rosparam file="$(find common_smart_nav)/launch/NESTOR_params.yaml" command="load" />
+  </node>
+</launch>
