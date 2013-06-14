@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node pkg="tf" type="static_transform_publisher" name="link_odom_broadcaster" args="0.0 0 0.0 0 0 0 map odom 100"/> 
+
+  <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0.05 0 0 0 odom base_link 100"/> 
+  <node pkg="tf" type="static_transform_publisher" name="link_laser_neato_broadcaster" args="0.0 0 0.1 0 0 0 base_link neato_laser 100"/> 
+ 
+  <node pkg="tf" type="static_transform_publisher" name="link_rotation_laser_neato_broadcaster" args="0.0 0 0.1 0 0 0 rotation_link scanner_link 100"/> 
+
+
+</launch>
+  
+  

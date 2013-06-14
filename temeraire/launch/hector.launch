@@ -7,7 +7,8 @@
     <param name="map_frame" value="map" />
     <param name="base_frame" value="odom" />
     <param name="odom_frame" value="odom" />
-    
+    <remap from="/scan" to="/TEMERAIRE/laser_scan"/> 
+   
     <!-- Tf use -->
     <param name="use_tf_scan_transformation" value="true"/>
     <param name="use_tf_pose_start_estimate" value="false"/>

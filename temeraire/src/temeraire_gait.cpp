@@ -152,8 +152,8 @@ class TemeraireGait {
 		ros::Publisher servo_pub;
 		ros::Publisher speed_pub;
 
-
-
+		tf::TransformBroadcaster br;
+		tf::Transform transform;
 
 		signed int ARMCoxaAngle;   
 		signed int ARMFemurAngle;
@@ -382,7 +382,9 @@ TemeraireGait::TemeraireGait()
 	servo_pub = nh.advertise < temeraire::SSC32_Servo > ("/TEMERAIRE/ssc32_comm", 3);
 	speed_pub = nh.advertise < std_msgs::Int32 > ("/TEMERAIRE/ssc32_speed", 3);
 
-
+	transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+	transform.setRotation( tf::Quaternion(0.0, 0.0, 0.0) );
+	br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "base_link", "rotation_link") );
 
 
 
@@ -1527,6 +1529,13 @@ void TemeraireGait::computeNextStep(void)
 	ssc32_servo.position = vector_pose;
 
 	servo_pub.publish(ssc32_servo);
+
+
+        transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+        transform.setRotation( tf::Quaternion(BodyRotX*3.14159/180.0, BodyRotZ*3.14159/180.0, 0.0) );
+        br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "base_link", "rotation_link") );
+
+
 
 }
 
