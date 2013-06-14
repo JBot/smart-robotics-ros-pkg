@@ -54,279 +54,246 @@
 #include <list>
 
 
+#define STOP 	0
+#define PAUSE	1
+#define RUN	2
+
+
 class TrajectoryManager {
-  public:
-    TrajectoryManager(tf::TransformListener& tf);
-    void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
-    void recompute_path(void);
+	public:
+		TrajectoryManager(tf::TransformListener& tf);
+		~TrajectoryManager();
+		void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
+		void recompute_path(void);
 
-    // Goal suscriber
-    ros::Subscriber goal_sub_;
+		// Goal suscriber
+		ros::Subscriber goal_sub_;
+		ros::Subscriber pathdone_sub_;
+		ros::Subscriber computepath_sub_;
+		ros::Subscriber pause_sub_;
+		ros::Subscriber resume_sub_;
 
-    ros::Publisher path_pub;
+		ros::Publisher path_pub;
+		ros::Publisher pathimpossible_pub;
 
-    ros::Subscriber pathdone_sub_;
-    ros::Publisher pathimpossible_pub;
-     int cpt_pathimp;
-  private:
-    void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
-    void pathDoneCallback(const std_msgs::Empty::ConstPtr & pose);
-     ros::NodeHandle nh;
+		int cpt_pathimp;
+	private:
+		void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+		void pathDoneCallback(const std_msgs::Empty::ConstPtr & pose);
+		void computePathCallback(const std_msgs::Empty::ConstPtr & pose);
+		void pauseCallback(const std_msgs::Empty::ConstPtr & pose);
+		void resumeCallback(const std_msgs::Empty::ConstPtr & pose);
 
-     int status; // 0 = pause ; 1 = checking path
-     int cpt;
-     nav_msgs::Path my_path;
-     geometry_msgs::PoseStamped final_pose;
+		void computePath(void);
+		void planThread(void);
+		void publishPath(void);
 
-     tf::TransformListener& tf_;
-     costmap_2d::Costmap2DROS* planner_costmap_;
-     //nav_core::BaseGlobalPlanner planner_;
-     navfn::NavfnROS* planner_;
-     //boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_;
-     //pluginlib::ClassLoader<nav_core::BaseGlobalPlanner> bgp_loader_;
+		ros::NodeHandle nh;
+
+		int status; // STOP PAUSE RUN
+		int cpt;
+
+		nav_msgs::Path my_path;
+		geometry_msgs::PoseStamped final_pose;
+
+		boost::thread* planner_thread_;
+
+		tf::TransformListener& tf_;
+		costmap_2d::Costmap2DROS* planner_costmap_;
+		//nav_core::BaseGlobalPlanner planner_;
+		navfn::NavfnROS* planner_;
+		//boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_;
+		//pluginlib::ClassLoader<nav_core::BaseGlobalPlanner> bgp_loader_;
 
 
 };
 
 TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
-tf_(tf)
+	tf_(tf)
 {
 
-    status = 0;	
-    cpt = 0;
-    cpt_pathimp = 0;
-    // Goal suscriber
-    goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/goal", 20, &TrajectoryManager::goalCallback, this);
+	status = 0;	
+	cpt = 0;
+	cpt_pathimp = 0;
+	// Goal suscriber
+	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/goal", 2, &TrajectoryManager::goalCallback, this);
 
-    path_pub = nh.advertise < nav_msgs::Path > ("/ROBOT/plan", 50);
+	path_pub = nh.advertise < nav_msgs::Path > ("/ROBOT/plan", 5);
 
-    pathdone_sub_ = nh.subscribe < std_msgs::Empty > ("/path_done", 20, &TrajectoryManager::pathDoneCallback, this);
-    pathimpossible_pub = nh.advertise < std_msgs::Empty > ("/goal_unreachable", 20);
+	pathdone_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/path_done", 2, &TrajectoryManager::pathDoneCallback, this);
+	computepath_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/compute_path", 2, &TrajectoryManager::computePathCallback, this);
+	pause_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/pause", 2, &TrajectoryManager::pauseCallback, this);
+	resume_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/resume", 2, &TrajectoryManager::resumeCallback, this);
 
-    my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
+	pathimpossible_pub = nh.advertise < std_msgs::Empty > ("/goal_unreachable", 2);
 
-    if (my_path.poses.std::vector < geometry_msgs::PoseStamped >::size() >
-        (my_path.poses.std::vector < geometry_msgs::PoseStamped >::max_size() - 2)) {
-        my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
-    }
+	my_path.poses = std::vector < geometry_msgs::PoseStamped > ();
 
-    final_pose.pose.position.x = 0.0;
-    final_pose.pose.position.y = 0.14;
-    final_pose.pose.position.z = 0.0;
-    //final_pose.theta = 0.0;
+	if (my_path.poses.std::vector < geometry_msgs::PoseStamped >::size() >
+			(my_path.poses.std::vector < geometry_msgs::PoseStamped >::max_size() - 2)) {
+		my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
+	}
 
-    //tf_ = tf;
+	final_pose.pose.position.x = 0.0;
+	final_pose.pose.position.y = 0.14;
+	final_pose.pose.position.z = 0.0;
+	//final_pose.theta = 0.0;
 
-    //create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
-    planner_costmap_ = new costmap_2d::Costmap2DROS("NESTOR_costmap", tf_);
-    planner_costmap_->pause();
+	//tf_ = tf;
 
-    //initialize the global planner
-    //bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner");
-    planner_ = new navfn::NavfnROS("NESTOR_planner", planner_costmap_);
-    //planner->initialize("NESTOR_planner", planner_costmap);
+	//create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
+	planner_costmap_ = new costmap_2d::Costmap2DROS("NESTOR_costmap", tf_);
+	planner_costmap_->pause();
 
-    planner_costmap_->start();    
+	//initialize the global planner
+	//bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner");
+	planner_ = new navfn::NavfnROS("NESTOR_planner", planner_costmap_);
+	//planner->initialize("NESTOR_planner", planner_costmap);
 
+	planner_costmap_->start();    
 
-
-
-
-
+	status = PAUSE;
 
 
+	planner_thread_ = new boost::thread(boost::bind(&TrajectoryManager::planThread, this));
+
+
+
+
+}
+
+TrajectoryManager::~TrajectoryManager()
+{
+
+	planner_thread_->interrupt();
+	planner_thread_->join();
 
 }
 
 void TrajectoryManager::recompute_path(void)
 {
-/*
-if( (status == 1) ){
-   if(cpt > 20) { // 30 // 40 // 50
-    nav_msgs::GetPlan tmp_plan;
-
-    common_smart_nav::GetRobotPose tmp_pose;
-
-
-
-    if (get_pose.call(tmp_pose))
-    {  
-            //ROS_INFO("Sum: %ld", get_path.response.plan);
-        tmp_plan.request.start = tmp_pose.response.pose;
-    }   
-    else
-    {
-            ROS_ERROR("Failed to call service GetRobotPose");
-    }
-
-    if( sqrt( pow(final_pose.pose.position.x - tmp_pose.response.pose.pose.position.x, 2) + pow(final_pose.pose.position.y - tmp_pose.response.pose.pose.position.y, 2) ) < 0.22 ) {
-
-	status = 0;
-
-    }
-    else {
-	    //tmp_plan.request.start = 90;
-	    tmp_plan.request.goal = final_pose;
-	    tmp_plan.request.tolerance = 0.01;
-	    if (get_path.call(tmp_plan))
-	    {  
-
-		    //ROS_INFO("Sum: %ld", get_path.response.plan);
-		    if(!(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty())) {
-			    tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::pop_back();
-			    tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::push_back(final_pose);
-		    }
-		    path_pub.publish(tmp_plan.response.plan);
-
-		    if(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty()) {
-			    // Goal unreachable
-			    std_msgs::Empty empty;
-			    pathimpossible_pub.publish(empty);
-			    if(cpt_pathimp == 3) {
-			    	status = 0;
-				cpt_pathimp = 0;
-			    }
-			    else  {
-				status = 1;
-				cpt_pathimp++;
-			    }
-			    return;
-		    }
-		    else {
-			cpt_pathimp = 0;
-
-		    }
-
-	    }   
-	    else
-	    {
-		    ROS_ERROR("Failed to call service GetPlan");
-	    }
-
-
-	    ROS_INFO("Trajectory manager : Goal RE-sent.");
-    }
-    cpt = 0;
-
-  }
-  else {
-    cpt++;
-  }
-}
-*/
 
 }
 
 void TrajectoryManager::rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose)
 {
-    // Assuming the angles are in radians.
-    double c1 = cos(heading / 2);
-    double s1 = sin(heading / 2);
-    double c2 = cos(attitude / 2);
+	// Assuming the angles are in radians.
+	double c1 = cos(heading / 2);
+	double s1 = sin(heading / 2);
+	double c2 = cos(attitude / 2);
 
-    double s2 = sin(attitude / 2);
-    double c3 = cos(bank / 2);
-    double s3 = sin(bank / 2);
-    double c1c2 = c1 * c2;
-    double s1s2 = s1 * s2;
+	double s2 = sin(attitude / 2);
+	double c3 = cos(bank / 2);
+	double s3 = sin(bank / 2);
+	double c1c2 = c1 * c2;
+	double s1s2 = s1 * s2;
 
-    pose->pose.orientation.w = c1c2 * c3 - s1s2 * s3;
-    pose->pose.orientation.x = c1c2 * s3 + s1s2 * c3;
-    pose->pose.orientation.y = s1 * c2 * c3 + c1 * s2 * s3;
-    pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
+	pose->pose.orientation.w = c1c2 * c3 - s1s2 * s3;
+	pose->pose.orientation.x = c1c2 * s3 + s1s2 * c3;
+	pose->pose.orientation.y = s1 * c2 * c3 + c1 * s2 * s3;
+	pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
 }
 
 void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
 {
-  status = 0;
+	status = PAUSE;
+}
+
+void TrajectoryManager::pauseCallback(const std_msgs::Empty::ConstPtr & pose)
+{
+	status = STOP;
+	planner_costmap_->pause();
+}
+
+void TrajectoryManager::resumeCallback(const std_msgs::Empty::ConstPtr & pose)
+{
+	status = PAUSE;
+	planner_costmap_->resume();
+}
+
+void TrajectoryManager::computePathCallback(const std_msgs::Empty::ConstPtr & pose)
+{
+
+	computePath();
+	publishPath();
+	status = RUN;
 }
 
 void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
-    final_pose = *pose;
-    std::vector<geometry_msgs::PoseStamped> global_plan;
-    nav_msgs::Path tmp_path;
+	final_pose = *pose;
+
+	computePath();
+	publishPath();
+
+	status = RUN;
+}
+
+void TrajectoryManager::computePath(void)
+{
+	std::vector<geometry_msgs::PoseStamped> global_plan;
+	nav_msgs::Path tmp_path;
 
 
-    //make sure we have a costmap for our planner
-    if(planner_costmap_ == NULL){
-      ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
-      //return false;
-    }
+	//make sure we have a costmap for our planner
+	if(planner_costmap_ == NULL){
+		ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
+		//return false;
+	}
 
-    tf::Stamped<tf::Pose> global_pose;
-    if(!planner_costmap_->getRobotPose(global_pose)){
-      ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
-      //return false;
-    }
+	tf::Stamped<tf::Pose> global_pose;
+	if(!planner_costmap_->getRobotPose(global_pose)){
+		ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
+		//return false;
+	}
 
-    geometry_msgs::PoseStamped start;
-    //if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
-    //if(req.start.header.frame_id == "")
-      tf::poseStampedTFToMsg(global_pose, start);
+	geometry_msgs::PoseStamped start;
+	//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
+	//if(req.start.header.frame_id == "")
+	tf::poseStampedTFToMsg(global_pose, start);
 
 
 
 	if(planner_->makePlan(start, final_pose, global_plan)){
-          if(!global_plan.empty()){
-            global_plan.push_back(final_pose);
-	  }
- 	}
-
-    tmp_path.poses = global_plan;
-
-    path_pub.publish(tmp_path);
-
-
-/*
-    common_smart_nav::GetRobotPose tmp_pose;
-
-    if (get_pose.call(tmp_pose))
-    {
-            //ROS_INFO("Sum: %ld", get_path.response.plan);
-        tmp_plan.request.start = tmp_pose.response.pose;
-    }
-    else
-    {
-            ROS_ERROR("Failed to call service GetRobotPose");
-    }
-
-
-    //tmp_plan.request.start = 90;
-    tmp_plan.request.goal = *pose;
-    tmp_plan.request.tolerance = 0.01;
-    if (get_path.call(tmp_plan))
-    {
-	    //ROS_INFO("Sum: %ld", get_path.response.plan);
-        if(!(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty())) {
-            tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::pop_back();
-            tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::push_back(final_pose);
-        }
-	path_pub.publish(tmp_plan.response.plan);
-	
-	if(tmp_plan.response.plan.poses.std::vector<geometry_msgs::PoseStamped >::empty()) {
-		// Goal unreachable
-		std_msgs::Empty empty;
-		pathimpossible_pub.publish(empty);
-
-		return;
+		if(!global_plan.empty()){
+			global_plan.push_back(final_pose);
+		}
 	}
-	else {
 
-	}
-    }
-    else
-    {
-            ROS_ERROR("Failed to call service GetPlan");
-    }
+	tmp_path.poses = global_plan;
 
+	// lock
+	my_path = tmp_path;
+	// unlock
 
-    ROS_INFO("Trajectory manager : Path sent.");
-
-    status = 1;
-    cpt = 0;
-*/
 }
+
+void TrajectoryManager::publishPath(void)
+{
+	path_pub.publish(my_path);
+}
+
+void TrajectoryManager::planThread(void)
+{
+	ros::Rate r(1);
+	while(nh.ok()) {
+
+		switch(status) {
+			case STOP:
+				break;
+			case PAUSE:
+				break;
+			case RUN:
+				computePath();
+				break;	
+			default:
+				break;
+		}
+		r.sleep();
+	}
+
+}
+
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
@@ -335,36 +302,23 @@ int main(int argc, char **argv)
 {
 
 
-        /**
-         * The ros::init() function needs to see argc and argv so that it can perform
-         * any ROS arguments and name remapping that were provided at the command line. For programmatic
-         * remappings you can use a different version of init() which takes remappings
-         * directly, but for most command-line programs, passing argc and argv is the easiest
-         * way to do it.  The third argument to init() is the name of the node.
-         *
-         * You must call one of the versions of ros::init() before using any other
-         * part of the ROS system.
-         */
-        ros::init(argc, argv, "Trajectory_Manager");
-        tf::TransformListener listener(ros::Duration(10));
-        TrajectoryManager trajectorymanager(listener);
+	/**
+	 * The ros::init() function needs to see argc and argv so that it can perform
+	 * any ROS arguments and name remapping that were provided at the command line. For programmatic
+	 * remappings you can use a different version of init() which takes remappings
+	 * directly, but for most command-line programs, passing argc and argv is the easiest
+	 * way to do it.  The third argument to init() is the name of the node.
+	 *
+	 * You must call one of the versions of ros::init() before using any other
+	 * part of the ROS system.
+	 */
+	ros::init(argc, argv, "Trajectory_Manager");
+	tf::TransformListener listener(ros::Duration(10));
+	TrajectoryManager trajectorymanager(listener);
 
 	ros::spin();
 
-        // Refresh rate
-/*        ros::Rate loop_rate(50);
-        float rotation = 0.0;
-        while (ros::ok()) {
-
-                ros::spinOnce();
-                loop_rate.sleep();
-		trajectorymanager.recompute_path();
-        }
-
-        ros::Duration(2.0).sleep();
-*/
-
-        ros::shutdown();
+	ros::shutdown();
 }
 
 

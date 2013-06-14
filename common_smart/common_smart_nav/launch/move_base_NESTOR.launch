@@ -4,5 +4,13 @@
   <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="NESTOR_pathplanner" output="screen">
 
     <rosparam file="$(find common_smart_nav)/launch/NESTOR_params.yaml" command="load" />
+
+        <remap from="/ROBOT/goal" to="/NESTOR/goal" />
+        <remap from="/ROBOT/plan" to="/NESTOR/plan" />
+        <remap from="/ROBOT/path_done" to="/NESTOR/path_done" />
+        <remap from="/ROBOT/compute_path" to="/NESTOR/compute_path" />
+        <remap from="/ROBOT/pause" to="/NESTOR/pause" />
+        <remap from="/ROBOT/resume" to="/NESTOR/resume" />
+
   </node>
 </launch>
