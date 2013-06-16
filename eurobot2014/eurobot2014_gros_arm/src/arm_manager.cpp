@@ -124,6 +124,9 @@ class ARM_manager {
 
 		void joint_publish(uint8_t type);
 		void unstack_heart(uint8_t type);
+		void swap_color(geometry_msgs::PoseStamped pose);
+		void take_color(geometry_msgs::PoseStamped pose);
+		void standard_pose(void);
 
 
 		ros::NodeHandle nh;
@@ -341,6 +344,9 @@ ARM_manager::ARM_manager()
 		ROS_ERROR("Failed to call service SetSlope");
 	}
 
+	usleep(500000);
+
+	standard_pose();
 
 }
 
@@ -350,76 +356,79 @@ void ARM_manager::actionCallback(const std_msgs::Int32::ConstPtr & ptr)
 
 void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & ptr)
 {
-	geometry_msgs::PoseStamped tmp_pose;
 
-	tmp_pose.pose.position.x = 0.2;
-	tmp_pose.pose.position.y = 0.0;
-	tmp_pose.pose.position.z = 0.09;
-	tmp_pose.pose.orientation.x = 0.0;
-	tmp_pose.pose.orientation.y = 0.707;
-	tmp_pose.pose.orientation.z = 0.0;
-	tmp_pose.pose.orientation.w = 0.707;
+	swap_color(*ptr);
+	/*
+	   geometry_msgs::PoseStamped tmp_pose;
 
-	compute_RIK(tmp_pose);
+	   tmp_pose.pose.position.x = 0.2;
+	   tmp_pose.pose.position.y = 0.0;
+	   tmp_pose.pose.position.z = 0.09;
+	   tmp_pose.pose.orientation.x = 0.0;
+	   tmp_pose.pose.orientation.y = 0.707;
+	   tmp_pose.pose.orientation.z = 0.0;
+	   tmp_pose.pose.orientation.w = 0.707;
 
-	tmp_pose.pose.position.x = 0.27;
-	tmp_pose.pose.position.y = 0.09;
-	tmp_pose.pose.position.z = 0.25;
-	tmp_pose.pose.orientation.x = 0.0;
-	tmp_pose.pose.orientation.y = 0.707;
-	tmp_pose.pose.orientation.z = 0.0;
-	tmp_pose.pose.orientation.w = 0.707;
+	   compute_RIK(tmp_pose);
 
-	compute_LIK(tmp_pose);
+	   tmp_pose.pose.position.x = 0.27;
+	   tmp_pose.pose.position.y = 0.09;
+	   tmp_pose.pose.position.z = 0.25;
+	   tmp_pose.pose.orientation.x = 0.0;
+	   tmp_pose.pose.orientation.y = 0.707;
+	   tmp_pose.pose.orientation.z = 0.0;
+	   tmp_pose.pose.orientation.w = 0.707;
 
-	joint_publish(2);
+	   compute_LIK(tmp_pose);
 
-	usleep(2000000);
+	   joint_publish(2);
+
+	   usleep(2000000);
 
 
-	tmp_pose.pose.position.x = 0.27;
-	tmp_pose.pose.position.y = -0.09;
-	tmp_pose.pose.position.z = 0.25;
-	tmp_pose.pose.orientation.x = 0.5;
-	tmp_pose.pose.orientation.y = 0.5;
-	tmp_pose.pose.orientation.z = 0.5;
-	tmp_pose.pose.orientation.w = 0.5;
+	   tmp_pose.pose.position.x = 0.27;
+	   tmp_pose.pose.position.y = -0.09;
+	   tmp_pose.pose.position.z = 0.25;
+	   tmp_pose.pose.orientation.x = 0.5;
+	   tmp_pose.pose.orientation.y = 0.5;
+	   tmp_pose.pose.orientation.z = 0.5;
+	   tmp_pose.pose.orientation.w = 0.5;
 
-	compute_RIK(tmp_pose);
+	   compute_RIK(tmp_pose);
 
-	tmp_pose.pose.position.x = 0.27;
-	tmp_pose.pose.position.y = 0.09;
-	tmp_pose.pose.position.z = 0.25;
-	tmp_pose.pose.orientation.x = 0.5;
-	tmp_pose.pose.orientation.y = -0.5;
-	tmp_pose.pose.orientation.z = 0.5;
-	tmp_pose.pose.orientation.w = -0.5;
+	   tmp_pose.pose.position.x = 0.27;
+	   tmp_pose.pose.position.y = 0.09;
+	   tmp_pose.pose.position.z = 0.25;
+	   tmp_pose.pose.orientation.x = 0.5;
+	   tmp_pose.pose.orientation.y = -0.5;
+	   tmp_pose.pose.orientation.z = 0.5;
+	   tmp_pose.pose.orientation.w = -0.5;
 
-	compute_LIK(tmp_pose);
+	   compute_LIK(tmp_pose);
 
-	joint_publish(2);
+	   joint_publish(2);
 
-	usleep(2000000);
+	   usleep(2000000);
 
-	tmp_pose.pose.position.x = 0.27;
-	tmp_pose.pose.position.y = -0.07;
-	tmp_pose.pose.position.z = 0.25;
-	tmp_pose.pose.orientation.x = 0.5;
-	tmp_pose.pose.orientation.y = 0.5;
-	tmp_pose.pose.orientation.z = 0.5;
-	tmp_pose.pose.orientation.w = 0.5;
+	   tmp_pose.pose.position.x = 0.27;
+	   tmp_pose.pose.position.y = -0.07;
+	   tmp_pose.pose.position.z = 0.25;
+	   tmp_pose.pose.orientation.x = 0.5;
+	   tmp_pose.pose.orientation.y = 0.5;
+	   tmp_pose.pose.orientation.z = 0.5;
+	   tmp_pose.pose.orientation.w = 0.5;
 
-	compute_RIK(tmp_pose);
+	   compute_RIK(tmp_pose);
 
-	tmp_pose.pose.position.x = 0.27;
-	tmp_pose.pose.position.y = 0.07;
-	tmp_pose.pose.position.z = 0.25;
-	tmp_pose.pose.orientation.x = 0.5;
-	tmp_pose.pose.orientation.y = -0.5;
-	tmp_pose.pose.orientation.z = 0.5;
-	tmp_pose.pose.orientation.w = -0.5;
+	   tmp_pose.pose.position.x = 0.27;
+	   tmp_pose.pose.position.y = 0.07;
+	   tmp_pose.pose.position.z = 0.25;
+	   tmp_pose.pose.orientation.x = 0.5;
+	   tmp_pose.pose.orientation.y = -0.5;
+	   tmp_pose.pose.orientation.z = 0.5;
+	   tmp_pose.pose.orientation.w = -0.5;
 
-	compute_LIK(tmp_pose);
+	   compute_LIK(tmp_pose);
 
 	joint_publish(2);
 
@@ -470,10 +479,10 @@ void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & 
 	compute_LIK(tmp_pose);
 
 	joint_publish(2);
+	*/
 
 
-
-	std_msgs::Empty done;
+		std_msgs::Empty done;
 	done_pub.publish(done);
 
 }
@@ -667,7 +676,260 @@ void ARM_manager::unstack_heart(uint8_t type)
 	}
 }
 
+void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
+{
+	geometry_msgs::PoseStamped tmp_pose;
+	ROS_INFO("SWAP");
 
+	if(pose.pose.position.y > 0) { // left arm take the fire
+
+		// Phase 1
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = -0.1;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = 0.5;
+
+		compute_RIK(tmp_pose);
+
+		tmp_pose.pose.position.x = pose.pose.position.x;
+		tmp_pose.pose.position.y = pose.pose.position.y;
+		tmp_pose.pose.position.z = pose.pose.position.z + 0.050;
+		tmp_pose.pose.orientation.x = 0.0;
+		tmp_pose.pose.orientation.y = 0.707;
+		tmp_pose.pose.orientation.z = 0.0;
+		tmp_pose.pose.orientation.w = 0.707;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(2);
+
+		//lpump_pub
+
+		usleep(1500000);
+
+		// Phase 2
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = -0.09;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = 0.5;
+
+		compute_RIK(tmp_pose);
+
+		tmp_pose.pose.position.x = pose.pose.position.x;
+		tmp_pose.pose.position.y = pose.pose.position.y;
+		tmp_pose.pose.position.z = pose.pose.position.z;
+		tmp_pose.pose.orientation.x = 0.0;
+		tmp_pose.pose.orientation.y = 0.707;
+		tmp_pose.pose.orientation.z = 0.0;
+		tmp_pose.pose.orientation.w = 0.707;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(2);
+
+		usleep(1000000);
+
+		// Phase 3
+
+		tmp_pose.pose.position.x = pose.pose.position.x;
+		tmp_pose.pose.position.y = pose.pose.position.y;
+		tmp_pose.pose.position.z = pose.pose.position.z + 0.050;
+		tmp_pose.pose.orientation.x = 0.0;
+		tmp_pose.pose.orientation.y = 0.707;
+		tmp_pose.pose.orientation.z = 0.0;
+		tmp_pose.pose.orientation.w = 0.707;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(1);
+
+		usleep(1000000);
+
+		// Phase 4
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = 0.09;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = -0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = -0.5;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(1);
+
+		usleep(1500000);
+
+		// Phase 5
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = -0.07;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = 0.5;
+
+		compute_RIK(tmp_pose);
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = 0.07;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = -0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = -0.5;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(2);
+
+		//rpump_pub
+
+		usleep(1000000);
+
+		//lpump_pub
+
+		usleep(300000);
+
+		// Phase 6
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = -0.09;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = 0.5;
+
+		compute_RIK(tmp_pose);
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = 0.09;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.5;
+		tmp_pose.pose.orientation.y = -0.5;
+		tmp_pose.pose.orientation.z = 0.5;
+		tmp_pose.pose.orientation.w = -0.5;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(2);
+
+		usleep(1000000);
+
+		// Phase 7
+
+		tmp_pose.pose.position.x = pose.pose.position.x;
+		if(pose.pose.position.y < 0.1)
+			tmp_pose.pose.position.y = pose.pose.position.y;
+		else
+			tmp_pose.pose.position.y = 0.0;
+		tmp_pose.pose.position.z = pose.pose.position.z + 0.050;
+		tmp_pose.pose.orientation.x = 0.0;
+		tmp_pose.pose.orientation.y = 0.707;
+		tmp_pose.pose.orientation.z = 0.0;
+		tmp_pose.pose.orientation.w = 0.707;
+
+		compute_RIK(tmp_pose);
+
+		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.y = 0.11;
+		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.orientation.x = 0.0;
+		tmp_pose.pose.orientation.y = 0.707;
+		tmp_pose.pose.orientation.z = 0.0;
+		tmp_pose.pose.orientation.w = 0.707;
+
+		compute_LIK(tmp_pose);
+
+		joint_publish(2);
+
+		usleep(1500000);
+
+		//rpump_pub
+
+		usleep(500000);
+
+		standard_pose();
+
+
+	}
+	else { // right arm take the fire
+
+	}
+
+}
+
+void ARM_manager::take_color(geometry_msgs::PoseStamped pose)
+{
+
+}
+
+void ARM_manager::standard_pose(void)
+{
+	geometry_msgs::PoseStamped tmp_pose;
+
+
+        tmp_pose.pose.position.x = 0.21;
+        tmp_pose.pose.position.y = -0.06;
+        tmp_pose.pose.position.z = 0.18;
+        tmp_pose.pose.orientation.x = 0.0;
+        tmp_pose.pose.orientation.y = 0.707;
+        tmp_pose.pose.orientation.z = 0.0;
+        tmp_pose.pose.orientation.w = 0.707;
+
+        compute_RIK(tmp_pose);
+
+        tmp_pose.pose.position.x = 0.21;
+        tmp_pose.pose.position.y = 0.06;
+        tmp_pose.pose.position.z = 0.18;
+        tmp_pose.pose.orientation.x = 0.0;
+        tmp_pose.pose.orientation.y = 0.707;
+        tmp_pose.pose.orientation.z = 0.0;
+        tmp_pose.pose.orientation.w = 0.707;
+
+        compute_LIK(tmp_pose);
+
+        joint_publish(2);
+
+        usleep(500000);
+
+
+	tmp_pose.pose.position.x = 0.18;
+	tmp_pose.pose.position.y = -0.06;
+	tmp_pose.pose.position.z = 0.24;
+	tmp_pose.pose.orientation.x = 0.0;
+	tmp_pose.pose.orientation.y = 0.707;
+	tmp_pose.pose.orientation.z = 0.0;
+	tmp_pose.pose.orientation.w = 0.707;
+
+	compute_RIK(tmp_pose);
+
+	tmp_pose.pose.position.x = 0.18;
+	tmp_pose.pose.position.y = 0.06;
+	tmp_pose.pose.position.z = 0.24;
+	tmp_pose.pose.orientation.x = 0.0;
+	tmp_pose.pose.orientation.y = 0.707;
+	tmp_pose.pose.orientation.z = 0.0;
+	tmp_pose.pose.orientation.w = 0.707;
+
+	compute_LIK(tmp_pose);
+
+	joint_publish(2);
+
+	usleep(100000);
+
+}
 
 void ARM_manager::joint_publish(uint8_t type)
 {

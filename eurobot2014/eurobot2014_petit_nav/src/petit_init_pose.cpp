@@ -178,8 +178,11 @@ void InitPose::poseCallback(const std_msgs::Empty::ConstPtr& vel)
 		/* Initialize the starting pose */
 		ROS_ERROR("YELLOW x : %f / y : %f", base_pose.pose.position.x, base_pose.pose.position.y);
 
-		t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w)), //tf::Quaternion(0, 0, 0, 1), 
-					tf::Vector3(YELLOW_START_X - base_pose.pose.position.x, YELLOW_START_Y - base_pose.pose.position.y, 0.0)), 
+		t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w)),  
+					tf::Vector3(YELLOW_START_X - (base_pose.pose.position.x*cos(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w) ) 
+					- base_pose.pose.position.y*sin(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w) )), 
+					YELLOW_START_Y - (base_pose.pose.position.y*cos(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w)) 
+					+ base_pose.pose.position.x*sin(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w) ) ), 0.0)), 
 				ros::Time::now(), "/petit_map", "/fake_map");
 
 		broadcaster.sendTransform(t);
@@ -189,9 +192,12 @@ void InitPose::poseCallback(const std_msgs::Empty::ConstPtr& vel)
 		/* Initialize the starting pose */
 		ROS_ERROR("RED x : %f / y : %f", base_pose.pose.position.x, base_pose.pose.position.y);
 
-		t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(RED_START_Z - 2*acos(base_pose.pose.orientation.w)), //tf::Quaternion(0, 0, 0, 1), 
-					tf::Vector3(RED_START_X - base_pose.pose.position.x, RED_START_Y - base_pose.pose.position.y, 0.0)), 
-				ros::Time::now(), "/petit_map", "/fake_map");
+                t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(RED_START_Z - 2*acos(base_pose.pose.orientation.w)),
+                                        tf::Vector3(RED_START_X - (base_pose.pose.position.x*cos(RED_START_Z - 2*acos(base_pose.pose.orientation.w) )
+                                        - base_pose.pose.position.y*sin(RED_START_Z - 2*acos(base_pose.pose.orientation.w) )),
+                                        RED_START_Y - (base_pose.pose.position.y*cos(RED_START_Z - 2*acos(base_pose.pose.orientation.w))
+                                        + base_pose.pose.position.x*sin(RED_START_Z - 2*acos(base_pose.pose.orientation.w) ) ), 0.0)),
+                                ros::Time::now(), "/petit_map", "/fake_map");
 
 		broadcaster.sendTransform(t);
 		init_done = 1;
