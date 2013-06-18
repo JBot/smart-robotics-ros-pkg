@@ -50,6 +50,8 @@ class DriveRoboClaw {
 	void write_RoboClaw_backward_M1(char addr, int32_t speed);
 	void write_RoboClaw_forward_M2(char addr, int32_t speed);
 	void write_RoboClaw_backward_M2(char addr, int32_t speed);
+	void write_RoboClaw_drive_M1(char addr, int32_t speed);
+	void write_RoboClaw_drive_M2(char addr, int32_t speed);
 	void write_RoboClaw_speed_M1(char addr, int32_t speed);
 	void write_RoboClaw_speed_M2(char addr, int32_t speed);
 	void write_RoboClaw_speed_M1M2(char addr, int32_t speedM1, int32_t speedM2);
@@ -109,20 +111,20 @@ DriveRoboClaw::DriveRoboClaw()
 void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 {
   compute_motor_speed(vel->linear.x, vel->linear.y, vel->angular.z);
-/*
-  write_RoboClaw_speed_M1M2(128, speed_motor1, speed_motor2);
-  write_RoboClaw_speed_M1(129, speed_motor3);  
-*/
+
+  write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000), int32_t(speed_motor2 * 20000));
+  write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000));  
+
 }
 
 void DriveRoboClaw::compute_motor_speed(double x, double y, double z)
 {
 /* Methode 1 : CRAP */
-/*
+
 	speed_motor1 = -sin(theta1) * x + cos(theta1) * y + R * z;
 	speed_motor2 = -sin(theta2) * x + cos(theta2) * y + R * z;
 	speed_motor3 = -sin(theta3) * x + cos(theta3) * y + R * z;
-*/
+
 
 /* Methode 2 : CVRA */
 	//speed_motor1 = sqrt(x*x + y*y) / RAYON * cos(
@@ -158,7 +160,7 @@ void DriveRoboClaw::write_RoboClaw_backward_M1(char addr, int32_t speed)
 {
     char checkSUM;
     checkSUM =
-        (addr + 0 + ((char) (speed & 0xFF))) & 0x7F;
+        (addr + 1 + ((char) (speed & 0xFF))) & 0x7F;
 
         unsigned char commands[4];
         commands[0] = addr;
@@ -174,7 +176,7 @@ void DriveRoboClaw::write_RoboClaw_forward_M2(char addr, int32_t speed)
 {
     char checkSUM;
     checkSUM =
-        (addr + 0 + ((char) (speed & 0xFF))) & 0x7F;
+        (addr + 4 + ((char) (speed & 0xFF))) & 0x7F;
 
         unsigned char commands[4];
         commands[0] = addr;
@@ -190,11 +192,43 @@ void DriveRoboClaw::write_RoboClaw_backward_M2(char addr, int32_t speed)
 {
     char checkSUM;
     checkSUM =
-        (addr + 0 + ((char) (speed & 0xFF))) & 0x7F;
+        (addr + 5 + ((char) (speed & 0xFF))) & 0x7F;
 
         unsigned char commands[4];
         commands[0] = addr;
         commands[1] = 5;
+        commands[2] = ((char) (speed & 0xFF));
+        commands[3] = checkSUM;
+
+        write(fd, commands, 4);  //Send data
+}
+
+// Used to change the speed value of motor 2
+void DriveRoboClaw::write_RoboClaw_drive_M1(char addr, int32_t speed)
+{
+    char checkSUM;
+    checkSUM =
+        (addr + 6 + ((char) (speed & 0xFF))) & 0x7F;
+
+        unsigned char commands[4];
+        commands[0] = addr;
+        commands[1] = 6;
+        commands[2] = ((char) (speed & 0xFF));
+        commands[3] = checkSUM;
+
+        write(fd, commands, 4);  //Send data
+}
+
+// Used to change the speed value of motor 2
+void DriveRoboClaw::write_RoboClaw_drive_M2(char addr, int32_t speed)
+{
+    char checkSUM;
+    checkSUM =
+        (addr + 7 + ((char) (speed & 0xFF))) & 0x7F;
+
+        unsigned char commands[4];
+        commands[0] = addr;
+        commands[1] = 7;
         commands[2] = ((char) (speed & 0xFF));
         commands[3] = checkSUM;
 
@@ -363,6 +397,20 @@ int main(int argc, char **argv)
     while (ros::ok()) {
         ros::spinOnce();
         loop_rate.sleep();
+/*
+	drive.write_RoboClaw_drive_M1(128, 100);
+	ros::Duration(1.0).sleep();
+	drive.write_RoboClaw_drive_M1(128, 50);
+	ros::Duration(1.0).sleep();
+	drive.write_RoboClaw_drive_M1(128, 64);
+	drive.write_RoboClaw_drive_M2(128, 50);
+        ros::Duration(1.0).sleep();
+	drive.write_RoboClaw_drive_M1(129, 50);
+	drive.write_RoboClaw_drive_M2(128, 64);
+        ros::Duration(1.0).sleep();
+	drive.write_RoboClaw_drive_M1(129, 64);
+        ros::Duration(1.0).sleep();
+*/
 /*
 	drive.write_RoboClaw_speed_M1M2(128, 10000, 0);
 	ros::Duration(1.0).sleep();
