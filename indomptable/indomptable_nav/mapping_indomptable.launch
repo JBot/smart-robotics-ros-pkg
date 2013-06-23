@@ -14,7 +14,7 @@
     <param name="pub_map_odom_transform" value="true"/>
     
     <!-- Map size / start point -->
-    <param name="map_resolution" value="0.007"/>
+    <param name="map_resolution" value="0.01"/>
     <param name="map_size" value="1000"/>
     <param name="map_start_x" value="0.5"/>
     <param name="map_start_y" value="0.5" />
@@ -43,8 +43,9 @@
     -->
   </node>
     
- <!--   <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0 0 0 0 map odom 100"/> 
- -->
+  <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0 0 0 0 odom base_link 100"/> 
+  <node pkg="tf" type="static_transform_publisher" name="link_laser_broadcaster" args="0 0 0.1 0 0 0 base_link neato_laser 100"/> 
+ 
 </launch>
   
   
