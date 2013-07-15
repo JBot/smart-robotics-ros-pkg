@@ -111,9 +111,14 @@ DriveRoboClaw::DriveRoboClaw()
 void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 {
   compute_motor_speed(vel->linear.x, vel->linear.y, vel->angular.z);
-
+/*
   write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000), int32_t(speed_motor2 * 20000));
   write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000));  
+*/
+  write_RoboClaw_drive_M1(128, int32_t( 64 + (speed_motor1 * 30) ));
+  write_RoboClaw_drive_M2(128, int32_t( 64 + (speed_motor2 * 30) ));
+  write_RoboClaw_drive_M1(129, int32_t( 64 + (speed_motor3 * 30) ));
+
 
 }
 

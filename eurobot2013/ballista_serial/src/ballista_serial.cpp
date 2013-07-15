@@ -277,6 +277,11 @@ void BallistaSerial::cmd_vel_cb(const geometry_msgs::Twist::ConstPtr & my_var)
     ROS_ERROR("Receiving cmd_vel : %f %f", my_var->linear.x, my_var->angular.z);
     cmd_vel_value.linear = my_var->linear;
     cmd_vel_value.angular = my_var->angular;
+    if(cmd_vel_value.angular.z > 0.2)
+	cmd_vel_value.angular.z = 0.2;
+    if(cmd_vel_value.angular.z < -0.2)
+        cmd_vel_value.angular.z = -0.2;
+
     cmd_vel_flag = 0;
     cmd_vel_out.publish(cmd_vel_value);
 

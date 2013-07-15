@@ -15,10 +15,10 @@
     
     <!-- Map size / start point -->
     <param name="map_resolution" value="0.01"/>
-    <param name="map_size" value="1000"/>
+    <param name="map_size" value="800"/>
     <param name="map_start_x" value="0.5"/>
     <param name="map_start_y" value="0.5" />
-    <param name="map_multi_res_levels" value="5" />
+    <param name="map_multi_res_levels" value="3" />
     
     <!-- Map update parameters -->
     <param name="update_factor_free" value="0.4"/>
@@ -33,7 +33,7 @@
     <param name="laser_min_dist" value="0.13"/>
     <param name="laser_max_dist" value="4.5"/>
 
-    <param name="map_pub_period" value="5.0"/>
+    <param name="map_pub_period" value="1.0"/>
 
     <!-- Debug parameters -->
     <!--
@@ -42,9 +42,10 @@
       <param name="pub_debug_output" value="true"/>
     -->
   </node>
-    
+<!--    
   <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0 0 0 0 odom base_link 100"/> 
-  <node pkg="tf" type="static_transform_publisher" name="link_laser_broadcaster" args="0 0 0.1 0 0 0 base_link neato_laser 100"/> 
+-->
+  <node pkg="tf" type="static_transform_publisher" name="link_laser_neato_broadcaster" args="0 0 0.1 0 0 0 base_link neato_laser 100"/> 
  
 </launch>
   

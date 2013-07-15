@@ -137,26 +137,27 @@ void TransformPose::publish_all(tf::TransformListener& listener)
                 listener.transformPose("/odom", odom_pose, base_pose);
 
 		my_odom.header.stamp = base_pose.header.stamp;
+		//my_odom.header.stamp = now;// + ros::Duration(0.3);
 		my_odom.pose.pose.position.x = base_pose.pose.position.x;
 		my_odom.pose.pose.position.y = base_pose.pose.position.y;
 		my_odom.pose.pose.position.z = base_pose.pose.position.z;
 		my_odom.pose.pose.orientation = base_pose.pose.orientation;
 
-		//my_maximus_odom.twist.twist.linear.x = sqrt(pow(base_pose.pose.position.x - old_x, 2) + pow(base_pose.pose.position.y - old_y, 2)) / (my_maximus_odom.header.stamp.toSec() - old_time.toSec());
-		my_odom.twist.twist.linear.x = xspeed.data;
+		my_odom.twist.twist.linear.x = sqrt(pow(base_pose.pose.position.x - old_x, 2) + pow(base_pose.pose.position.y - old_y, 2)) / (my_odom.header.stamp.toSec() - old_time.toSec());
+		//my_odom.twist.twist.linear.x = xspeed.data;
 		my_odom.twist.twist.linear.y = 0;
 		my_odom.twist.twist.linear.z = 0;
 		my_odom.twist.twist.angular.x = 0;
 		my_odom.twist.twist.angular.y = 0;
-		my_odom.twist.twist.angular.z = tspeed.data;
-		//my_maximus_odom.twist.twist.angular.z = 1.1 * (tf::getYaw (my_maximus_odom.pose.pose.orientation) - old_theta) / (my_maximus_odom.header.stamp.toSec() - old_time.toSec());
+		//my_odom.twist.twist.angular.z = tspeed.data;
+		my_odom.twist.twist.angular.z = 1.0 * (tf::getYaw (my_odom.pose.pose.orientation) - old_theta) / (my_odom.header.stamp.toSec() - old_time.toSec());
 
 		odom_pub.publish(my_odom);
 
-		//old_x = base_pose.pose.position.x;
-		//old_y = base_pose.pose.position.y;
-		//old_theta = tf::getYaw (my_odom.pose.pose.orientation);
-		//old_time = my_odom.header.stamp;
+		old_x = base_pose.pose.position.x;
+		old_y = base_pose.pose.position.y;
+		old_theta = tf::getYaw (my_odom.pose.pose.orientation);
+		old_time = my_odom.header.stamp;
 /*
                 ROS_INFO("base_laser: (%.2f, %.2f. %.2f) -----> base_link: (%.2f, %.2f, %.2f) at time %.2f",
                         my_maximus_odom.pose.pose.position.x, my_maximus_odom.pose.pose.position.y, my_maximus_odom.pose.pose.position.z,

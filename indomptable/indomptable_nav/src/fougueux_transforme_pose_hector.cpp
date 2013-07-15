@@ -174,12 +174,12 @@ void TransformPoseHector::publish_all(tf::TransformListener& listener)
     cloud.header.stamp = ros::Time::now();
     cloud.header.frame_id = "/map";
 
-    cloud.set_points_size(4);
+    //cloud.set_points_size(4);
 
     //we'll also add an intensity channel to the cloud
-    cloud.set_channels_size(1);
+    //cloud.set_channels_size(1);
     cloud.channels[0].name = "intensities";
-    cloud.channels[0].set_values_size(4);
+    //cloud.channels[0].set_values_size(4);
 
     //generate some fake data for our point cloud
 
