@@ -1,0 +1,14 @@
+<launch>
+
+    <node pkg="common_smart_nav" type="compute_pose" name="NESTOR_compute_pose" output="screen">
+	<remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+    </node>
+
+    <node pkg="common_smart_nav" type="trajectory_wrapper" name="NESTOR_trajectory_wrapper" output="screen">
+	<remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+	<remap from="/ROBOT/goal" to="/NESTOR/goal" />
+	<remap from="/ROBOT/plan" to="/NESTOR/plan" />
+	<remap from="/ROBOT/NavfnROS/make_plan" to="/NESTOR/NavfnROS/make_plan" />
+    </node>
+
+  </launch>

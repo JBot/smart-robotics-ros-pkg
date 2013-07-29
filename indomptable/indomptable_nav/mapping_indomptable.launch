@@ -5,7 +5,7 @@
     
     <!-- Frame names -->
     <param name="map_frame" value="map" />
-    <param name="base_frame" value="base_link" />
+    <param name="base_frame" value="odom" />
     <param name="odom_frame" value="odom" />
     
     <!-- Tf use -->
@@ -42,10 +42,9 @@
       <param name="pub_debug_output" value="true"/>
     -->
   </node>
-<!--    
+
   <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0 0 0 0 odom base_link 100"/> 
--->
-  <node pkg="tf" type="static_transform_publisher" name="link_laser_neato_broadcaster" args="0 0 0.1 0 0 0 base_link neato_laser 100"/> 
+  <node pkg="tf" type="static_transform_publisher" name="link_laser_neato_broadcaster" args="0.02 0 0.1 0 0 0 base_link laser 100"/> 
  
 </launch>
   

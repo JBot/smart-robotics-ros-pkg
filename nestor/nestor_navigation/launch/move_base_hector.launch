@@ -1,0 +1,13 @@
+<launch>
+  <master auto="start"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="NESTOR" output="screen">
+
+
+    <rosparam file="$(find nestor_navigation)/launch/costmap_common_params_hector.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find nestor_navigation)/launch/costmap_common_params_hector.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find nestor_navigation)/launch/local_costmap_params_hector.yaml" command="load" />
+    <rosparam file="$(find nestor_navigation)/launch/global_costmap_params_hector.yaml" command="load" />
+    <rosparam file="$(find nestor_navigation)/launch/base_local_planner_params_hector.yaml" command="load" />
+  </node>
+</launch>

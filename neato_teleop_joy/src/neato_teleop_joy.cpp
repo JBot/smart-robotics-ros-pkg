@@ -26,8 +26,8 @@ private:
 TeleopNeato::TeleopNeato():
   linear_(1),
   angular_(2),
-  a_scale_(3), // 0.6
-  l_scale_(1.2) // 0.2
+  a_scale_(0.2), // 0.6
+  l_scale_(0.18) // 0.2
 {
 
   nh_.param("axis_linear", linear_, linear_);
@@ -49,7 +49,7 @@ void TeleopNeato::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   geometry_msgs::Twist vel;
   vel.angular.z = a_scale_*joy->axes[angular_];
   vel.linear.x = l_scale_*joy->axes[linear_];
-  vel.linear.y = -l_scale_*joy->axes[0];
+  vel.linear.y = l_scale_*joy->axes[0];
   vel_pub_.publish(vel);
 
   if(joy->buttons[0] == 1) {
