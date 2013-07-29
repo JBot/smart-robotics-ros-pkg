@@ -115,6 +115,10 @@ void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
   write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000), int32_t(speed_motor2 * 20000));
   write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000));  
 */
+
+// TODO : brider la vitesse des moteurs
+// TODO : SI un moteur va trop vite, prendre son ratio par rapport a vitesse max et l'appliquer aux autres moteurs
+
   write_RoboClaw_drive_M1(128, int32_t( 64 + (-speed_motor1 * 12.85) ));
   write_RoboClaw_drive_M2(128, int32_t( 64 + (-speed_motor3 * 12.85) ));
   write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2 * 12.85) ));
@@ -124,15 +128,10 @@ void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 
 void DriveRoboClaw::compute_motor_speed(double x, double y, double z)
 {
-/* Methode 1 : CRAP */
 
 	speed_motor1 = (-sin(theta1) * x + cos(theta1) * y + R * z) / RAYON;
 	speed_motor2 = (-sin(theta2) * x + cos(theta2) * y + R * z) / RAYON;
 	speed_motor3 = (-sin(theta3) * x + cos(theta3) * y + R * z) / RAYON;
-
-
-/* Methode 2 : CVRA */
-	//speed_motor1 = sqrt(x*x + y*y) / RAYON * cos(
 
         printf("speed_motor1 : %f speed_motor2 : %f speed_motor3 : %f \n", speed_motor1, speed_motor2, speed_motor3);
 
