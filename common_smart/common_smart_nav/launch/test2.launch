@@ -1,0 +1,10 @@
+<launch>
+
+    <node pkg="common_smart_nav" type="pathwrapper" name="NESTOR_pathwrapper" output="screen">
+    	<remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+	<remap from="/ROBOT/plan" to="/NESTOR/plan" />
+	<remap from="/cmd_vel" to="/my_cmd_vel" />
+    </node>
+
+
+  </launch>

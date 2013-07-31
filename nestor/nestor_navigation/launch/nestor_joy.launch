@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- JOYSTICK NODE -->
+  <node pkg="joy" type="joy_node" name="joystick_node" output="screen">
+  </node>
+
+  <!-- NEATO TELEOP NODE -->
+  <node pkg="neato_teleop_joy" type="teleop_neato" name="teleop_neato_node" output="screen">
+    <remap from="/cmd_vel" to="/my_cmd_vel" />
+  </node>
+
+
+</launch>

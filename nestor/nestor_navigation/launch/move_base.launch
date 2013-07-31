@@ -1,7 +1,7 @@
 <launch>
   <master auto="start"/>
 
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  <node pkg="move_base" type="move_base" respawn="false" name="NESTOR" output="screen">
 
 
     <rosparam file="$(find nestor_navigation)/launch/costmap_common_params.yaml" command="load" ns="global_costmap" />

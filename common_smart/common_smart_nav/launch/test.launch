@@ -11,4 +11,5 @@
 	<remap from="/ROBOT/NavfnROS/make_plan" to="/NESTOR/NavfnROS/make_plan" />
     </node>
 
+
   </launch>

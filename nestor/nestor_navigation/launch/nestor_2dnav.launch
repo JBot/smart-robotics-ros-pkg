@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- LASER NODE -->
+  <node pkg="hokuyo_node" type="hokuyo_node" name="laser_publisher" output="screen">
+    <param name="frame_id" value="/laser" />
+    <param name="min_ang" value="-2.086214" />
+    <param name="max_ang" value="2.092350" /> 
+  </node>
+
+  <!-- MOTOR DRIVER NODE -->
+  <node pkg="nestor_navigation" type="nestor_drive_roboclaw" name="nestor_drive_roboclaw" output="screen">
+    <remap from="/cmd_vel" to="/my_cmd_vel" />
+  </node>
+
+  <!-- Publish a static transform between the robot base and the map frame -->
+  <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0 0 0 0 odom base_link 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="link_laser_broadcaster" args="0.02 0 0.1 0 0 0 base_link laser 100"/>
+
+
+  <!-- HECTOR MAPPING -->
+  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
+
+    <!-- Frame names -->
+    <param name="map_frame" value="map" />
+    <param name="base_frame" value="odom" />
+    <param name="odom_frame" value="odom" />
+
+    <!-- Tf use -->
+    <param name="use_tf_scan_transformation" value="true"/>
+    <param name="use_tf_pose_start_estimate" value="false"/>
+    <param name="pub_map_odom_transform" value="true"/>
+
+    <!-- Map size / start point -->
+    <param name="map_resolution" value="0.01"/>
+    <param name="map_size" value="800"/>
+    <param name="map_start_x" value="0.5"/>
+    <param name="map_start_y" value="0.5" />
+    <param name="map_multi_res_levels" value="3" />
+
+    <!-- Map update parameters -->
+    <param name="update_factor_free" value="0.4"/>
+    <param name="update_factor_occupied" value="0.9" />
+    <param name="map_update_distance_thresh" value="0.05"/>
+    <param name="map_update_angle_thresh" value="0.1" />
+
+    <!-- Advertising config -->
+    <param name="advertise_map_service" value="true"/>
+
+    <!-- Laser parameters -->
+    <param name="laser_min_dist" value="0.13"/>
+    <param name="laser_max_dist" value="4.5"/>
+
+    <param name="map_pub_period" value="1.0"/>
+
+    <!-- Debug parameters -->
+    <!--
+      <param name="output_timing" value="false"/>
+      <param name="pub_drawings" value="true"/>
+      <param name="pub_debug_output" value="true"/>
+    -->
+  </node>
+
+
+<!--
+  <node pkg="map_server" type="map_server" name="eurobot_map" args="$(find indomptable_nav)/mymap2.yaml" output="screen">
+  </node>
+-->
+
+  <!-- COMPUTE POSE NODE -->
+  <node pkg="common_smart_nav" type="compute_pose" name="NESTOR_compute_pose" output="screen">
+    <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+  </node>
+
+  <!-- TRAJECTORY WRAPPER NODE -->
+  <node pkg="common_smart_nav" type="trajectory_wrapper" name="NESTOR_trajectory_wrapper" output="screen">
+    <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+    <remap from="/ROBOT/goal" to="/NESTOR/goal" />
+    <remap from="/ROBOT/plan" to="/NESTOR/plan" />
+    <remap from="/ROBOT/NavfnROS/make_plan" to="/NESTOR/NavfnROS/make_plan" />
+  </node>
+
+  <!-- PATH WRAPPER NODE -->
+  <node pkg="common_smart_nav" type="pathwrapper" name="NESTOR_pathwrapper" output="screen">
+    <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+    <remap from="/ROBOT/plan" to="/NESTOR/plan" />
+    <remap from="/cmd_vel" to="/my_cmd_vel" />
+  </node>
+
+
+
+
+</launch>

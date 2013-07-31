@@ -14,6 +14,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
+#include "common_smart_nav/GetRobotPose.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -40,7 +41,7 @@
 #define NB_STEP_SKIP	3//8
 #define MAX_DIST_SKIP	0.10//0.14
 
-#define MAX_SPEED_LIN	0.12
+#define MAX_SPEED_LIN	0.08 //0.12
 #define MAX_SPEED_ANG	0.15
 
 
@@ -50,7 +51,7 @@ class Pathwrapper {
 		void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
 		double getHeadingFromQuat(geometry_msgs::Quaternion pose);
 		void compute_next_pathpoint(tf::TransformListener& listener);
-		void init_pose(tf::TransformListener& listener);
+		void init_pose(void);
 
 		// Goal suscriber
 		ros::Subscriber goal_sub_;
@@ -64,6 +65,9 @@ class Pathwrapper {
 
 		ros::Subscriber pause_sub_;
 		ros::Subscriber resume_sub_;
+
+		ros::ServiceClient get_pose;
+
 	private:
 		void pathCallback(const nav_msgs::Path::ConstPtr & path);
 		void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
@@ -99,6 +103,8 @@ Pathwrapper::Pathwrapper()
 
 	pause_sub_ = nh.subscribe < std_msgs::Empty > ("/pause_nav", 2, &Pathwrapper::pauseCallback, this);
 	resume_sub_ = nh.subscribe < std_msgs::Empty > ("/resume_nav", 2, &Pathwrapper::resumeCallback, this);
+
+	get_pose = nh.serviceClient<common_smart_nav::GetRobotPose>("/ROBOT/get_robot_pose");
 
 	pause = 0;
 
@@ -193,22 +199,20 @@ void Pathwrapper::pathCallback(const nav_msgs::Path::ConstPtr & path)
 	my_path = *path;
 	ROS_INFO("Path next.");
 
+
 	if( !(my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
 		my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+
+		// TEST
+
+		final_pose.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+		final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+
+		final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
+		final_pose2.header.stamp = ros::Time::now();
+		// TEST
+
 	}
-
-	// TEST
-
-	final_pose.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-	final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-
-	final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
-	final_pose2.header.stamp = ros::Time::now();
-	// TEST
-
-
-	geometry_msgs::PoseArray my_pose_array;
-	int i = 0;
 
 	cpt_send = 0;
 
@@ -227,43 +231,21 @@ void Pathwrapper::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose
 
 }
 
-void Pathwrapper::init_pose(tf::TransformListener& listener) {
-	geometry_msgs::PoseStamped odom_pose;
-	odom_pose.header.frame_id = "/base_link";
-	ros::Time now = ros::Time::now();
+void Pathwrapper::init_pose() {
+	
+    common_smart_nav::GetRobotPose tmp_pose;
 
-	//we'll just use the most recent transform available for our simple example
-	odom_pose.header.stamp = now;
-	final_pose2.header.stamp = now;
-
-	//just an arbitrary point in space
-	odom_pose.pose.position.x = 0.0;
-	odom_pose.pose.position.y = 0.0;
-	odom_pose.pose.position.z = 0.0;
-
-	odom_pose.pose.orientation.x = 0.0;
-	odom_pose.pose.orientation.y = 0.0;
-	odom_pose.pose.orientation.z = 0.0;
-	odom_pose.pose.orientation.w = 1.0;
-
-
-	try{
-		listener.waitForTransform("/map", "/base_link", now, ros::Duration(5.0));
-		geometry_msgs::PoseStamped base_pose;
-		listener.transformPose("/map", odom_pose, base_pose);
-
-		final_pose2 = base_pose;
-		final_pose2.header.stamp = now;
-		final_pose.x = base_pose.pose.position.x;
-		final_pose.y = base_pose.pose.position.y;
-
-		ROS_ERROR("frame1 : %f %f / frame2 : %f %f %f ", (final_pose.x), (final_pose.y), (final_pose2.pose.position.x), (final_pose2.pose.position.y), getHeadingFromQuat(final_pose2.pose.orientation));
-
-	}
-	catch(tf::TransformException& ex){
-		ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
-	}
-
+    if (get_pose.call(tmp_pose))
+    {
+            //ROS_INFO("Sum: %ld", get_path.response.plan);
+    	final_pose2 = tmp_pose.response.pose;
+	final_pose.x = tmp_pose.response.pose.pose.position.x;
+	final_pose.y = tmp_pose.response.pose.pose.position.y;
+    }
+    else
+    {
+            ROS_ERROR("Failed to call service GetRobotPose");
+    }
 
 }
 
@@ -298,6 +280,70 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 			//ROS_INFO("%f %f %f %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y);
 
+
+
+			// Move direction first to be able to see something with the laser
+			/*
+			// transform in base_link frame
+			//const string trans_frame = "base_link";
+			geometry_msgs::PoseStamped my_pose_stamped;
+			geometry_msgs::PoseStamped my_map_pose = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
+			my_pose_stamped.header.stamp = now;
+			my_map_pose.header.stamp = now;
+			//tf::Transformer::transformPose("/base_link", my_map_pose, my_pose_stamped);
+			listener.transformPose("/base_link", my_map_pose, my_pose_stamped);
+			ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (my_map_pose.pose.position.x), (my_map_pose.pose.position.y), getHeadingFromQuat(my_map_pose.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
+			// normalize Vx, Vy
+
+			double current_angle_error = getHeadingFromQuat(my_pose_stamped.pose.orientation); // RAD ?
+
+			if( fabs(current_angle_error) > 1.57 )
+			{
+
+			if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
+			{
+			double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
+			double max_speed_lin = my_pose_stamped.pose.position.x * 2;
+			if(max_speed_lin > MAX_SPEED_LIN)
+			max_speed_lin = MAX_SPEED_LIN;
+			if(max_speed_lin < -MAX_SPEED_LIN)
+			max_speed_lin = -MAX_SPEED_LIN;
+
+			final_cmd_vel.linear.x = max_speed_lin;
+			final_cmd_vel.linear.y = max_speed_lin / speed_ratio;
+			}
+			else
+			{
+			double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
+			double max_speed_lin = my_pose_stamped.pose.position.y * 2;
+			if(max_speed_lin > MAX_SPEED_LIN)
+			max_speed_lin = MAX_SPEED_LIN;
+			if(max_speed_lin < -MAX_SPEED_LIN)
+			max_speed_lin = -MAX_SPEED_LIN;
+
+			final_cmd_vel.linear.x = max_speed_lin / speed_ratio;
+			final_cmd_vel.linear.y = max_speed_lin;
+			}
+
+
+			// find Vtheta
+
+			final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 1.5; // RAD ?
+			if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
+			final_cmd_vel.angular.z = MAX_SPEED_ANG;
+			if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
+			final_cmd_vel.angular.z = -MAX_SPEED_ANG;
+
+			// publish cmd_vel
+			cmd_vel_pub.publish(final_cmd_vel);
+
+
+			}
+			else 
+			{ 
+
+			 */
+
 			if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < MAX_DIST_SKIP ) {
 
 				if( !(my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
@@ -329,7 +375,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						listener.transformPose("/base_link", my_map_pose, my_pose_stamped);
 						ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (my_map_pose.pose.position.x), (my_map_pose.pose.position.y), getHeadingFromQuat(my_map_pose.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
 						// normalize Vx, Vy
-						if( my_pose_stamped.pose.position.x > my_pose_stamped.pose.position.y)
+						if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 						{
 							double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
 							double max_speed_lin = my_pose_stamped.pose.position.x * 2;
@@ -356,13 +402,13 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 						// find Vtheta
-						
-						   final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 1.5; // RAD ?
-						   if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
-						   	final_cmd_vel.angular.z = MAX_SPEED_ANG;
-						   if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
-						   	final_cmd_vel.angular.z = -MAX_SPEED_ANG;
-						 
+
+						final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 1.5; // RAD ?
+						if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
+							final_cmd_vel.angular.z = MAX_SPEED_ANG;
+						if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
+							final_cmd_vel.angular.z = -MAX_SPEED_ANG;
+
 						// publish cmd_vel
 						cmd_vel_pub.publish(final_cmd_vel);
 
@@ -427,7 +473,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (final_pose2.pose.position.x), (final_pose2.pose.position.y), getHeadingFromQuat(final_pose2.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
 							//ROS_ERROR("frame1 : %f / frame2 : %f", (my_map_pose.pose.position.x), (my_pose_stamped.pose.position.x));
 							// normalize Vx, Vy
-							if( my_pose_stamped.pose.position.x > my_pose_stamped.pose.position.y)
+							if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 							{
 								double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
 								double max_speed_lin = my_pose_stamped.pose.position.x * 2;
@@ -452,14 +498,14 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 								final_cmd_vel.linear.y = max_speed_lin;
 							}
 
-							
+
 							// find Vtheta
 							final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 1.5; // RAD ?
 							if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
 								final_cmd_vel.angular.z = MAX_SPEED_ANG;
 							if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
 								final_cmd_vel.angular.z = -MAX_SPEED_ANG;
-							 
+
 							// publish cmd_vel
 							cmd_vel_pub.publish(final_cmd_vel);
 
@@ -507,7 +553,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 				listener.transformPose("/base_link", final_pose2, my_pose_stamped);
 				//ROS_ERROR("frame1 : %f / frame2 : %f", (my_map_pose.pose.position.x), (my_pose_stamped.pose.position.x));
 				// normalize Vx, Vy
-				if( my_pose_stamped.pose.position.x > my_pose_stamped.pose.position.y)
+				if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 				{
 					double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
 					double max_speed_lin = my_pose_stamped.pose.position.x * 2;
@@ -532,7 +578,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					final_cmd_vel.linear.y = max_speed_lin;
 				}
 
-				
+
 				// find Vtheta
 				final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 1.5; // RAD ?
 				ROS_INFO("angular %f", final_cmd_vel.angular.z);
@@ -540,12 +586,15 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					final_cmd_vel.angular.z = MAX_SPEED_ANG;
 				if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
 					final_cmd_vel.angular.z = -MAX_SPEED_ANG;
-				 
+
 				// publish cmd_vel
 				cmd_vel_pub.publish(final_cmd_vel);
 
 
 			}
+			/*
+			   }
+			 */
 		}
 		catch(tf::TransformException& ex){
 			ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
@@ -581,7 +630,7 @@ int main(int argc, char **argv)
 	float rotation = 0.0;
 
 	ros::spinOnce();
-	pathwrapper.init_pose(boost::ref(listener));
+	pathwrapper.init_pose();
 
 	while (ros::ok()) {
 
