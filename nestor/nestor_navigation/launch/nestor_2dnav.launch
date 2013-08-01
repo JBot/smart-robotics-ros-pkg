@@ -10,7 +10,7 @@
 
   <!-- MOTOR DRIVER NODE -->
   <node pkg="nestor_navigation" type="nestor_drive_roboclaw" name="nestor_drive_roboclaw" output="screen">
-    <remap from="/cmd_vel" to="/my_cmd_vel" />
+    <remap from="/cmd_vel" to="/NESTOR/cmd_vel" />
   </node>
 
   <!-- Publish a static transform between the robot base and the map frame -->
@@ -84,7 +84,7 @@
   <node pkg="common_smart_nav" type="pathwrapper" name="NESTOR_pathwrapper" output="screen">
     <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
     <remap from="/ROBOT/plan" to="/NESTOR/plan" />
-    <remap from="/cmd_vel" to="/my_cmd_vel" />
+    <remap from="/cmd_vel" to="/NESTOR/cmd_vel" />
   </node>
 
 

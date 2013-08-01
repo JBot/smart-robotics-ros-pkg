@@ -119,9 +119,40 @@ void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 // TODO : brider la vitesse des moteurs
 // TODO : SI un moteur va trop vite, prendre son ratio par rapport a vitesse max et l'appliquer aux autres moteurs
 
-  write_RoboClaw_drive_M1(128, int32_t( 64 + (-speed_motor1 * 12.85) ));
-  write_RoboClaw_drive_M2(128, int32_t( 64 + (-speed_motor3 * 12.85) ));
-  write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2 * 12.85) ));
+double ratio = 1.0;
+
+if( fabs(speed_motor1) > fabs(speed_motor2) )
+{
+	if( fabs(speed_motor1) > fabs(speed_motor3) )
+	{ // speed_motor1 is the biggest
+		if( fabs(speed_motor1) > 63.0 )
+			ratio = fabs(speed_motor1) / 63.0;
+	}
+	else // speed_motor3 is the biggest
+	{
+		if( fabs(speed_motor3) > 63.0 )
+			ratio = fabs(speed_motor3) / 63.0;
+	}
+}
+else
+{
+	if( fabs(speed_motor2) > fabs(speed_motor3) )
+        { // speed_motor2 is the biggest
+		if( fabs(speed_motor2) > 63.0 )
+			ratio = fabs(speed_motor2) / 63.0;
+
+        }
+        else // speed_motor3 is the biggest
+        {
+		if( fabs(speed_motor3) > 63.0 )
+			ratio = fabs(speed_motor3) / 63.0;
+
+        }
+}
+
+  write_RoboClaw_drive_M1(128, int32_t( 64 + (-speed_motor1/ratio * 12.85) ));
+  write_RoboClaw_drive_M2(128, int32_t( 64 + (-speed_motor3/ratio * 12.85) ));
+  write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2/ratio * 12.85) ));
 
 
 }

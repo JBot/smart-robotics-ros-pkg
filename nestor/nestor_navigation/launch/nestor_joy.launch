@@ -8,7 +8,7 @@
 
   <!-- NEATO TELEOP NODE -->
   <node pkg="neato_teleop_joy" type="teleop_neato" name="teleop_neato_node" output="screen">
-    <remap from="/cmd_vel" to="/my_cmd_vel" />
+    <remap from="/cmd_vel" to="/NESTOR/cmd_vel" />
   </node>
 
 
