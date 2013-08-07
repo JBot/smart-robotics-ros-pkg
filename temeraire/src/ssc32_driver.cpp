@@ -249,7 +249,7 @@ void SSC32Driver::posCallback(const temeraire::SSC32_Servo::ConstPtr& pos)
 	if ( fd )
 	{
 		write(fd, &Serout, sizeof(Serout));
-		printf("Writing.\n%s\n", Serout);
+		//printf("Writing.\n%s\n", Serout);
 	}
 
 }

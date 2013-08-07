@@ -125,6 +125,7 @@ class TemeraireGait {
 
 	private:
 		void velCallback(const geometry_msgs::Twist::ConstPtr& vel);
+		void poseCallback(const geometry_msgs::Twist::ConstPtr& pose);
 		void gaitCallback(const std_msgs::Int32::ConstPtr& gait);
 
 		void GetSinCos (float AngleDeg);
@@ -145,6 +146,7 @@ class TemeraireGait {
 
 		ros::NodeHandle nh;
 		ros::Subscriber vel_sub;
+		ros::Subscriber pose_sub;
 		ros::Subscriber gait_sub;
 
 		ros::Publisher servo_pub;
@@ -373,7 +375,8 @@ class TemeraireGait {
 
 TemeraireGait::TemeraireGait()
 {
-	vel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 5, &TemeraireGait::velCallback, this);
+	vel_sub = nh.subscribe<geometry_msgs::Twist>("/TEMERAIRE/cmd_vel", 5, &TemeraireGait::velCallback, this);
+	pose_sub = nh.subscribe<geometry_msgs::Twist>("/TEMERAIRE/body_pose", 5, &TemeraireGait::poseCallback, this);
 	gait_sub = nh.subscribe<std_msgs::Int32>("/TEMERAIRE/gait", 5, &TemeraireGait::gaitCallback, this);
 
 	servo_pub = nh.advertise < temeraire::SSC32_Servo > ("/TEMERAIRE/ssc32_comm", 3);
@@ -649,7 +652,7 @@ TemeraireGait::TemeraireGait()
 
 
 	GaitType = 1;
-	TravelLengthZ = 20;
+	TravelLengthZ = 0;
 
 
 	GaitSelect();
@@ -1403,17 +1406,24 @@ void TemeraireGait::GaitSeq(void) {
 
 void TemeraireGait::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 {
-	//compute_motor_speed(vel->linear.x, vel->linear.y, vel->angular.z);
-
-
-        TravelLengthX = vel->linear.y * 100;
-        TravelLengthZ = vel->linear.x * 100;
+        TravelLengthX = vel->linear.y * 200;
+        TravelLengthZ = vel->linear.x * 200;
         TravelRotationY = vel->angular.z * 100;
-
-
-
-
 }
+
+void TemeraireGait::poseCallback(const geometry_msgs::Twist::ConstPtr& pose)
+{
+                //Body Positions
+                BodyPosXint = pose->linear.y * 150;
+                BodyPosZint = pose->linear.x * 150;
+                BodyPosYint = 80 + pose->linear.z * 150;
+
+                //Body Rotations
+                BodyRotX = pose->angular.y * 90;
+                BodyRotY = pose->angular.z * 90;
+                BodyRotZ = pose->angular.x * 90;
+}
+
 
 void TemeraireGait::gaitCallback(const std_msgs::Int32::ConstPtr& gait)
 {
@@ -1527,7 +1537,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "Temeraire_Gait");
 	TemeraireGait temeraire_gait;
 	// Refresh rate
-	ros::Rate loop_rate(2.5);                                // 35 with bluetooth
+	ros::Rate loop_rate(2);                                // 35 with bluetooth
 
 
 	while (ros::ok()) {

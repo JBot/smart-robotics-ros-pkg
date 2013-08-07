@@ -48,8 +48,12 @@ void TeleopNeato::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
   geometry_msgs::Twist vel;
   vel.angular.z = a_scale_*joy->axes[angular_];
+  vel.angular.y = a_scale_*joy->axes[3];
+  vel.angular.x = 0;
   vel.linear.x = l_scale_*joy->axes[linear_];
   vel.linear.y = l_scale_*joy->axes[0];
+  vel.linear.z = 0;
+
   vel_pub_.publish(vel);
 
   if(joy->buttons[0] == 1) {

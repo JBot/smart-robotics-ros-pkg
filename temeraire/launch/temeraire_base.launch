@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- JOYSTICK NODE -->
+  <node pkg="joy" type="joy_node" name="TEMERAIRE_joystick_node" output="screen">
+  </node>
+
+  <!-- NEATO TELEOP NODE -->
+  <node pkg="neato_teleop_joy" type="teleop_neato" name="TEMERAIRE_teleop_neato_node" output="screen">
+    <remap from="/cmd_vel" to="/TEMERAIRE/cmd_vel" />
+  </node>
+
+  <!-- SSC32 DRIVER NODE -->
+  <node pkg="temeraire" type="ssc32_driver" name="TEMERAIRE_ssc32_driver" output="screen">
+  </node>
+
+  <!-- TEMERAIRE GAIT AND IK NODE -->
+  <node pkg="temeraire" type="temeraire_gait" name="TEMERAIRE_temeraire_gait" output="screen">
+  </node>
+
+
+</launch>
