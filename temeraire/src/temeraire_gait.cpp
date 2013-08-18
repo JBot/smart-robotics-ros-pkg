@@ -644,7 +644,7 @@ TemeraireGait::TemeraireGait()
 		Ybase = 108;
 		Zbase = -80;
 
-		BodyPosYint = 80;
+		BodyPosYint = 65;
 		NomGaitSpeed = 500;
 
 
@@ -1537,7 +1537,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "Temeraire_Gait");
 	TemeraireGait temeraire_gait;
 	// Refresh rate
-	ros::Rate loop_rate(2);                                // 35 with bluetooth
+	ros::Rate loop_rate(4);                                // 35 with bluetooth
 
 
 	while (ros::ok()) {
