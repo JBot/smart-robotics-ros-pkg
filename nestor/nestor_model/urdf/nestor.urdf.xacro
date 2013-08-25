@@ -1,0 +1,1003 @@
+<?xml version="1.0"?>
+
+<!-- XML namespaces -->
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro" 
+	   name="indomptable">
+
+	<!--
+	<include filename="$(find pi_robot_description)/urdf/sensors/hokuyo_laser_gazebo.xacro" />
+	-->
+	
+	<xacro:macro name="cyan1">
+		<material name="cyan1">
+			<color rgba="0 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+
+	<xacro:macro name="cyan2">	
+		<material name="cyan2">
+	     <color rgba="0 0.7 0.7 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="cyan3">	
+		<material name="cyan3">
+	     <color rgba="0 0.5 0.5 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black">
+		<material name="black">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black1">
+		<material name="black1">
+			<color rgba="0.2 0.2 0.2 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="yellow2">
+		<material name="yellow2">
+			<color rgba="0.8 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green1">
+		<material name="green1">
+			<color rgba="0 1 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green2">
+		<material name="green2">
+			<color rgba="0.1 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green3">
+		<material name="green3">
+			<color rgba="0.1 0.5 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey1">
+		<material name="grey1">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey2">
+		<material name="grey2">
+			<color rgba="0.6 0.6 0.6 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey3">
+		<material name="grey3">
+			<color rgba="0.8 0.8 0.8 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="blue1">
+		<material name="blue1">
+			<color rgba="0 0 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12_color">
+		<material name="ax12_color">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="bracket_color">
+		<material name="bracket_color">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.5 0.32 0.38" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.5 0.32 0.38" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.055" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/FlatBlack" />
+	</xacro:macro>
+	
+	<xacro:macro name="bracket1" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.05 0.025 0.038" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.05 0.025 0.038" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.02" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/WhiteEmissive" />
+	</xacro:macro>
+	
+	<xacro:macro name="my_box" params="name lwh xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="${lwh}" />
+				</geometry>
+			    <xacro:insert_block name="rviz_color" />             
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="${lwh}" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="${mass}" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+	<xacro:macro name="my_cylinder" params="name l r xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>	
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<cylinder length="${l}" radius="${r}" />
+				</geometry>
+            	<xacro:insert_block name="rviz_color" />
+            </visual>
+            <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<cylinder length="${l}" radius="${r}" />
+					</geometry>
+            </collision>
+            <xacro:default_inertial mass="${mass}" />
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+    <xacro:macro name="default_inertial" params="mass">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                     iyy="0.001" iyz="0.0"
+                     izz="0.001" />                     
+			</inertial>
+    </xacro:macro>
+    
+    <xacro:macro name="default_gazebo" params="name material">
+ 		<gazebo reference="${name}">
+			<material>${material}</material>
+			<selfCollide>false</selfCollide>
+			<turnGravityOff>true</turnGravityOff>
+		</gazebo>
+    </xacro:macro>
+
+
+ 	<!-- ============================   Body   ============================ -->
+ 	
+ 	<!--
+ 	<link name="world" />
+ 	-->
+
+ 	<!--
+	<xacro:my_box name="base_link" lwh="0.24 0.32 0.01" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+ 	-->
+	<xacro:my_cylinder name="base_link" l="0.01" r="0.25" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	
+	<xacro:my_box name="plate_link" lwh="0.28 0.4 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_box>
+	<xacro:my_cylinder name="plate_tube1_link" l="0.170" r="0.003" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="plate_tube2_link" l="0.170" r="0.003" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="plate_tube3_link" l="0.170" r="0.003" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="plate_tube4_link" l="0.170" r="0.003" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	
+	<xacro:my_box name="level1_link" lwh="0.25 0.34 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_box>
+	<xacro:my_cylinder name="level1_tube1_link" l="0.500" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="level1_tube2_link" l="0.500" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="level1_tube3_link" l="0.500" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="level1_tube4_link" l="0.500" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	
+	<xacro:my_box name="level2_link" lwh="0.25 0.34 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_box>
+	
+	<xacro:my_box name="head_base_link" lwh="0.21 0.28 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_box>
+	<xacro:my_cylinder name="head_tube1_link" l="0.650" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="head_tube2_link" l="0.650" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	<xacro:my_cylinder name="head_tube3_link" l="0.650" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_cylinder>
+	
+ 	<!--
+	<xacro:my_box name="base_laser_bottom" lwh="0.05 0.05 0.041" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/FlatBlack">
+		<xacro:black1 />
+	</xacro:my_box>
+	
+	<xacro:my_cylinder name="base_laser" l="0.029" r="0.025" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+		<xacro:black1 />
+	</xacro:my_cylinder>
+	
+	<xacro:my_box name="first_level" lwh="0.24 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+	<xacro:my_box name="netbook_level" lwh="0.2 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+	<xacro:my_box name="top_level" lwh="0.24 0.32 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+	<xacro:my_box name="right_arm_panel" lwh="0.025 0.002 0.06" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+        <xacro:my_box name="left_arm_panel" lwh="0.025 0.002 0.06" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+        <xacro:my_box name="right_panel" lwh="0.16 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+        <xacro:my_box name="left_panel" lwh="0.16 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+ 	-->
+
+	
+ 	<!-- ============================   Arms   ============================ -->
+
+                <xacro:my_box name="shoulder_yaw_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="shoulder_pitch_link" lwh="0.4 0.14 0.1" xyz="0.2 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="elbow_pitch_link" lwh="0.3 0.1 0.08" xyz="0.15 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="wrist_pitch_link" lwh="0.05 0.04 0.03" xyz="-0.015 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="wrist_yaw_link" lwh="0.05 0.032 0.038" xyz="-0.015 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="wrist_roll_link" lwh="0.038 0.032 0.05" xyz="0 0 0.015" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="claw_link" lwh="0.15 0.15 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+
+
+
+
+
+
+<!--
+	<xacro:macro name="arm" params="side reflect">
+	
+                <xacro:my_box name="${side}_shoulder_roll_link" lwh="0.05 0.03 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_shoulder_link" lwh="0.038 0.025 0.05" xyz="0.007 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_shoulder_lift_link" lwh="0.05 0.03 0.03" xyz="0.015 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_shoulder_link2" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_elbow_servo_link" lwh="0.05 0.03 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_elbow_link" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_wrist_lift_link" lwh="0.05 0.03 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_wrist_link" lwh="0.054 0.05 0.025" xyz="0.027 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="${side}_pump_link" lwh="0.026 0.01 0.01" xyz="0 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+
+
+	</xacro:macro>
+-->	
+
+
+
+	<!-- =================== Joint Definitions ==================== -->
+	
+	<!--
+	<joint name="base_world_link" type="continuous">
+    	<parent link="world"/>
+    	<child link="base_link"/>
+    	<axis xyz="0 0 0"/>
+    	<origin rpy="0 0 0" xyz="0 0 0"/>
+    	<dynamics damping="0.05"/>
+  	</joint>
+  	-->
+
+
+
+        <joint name="plate_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="plate_link" />
+        <origin xyz="0.15 0.0 0.176" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="plate_tube1_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="plate_tube1_link" />
+        <origin xyz="0.158 0.145 0.090" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="plate_tube2_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="plate_tube2_link" />
+        <origin xyz="0.158 -0.145 0.090" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="plate_tube3_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="plate_tube3_link" />
+        <origin xyz="0.038 0.175 0.090" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="plate_tube4_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="plate_tube4_link" />
+        <origin xyz="0.038 -0.175 0.090" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+
+
+
+        <joint name="level1_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="level1_link" />
+        <origin xyz="-0.12 0.0 0.509" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="level1_tube1_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="level1_tube1_link" />
+        <origin xyz="-0.01 0.130 0.255" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="level1_tube2_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="level1_tube2_link" />
+        <origin xyz="-0.01 -0.130 0.255" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="level1_tube3_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="level1_tube3_link" />
+        <origin xyz="-0.180 0.08 0.255" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="level1_tube4_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="level1_tube4_link" />
+        <origin xyz="-0.180 -0.08 0.255" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+        <joint name="level2_joint" type="fixed">
+        <parent link="level1_link" />
+        <child link="level2_link" />
+        <origin xyz="0.0 0.0 0.1" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+        <joint name="head_base_joint" type="fixed">
+        <parent link="level2_link" />
+        <child link="head_base_link" />
+        <origin xyz="0.0 0.0 0.65" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="head_tube1_joint" type="fixed">
+        <parent link="level2_link" />
+        <child link="head_tube1_link" />
+        <origin xyz="0.035 0.125 0.326" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="head_tube2_joint" type="fixed">
+        <parent link="level2_link" />
+        <child link="head_tube2_link" />
+        <origin xyz="0.035 -0.125 0.326" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        <joint name="head_tube3_joint" type="fixed">
+        <parent link="level2_link" />
+        <child link="head_tube3_link" />
+        <origin xyz="-0.065 0.0 0.326" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+
+
+
+        <joint name="shoulder_yaw_joint" type="revolute">
+        <parent link="level2_link" />
+        <child link="shoulder_yaw_link" />
+        <origin xyz="0.085 0.0 0.025" rpy="0 0 0" />
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="shoulder_pitch_joint" type="revolute">
+        <parent link="shoulder_yaw_link" />
+        <child link="shoulder_pitch_link" />
+        <origin xyz="0.0 0.0 0.08" rpy="0 0 0" />
+        <limit lower="-0.625" upper="0.625" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="elbow_pitch_joint" type="revolute">
+        <parent link="shoulder_pitch_link" />
+        <child link="elbow_pitch_link" />
+        <origin xyz="0.4 0.0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="wrist_fixed_joint" type="fixed">
+        <parent link="elbow_pitch_link" />
+        <child link="wrist_pitch_link" />
+        <origin xyz="0.3 -0.04 0.0" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        
+        <joint name="wrist_pitch_joint" type="revolute">
+        <parent link="wrist_pitch_link" />
+        <child link="wrist_yaw_link" />
+        <origin xyz="0.0 0.04 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="wrist_yaw_joint" type="revolute">
+        <parent link="wrist_yaw_link" />
+        <child link="wrist_roll_link" />
+        <origin xyz="0.0 0.0 -0.065" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="wrist_roll_joint" type="revolute">
+        <parent link="wrist_roll_link" />
+        <child link="claw_link" />
+        <origin xyz="0.08 0.0 0.0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+<!-- Finger joint -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!--
+	<joint name="first_level_joint" type="fixed">
+    	<parent link="base_link" />
+    	<child link="first_level" />
+    	<origin xyz="0 0 0.1" rpy="0 0 0" />
+	</joint>
+	
+	<joint name="netbook_level_joint" type="fixed">
+    	<parent link="base_link" />
+    	<child link="netbook_level" />
+    	<origin xyz="-0.02 0 0.21" rpy="0 0 0" />
+	</joint>
+	
+	<joint name="top_level_joint" type="fixed">
+    	<parent link="base_link" />
+    	<child link="top_level" />
+    	<origin xyz="0 0 0.34" rpy="0 0 0" />
+	</joint>
+	
+	<joint name="base_laser_bottom_joint" type="fixed">
+    	<parent link="base_link" />
+    	<child link="base_laser_bottom" />
+    	<origin xyz="0.081 0 0.022" rpy="0 0 -0.02" />
+	</joint>
+	
+	<joint name="base_laser_joint" type="fixed">
+    	<parent link="base_laser_bottom" />
+    	<child link="base_laser" />
+    	<origin xyz="0 0 0.035" rpy="0 0 0" />
+	</joint>
+
+	<joint name="left_arm_panel_joint" type="fixed">
+    	<parent link="netbook_level" />
+    	<child link="left_arm_panel" />
+    	<origin xyz="0.065 0.09 0.03" rpy="0 0 0" />
+	</joint>
+
+        <joint name="right_arm_panel_joint" type="fixed">
+        <parent link="netbook_level" />
+        <child link="right_arm_panel" />
+        <origin xyz="0.065 -0.09 0.03" rpy="0 0 0" />
+        </joint>
+
+        <joint name="left_panel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="left_panel" />
+        <origin xyz="0 0.155 0.17" rpy="0 0 0" />
+        </joint>
+
+        <joint name="right_panel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="right_panel" />
+        <origin xyz="0 -0.155 0.17" rpy="0 0 0" />
+        </joint>
+
+
+
+
+        <joint name="left_shoulder_joint" type="fixed">
+        <parent link="left_arm_panel" />
+        <child link="left_shoulder_roll_link" />
+        <origin xyz="0 -0.016 0.005" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+        
+        <joint name="left_shoulder_roll_joint" type="revolute">
+        <parent link="left_shoulder_roll_link" />
+        <child link="left_shoulder_link" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+	<joint name="left_shoulder_joint2" type="fixed">
+        <parent link="left_shoulder_link" />
+        <child link="left_shoulder_link2" />
+        <origin xyz="0.03 0 0" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+	<joint name="left_shoulder_lift_joint" type="revolute">
+        <parent link="left_shoulder_link2" />
+        <child link="left_shoulder_lift_link" />
+        <origin xyz="0.054 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+  	-->
+
+<!--
+        <joint name="left_shoulder_joint2" type="fixed">
+        <parent link="left_shoulder_link" />
+        <child link="left_shoulder_lift_link" />
+        <origin xyz="0.051 0 0" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+        <joint name="left_shoulder_lift_joint" type="revolute">
+        <parent link="left_shoulder_lift_link" />
+        <child link="left_shoulder_link2" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+-->
+<!--
+        <joint name="left_elbow_servo_joint" type="fixed">
+        <parent link="left_shoulder_lift_link" />
+        <child link="left_elbow_servo_link" />
+        <origin xyz="0.075 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
+
+        <joint name="left_elbow_joint" type="revolute">
+        <parent link="left_elbow_servo_link" />
+        <child link="left_elbow_link" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="left_wrist_lift_joint" type="fixed">
+        <parent link="left_elbow_link" />
+        <child link="left_wrist_lift_link" />
+        <origin xyz="0.08 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
+
+        <joint name="left_wrist_joint" type="revolute">
+        <parent link="left_wrist_lift_link" />
+        <child link="left_wrist_link" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="left_pump_joint" type="fixed">
+        <parent link="left_wrist_link" />
+        <child link="left_pump_link" />
+        <origin xyz="0.067 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
+
+
+
+        <joint name="right_shoulder_joint" type="fixed">
+        <parent link="right_arm_panel" />
+        <child link="right_shoulder_roll_link" />
+        <origin xyz="0 0.016 0.005" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+        <joint name="right_shoulder_roll_joint" type="revolute">
+        <parent link="right_shoulder_roll_link" />
+        <child link="right_shoulder_link" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="right_shoulder_joint2" type="fixed">
+        <parent link="right_shoulder_link" />
+        <child link="right_shoulder_lift_link" />
+        <origin xyz="0.051 0 0" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
+        <joint name="right_shoulder_lift_joint" type="revolute">
+        <parent link="right_shoulder_lift_link" />
+        <child link="right_shoulder_link2" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="right_elbow_servo_joint" type="fixed">
+        <parent link="right_shoulder_link2" />
+        <child link="right_elbow_servo_link" />
+        <origin xyz="0.08 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
+
+        <joint name="right_elbow_joint" type="revolute">
+        <parent link="right_elbow_servo_link" />
+        <child link="right_elbow_link" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="right_wrist_lift_joint" type="fixed">
+        <parent link="right_elbow_link" />
+        <child link="right_wrist_lift_link" />
+        <origin xyz="0.08 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
+
+        <joint name="right_wrist_joint" type="revolute">
+        <parent link="right_wrist_lift_link" />
+        <child link="right_wrist_link" />
+        <origin xyz="0.01 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="right_pump_joint" type="fixed">
+        <parent link="right_wrist_link" />
+        <child link="right_pump_link" />
+        <origin xyz="0.067 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        </joint>
+
+-->
+
+
+<!--        
+ 	<joint name="left_shoulder_joint" type="fixed">
+    	<parent link="left_arm_panel" />
+    	<child link="left_shoulder_link" />
+    	<origin xyz="0 0.034 0.05" rpy="0 0 0" />
+	</joint>
+	
+ 	<joint name="left_shoulder_pan_joint" type="revolute">
+    	<parent link="left_shoulder_link" />
+    	<child link="left_shoulder_pan_link" />
+    	<origin xyz="0 0.031 0" rpy="0 0 0" />
+       	<limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="left_shoulder_lift_joint" type="revolute">
+    	<parent link="left_shoulder_pan_link" />
+    	<child link="left_shoulder_lift_link" />
+    	<origin xyz="0 0.047 0" rpy="0 -1.57 0" />
+       	<limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="left_upper_arm_bracket_joint" type="fixed">
+    	<parent link="left_shoulder_lift_link" />
+    	<child link="left_upper_arm_bracket_link" />
+    	<origin xyz="0 0.009 -0.0465" rpy="0 0 0" />
+	</joint>
+	
+ 	<joint name="left_arm_roll_joint" type="revolute">
+    	<parent link="left_upper_arm_bracket_link" />
+    	<child link="left_arm_roll_link" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+    	<origin xyz="0 -0.009 -0.0175" rpy="0 0 0" />
+        <axis xyz="0 0 -1" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="left_upper_elbow_bracket_joint" type="fixed">
+    	<parent link="left_arm_roll_link" />
+    	<child link="left_upper_elbow_bracket_link" />
+    	<origin xyz="-0.012 0.009 -0.0175" rpy="0 0 -1.57" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="left_elbow_servo_joint" type="fixed">
+    	<parent link="left_upper_elbow_bracket_link" />
+    	<child link="left_elbow_servo_link" />
+    	<origin xyz="0 0 -0.0275" rpy="0 0 1.57" />
+        <axis xyz="0 1 0" />
+	</joint>
+	
+ 	<joint name="left_elbow_joint" type="revolute">
+    	<parent link="left_elbow_servo_link" />
+    	<child link="left_elbow_link" />
+    	<origin xyz="0 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="left_wrist_bracket_joint" type="fixed">
+    	<parent link="left_lower_arm_link" />
+    	<child link="left_wrist_bracket_link" />
+    	<origin xyz="0 0 -0.092" rpy="0 0 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="left_hand_joint" type="fixed">
+    	<parent link="left_wrist_link" />
+    	<child link="left_hand_link" />
+    	<origin xyz="0 0 -0.041" rpy="0 0 0" />
+	</joint>
+	
+ 	<joint name="left_finger_joint" type="fixed">
+    	<parent link="left_hand_link" />
+    	<child link="left_finger_link" />
+    	<origin xyz="0 0 -0.064" rpy="0 0 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+
+        <joint name="left_lower_arm_joint" type="fixed">
+        <parent link="left_elbow_link" />
+        <child link="left_lower_arm_link" />
+        <origin xyz="0 0 -0.038" rpy="0 0 0" />
+        </joint>
+
+        <joint name="left_wrist_joint" type="revolute">
+        <parent link="left_wrist_bracket_link" />
+        <child link="left_wrist_link" />
+        <origin xyz="0 0 -0.026" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+-->
+
+
+<!--	
+ 	<joint name="right_shoulder_joint" type="fixed">
+    	<parent link="right_arm_panel" />
+    	<child link="right_shoulder_link" />
+    	<origin xyz="0 -0.034 0.05" rpy="0 0 0" />
+	</joint>
+
+ 	<joint name="right_shoulder_pan_joint" type="revolute">
+    	<parent link="right_shoulder_link" />
+    	<child link="right_shoulder_pan_link" />
+    	<origin xyz="0 -0.031 0" rpy="0 0 0" />
+       	<limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_shoulder_lift_joint" type="revolute">
+    	<parent link="right_shoulder_pan_link" />
+    	<child link="right_shoulder_lift_link" />
+    	<origin xyz="0 -0.047 0" rpy="0 -1.57 0" />
+       	<limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 -1 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_upper_arm_bracket_joint" type="fixed">
+    	<parent link="right_shoulder_lift_link" />
+    	<child link="right_upper_arm_bracket_link" />
+    	<origin xyz="0 -0.009 -0.0465" rpy="0 0 0" />
+	</joint>
+	
+ 	<joint name="right_arm_roll_joint" type="revolute">
+    	<parent link="right_upper_arm_bracket_link" />
+    	<child link="right_arm_roll_link" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+    	<origin xyz="0 0.009 -0.0175" rpy="0 0 0" />
+        <axis xyz="0 0 -1" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_upper_elbow_bracket_joint" type="fixed">
+    	<parent link="right_arm_roll_link" />
+    	<child link="right_upper_elbow_bracket_link" />
+    	<origin xyz="-0.012 -0.009 -0.0175" rpy="0 0 -1.57" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_elbow_servo_joint" type="fixed">
+    	<parent link="right_upper_elbow_bracket_link" />
+    	<child link="right_elbow_servo_link" />
+    	<origin xyz="0 0 -0.0275" rpy="0 0 1.57" />
+        <axis xyz="0 -1 0" />
+	</joint>
+	
+ 	<joint name="right_elbow_joint" type="revolute">
+    	<parent link="right_elbow_servo_link" />
+    	<child link="right_elbow_link" />
+    	<origin xyz="0 0 0" rpy="0 0 0" />
+       	<limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_lower_arm_joint" type="fixed">
+    	<parent link="right_elbow_link" />
+    	<child link="right_lower_arm_link" />
+    	<origin xyz="0 0 -0.038" rpy="0 0 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_wrist_bracket_joint" type="fixed">
+    	<parent link="right_lower_arm_link" />
+    	<child link="right_wrist_bracket_link" />
+    	<origin xyz="0 0 -0.092" rpy="0 0 0" />
+	</joint>
+	
+ 	<joint name="right_wrist_joint" type="revolute">
+    	<parent link="right_wrist_bracket_link" />
+    	<child link="right_wrist_link" />
+    	<origin xyz="0 0 -0.026" rpy="0 0 0" />
+       	<limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+    	<dynamics damping="0.0"/>
+	</joint>
+	
+ 	<joint name="right_hand_joint" type="fixed">
+    	<parent link="right_wrist_link" />
+    	<child link="right_hand_link" />
+    	<origin xyz="0 0 -0.041" rpy="0 0 0" />
+	</joint>
+	
+ 	<joint name="right_finger_joint" type="fixed">
+    	<parent link="right_hand_link" />
+    	<child link="right_finger_link" />
+    	<origin xyz="0 0 -0.064" rpy="0 0 0" />
+	</joint>
+	-->
+	<gazebo reference="indomptable">
+  	</gazebo>
+</robot>
+

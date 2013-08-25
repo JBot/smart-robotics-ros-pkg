@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- OCTOMAP NODE -->
+  <node pkg="octomap_server" type="octomap_server_node" name="TEMERAIRE_octomap" output="screen">
+    <param name="resolution" value="0.02" />
+    <remap from="/cloud_in" to="/TEMERAIRE/point_cloud" />
+  </node>
+
+
+</launch>

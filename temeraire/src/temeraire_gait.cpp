@@ -1532,7 +1532,7 @@ void TemeraireGait::computeNextStep(void)
 
 
         transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
-        transform.setRotation( tf::Quaternion(BodyRotX*3.14159/180.0, BodyRotZ*3.14159/180.0, 0.0) );
+        transform.setRotation( tf::Quaternion(-BodyRotX*3.14159/180.0, BodyRotZ*3.14159/180.0, 0.0) );
         br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "base_link", "rotation_link") );
 
 

@@ -1,0 +1,22 @@
+<package>
+  <description brief="nestor_arm">
+
+     nestor_arm
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nestor_arm</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="trajectory_msgs"/>
+  <depend package="control_msgs"/>
+  <depend package="dynamixel_controllers"/>
+  <depend package="tf"/>
+
+</package>
+
+

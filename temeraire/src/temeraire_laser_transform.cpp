@@ -29,7 +29,7 @@ class LaserScanToPointCloud{
 
 		LaserScanToPointCloud(ros::NodeHandle n) : 
 			n_(n),
-			laser_sub_(n_, "base_scan", 10),
+			laser_sub_(n_, "scan", 10),
 			laser_notifier_(laser_sub_,listener_, "base_link", 10)
 	{
 
@@ -50,6 +50,7 @@ class LaserScanToPointCloud{
 		void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in)
 		{
 
+
 			if(current_mode == 0) {
 				// Publish laser_scan
 
@@ -67,7 +68,7 @@ class LaserScanToPointCloud{
 				try
 				{
 					projector_.transformLaserScanToPointCloud(
-							"base_link",*scan_in, cloud,listener_);
+							"neato_laser",*scan_in, cloud,listener_);
 
 					cloud.header.frame_id = "scanner_link";
 				}
@@ -80,6 +81,7 @@ class LaserScanToPointCloud{
 
 
 				// Do something with cloud.
+				saved_laser.header.stamp = ros::Time::now();
 				laser_pub_.publish(saved_laser);
 				scan_pub_.publish(cloud);
 			}
