@@ -1,0 +1,20 @@
+<launch>
+  <master auto="start"/>
+
+  <node pkg="eurobot2014_gros_ai" type="objective_manager" respawn="false" name="GROS_objective_manager" output="screen">
+
+        <remap from="/ROBOT/get_objective" to="/GROS/get_objective" />
+        <remap from="/ROBOT/delet_objective" to="/GROS/delet_objective" />
+        <remap from="/ROBOT/update_priority" to="/GROS/update_priority" />
+        <remap from="/TEAM/color" to="/SMART/color" />
+
+        <remap from="/ROBOT/get_robot_pose" to="/GROS/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/GROS/get_distance" />
+        <remap from="/ROBOT/get_path" to="/GROS/get_path" />
+
+  </node>
+
+
+
+
+</launch>

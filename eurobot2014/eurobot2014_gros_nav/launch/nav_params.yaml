@@ -1,4 +1,4 @@
-NESTOR_costmap:
+GROS_costmap:
   global_frame: /map
   robot_base_frame: /base_link
   transform_tolerance: 0.05
@@ -18,7 +18,7 @@ NESTOR_costmap:
   map_type: costmap
   track_unknown_space: true
 
-NESTOR_planner:
+GROS_planner:
   allow_unknown: true
   visualize_potential: true
 
