@@ -2,17 +2,17 @@
 
 <launch>
   <!-- LASER NODE -->
-  <node pkg="hokuyo_node" type="hokuyo_node" name="laser_publisher" output="screen">
+<!--  <node pkg="hokuyo_node" type="hokuyo_node" name="laser_publisher" output="screen">
     <param name="frame_id" value="/laser" />
     <param name="min_ang" value="-2.086214" />
     <param name="max_ang" value="2.092350" /> 
   </node>
-
+-->
   <!-- MOTOR DRIVER NODE -->
-  <node pkg="nestor_navigation" type="nestor_drive_roboclaw" name="nestor_drive_roboclaw" output="screen">
+<!--  <node pkg="nestor_navigation" type="nestor_drive_roboclaw" name="nestor_drive_roboclaw" output="screen">
     <remap from="/cmd_vel" to="/NESTOR/cmd_vel" />
   </node>
-
+-->
   <!-- Publish a static transform between the robot base and the map frame -->
   <node pkg="tf" type="static_transform_publisher" name="link_nav_broadcaster" args="0 0 0 0 0 0 odom base_link 100"/>
   <node pkg="tf" type="static_transform_publisher" name="link_laser_broadcaster" args="0.02 0 0.1 0 0 0 base_link laser 100"/>
