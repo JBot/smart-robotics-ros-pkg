@@ -1,0 +1,464 @@
+<?xml version="1.0"?>
+
+<!-- XML namespaces -->
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro" 
+	   name="indomptable">
+
+	<!--
+	<include filename="$(find pi_robot_description)/urdf/sensors/hokuyo_laser_gazebo.xacro" />
+	-->
+	
+	<xacro:macro name="cyan1">
+		<material name="cyan1">
+			<color rgba="0 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+
+	<xacro:macro name="cyan2">	
+		<material name="cyan2">
+	     <color rgba="0 0.7 0.7 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="cyan3">	
+		<material name="cyan3">
+	     <color rgba="0 0.5 0.5 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black">
+		<material name="black">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black1">
+		<material name="black1">
+			<color rgba="0.2 0.2 0.2 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="yellow2">
+		<material name="yellow2">
+			<color rgba="0.8 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green1">
+		<material name="green1">
+			<color rgba="0 1 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green2">
+		<material name="green2">
+			<color rgba="0.1 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green3">
+		<material name="green3">
+			<color rgba="0.1 0.5 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey1">
+		<material name="grey1">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey2">
+		<material name="grey2">
+			<color rgba="0.6 0.6 0.6 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey3">
+		<material name="grey3">
+			<color rgba="0.8 0.8 0.8 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="blue1">
+		<material name="blue1">
+			<color rgba="0 0 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12_color">
+		<material name="ax12_color">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="bracket_color">
+		<material name="bracket_color">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.5 0.32 0.38" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.5 0.32 0.38" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.055" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/FlatBlack" />
+	</xacro:macro>
+	
+	<xacro:macro name="bracket1" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.05 0.025 0.038" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.05 0.025 0.038" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.02" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/WhiteEmissive" />
+	</xacro:macro>
+	
+	<xacro:macro name="my_box" params="name lwh xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="${lwh}" />
+				</geometry>
+			    <xacro:insert_block name="rviz_color" />             
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="${lwh}" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="${mass}" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+	<xacro:macro name="my_cylinder" params="name l r xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>	
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<cylinder length="${l}" radius="${r}" />
+				</geometry>
+            	<xacro:insert_block name="rviz_color" />
+            </visual>
+            <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<cylinder length="${l}" radius="${r}" />
+					</geometry>
+            </collision>
+            <xacro:default_inertial mass="${mass}" />
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+    <xacro:macro name="default_inertial" params="mass">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                     iyy="0.001" iyz="0.0"
+                     izz="0.001" />                     
+			</inertial>
+    </xacro:macro>
+    
+    <xacro:macro name="default_gazebo" params="name material">
+ 		<gazebo reference="${name}">
+			<material>${material}</material>
+			<selfCollide>false</selfCollide>
+			<turnGravityOff>true</turnGravityOff>
+		</gazebo>
+    </xacro:macro>
+
+
+ 	<!-- ============================   Body   ============================ -->
+ 	
+ 	<!--
+ 	<link name="world" />
+ 	-->
+
+ 	
+	<xacro:my_box name="base_link" lwh="0.24 0.3 0.003" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_box>
+ 	
+	<xacro:my_box name="arm_level_link" lwh="0.24 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+		<xacro:grey2 />
+	</xacro:my_box>
+ 	
+        <xacro:my_box name="right_panel" lwh="0.16 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+        <xacro:my_box name="left_panel" lwh="0.16 0.002 0.34" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
+        <xacro:my_box name="top_level" lwh="0.24 0.3 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+	
+        <xacro:my_box name="base_laser" lwh="0.05 0.05 0.041" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_box>
+
+        <xacro:my_cylinder name="hokuyo_laser" l="0.029" r="0.021" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_cylinder>
+
+
+
+	
+ 	<!-- ============================   Arms   ============================ -->
+
+
+                <xacro:my_box name="link1" lwh="0.04 0.04 0.04" xyz="-0.02 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+                
+		<xacro:my_box name="link2" lwh="0.0797 0.04 0.04" xyz="0.03985 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="link3" lwh="0.053 0.04 0.04" xyz="0.0265 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="link4" lwh="0.026 0.04 0.04" xyz="0.013 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="link5" lwh="0.0675 0.04 0.04" xyz="0.03375 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="link6" lwh="0.04 0.04 0.04" xyz="0.02 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+
+
+                <xacro:my_box name="Llink1" lwh="0.04 0.04 0.04" xyz="-0.02 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="Llink2" lwh="0.052 0.04 0.04" xyz="0.026 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="Llink3" lwh="0.0815 0.04 0.04" xyz="0.04075 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="Llink4" lwh="0.0415 0.04 0.04" xyz="0.02075 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="Llink5" lwh="0.052 0.04 0.04" xyz="0.026 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                        <xacro:ax12_color />
+                </xacro:my_box>
+
+                <xacro:my_box name="Llink6" lwh="0.04 0.04 0.04" xyz="0.02 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                        <xacro:bracket_color />
+                </xacro:my_box>
+
+
+
+	<!-- =================== Joint Definitions ==================== -->
+	
+	<!--
+	<joint name="base_world_link" type="continuous">
+    	<parent link="world"/>
+    	<child link="base_link"/>
+    	<axis xyz="0 0 0"/>
+    	<origin rpy="0 0 0" xyz="0 0 0"/>
+    	<dynamics damping="0.05"/>
+  	</joint>
+  	-->
+
+        <joint name="arm_level_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="arm_level_link" />
+        <origin xyz="0 0 0.147" rpy="0 0 0" />
+        </joint>
+
+        <joint name="rightarm_joint" type="fixed">
+        <parent link="arm_level_link" />
+        <child link="link1" />
+        <origin xyz="0.05 -0.06 0.032" rpy="0 0 0" />
+        </joint>
+
+        <joint name="leftarm_joint" type="fixed">
+        <parent link="arm_level_link" />
+        <child link="Llink1" />
+        <origin xyz="0.05 0.06 0.032" rpy="0 0 0" />
+        </joint>
+
+        <joint name="left_panel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="left_panel" />
+        <origin xyz="0 0.15 0.17" rpy="0 0 0" />
+        </joint>
+
+        <joint name="right_panel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="right_panel" />
+        <origin xyz="0 -0.15 0.17" rpy="0 0 0" />
+        </joint>
+
+        <joint name="top_level_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="top_level" />
+        <origin xyz="0 0 0.34" rpy="0 0 0" />
+        </joint>
+
+
+	<!-- =================== LASER Definitions ==================== -->
+
+        <joint name="base_laser_joint" type="prismatic">
+        <parent link="base_link" />
+        <child link="base_laser" />
+        <origin xyz="0.15 0 0.07" rpy="0 0 0" />
+        <limit lower="0.0" upper="0.1" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        </joint>
+
+        <joint name="laser_joint" type="fixed">
+        <parent link="base_laser" />
+        <child link="hokuyo_laser" />
+        <origin xyz="0 0 -0.035" rpy="0 0 1.5707963267" />
+        </joint>
+
+
+
+ 	<!-- =================== RIGHT ARM Definitions ==================== -->
+        
+        <joint name="joint1" type="revolute">
+        <parent link="link1" />
+        <child link="link2" />
+        <origin xyz="0.0 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="joint2" type="revolute">
+        <parent link="link2" />
+        <child link="link3" />
+        <origin xyz="0.0797 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="joint3" type="revolute">
+        <parent link="link3" />
+        <child link="link4" />
+        <origin xyz="0.053 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="joint4" type="revolute">
+        <parent link="link4" />
+        <child link="link5" />
+        <origin xyz="0.026 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="joint5" type="revolute">
+        <parent link="link5" />
+        <child link="link6" />
+        <origin xyz="0.0675 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+	<!-- =================== LEFT ARM Definitions ==================== -->
+
+        <joint name="Ljoint1" type="revolute">
+        <parent link="Llink1" />
+        <child link="Llink2" />
+        <origin xyz="0.0 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="Ljoint2" type="revolute">
+        <parent link="Llink2" />
+        <child link="Llink3" />
+        <origin xyz="0.052 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="Ljoint3" type="revolute">
+        <parent link="Llink3" />
+        <child link="Llink4" />
+        <origin xyz="0.0815 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="1 0 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="Ljoint4" type="revolute">
+        <parent link="Llink4" />
+        <child link="Llink5" />
+        <origin xyz="0.0415 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+        <joint name="Ljoint5" type="revolute">
+        <parent link="Llink5" />
+        <child link="Llink6" />
+        <origin xyz="0.052 0 0" rpy="0 0 0" />
+        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.0"/>
+        </joint>
+
+
+	<gazebo reference="indomptable">
+  	</gazebo>
+</robot>
+

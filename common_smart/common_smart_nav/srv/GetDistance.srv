@@ -1,0 +1,6 @@
+
+geometry_msgs/PoseStamped goal
+
+---
+
+std_msgs/Float64 distance

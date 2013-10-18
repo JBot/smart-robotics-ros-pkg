@@ -1,0 +1,25 @@
+<launch>
+
+    <!-- Load the URDF/Xacro model of our robot -->
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find eurobot2014_models)/urdf/test.urdf.xacro'" />
+
+    <!-- Publish the robot state -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <param name="publish_frequency" value="20.0"/>
+    </node>
+
+  <!-- The semantic description that corresponds to the URDF -->
+  <param name="robot_description_semantic" textfile="$(find eurobot2014_gros_arm)/launch/indomptable.srdf" />
+
+  <!-- Load to the parameter server yaml files -->
+  <group ns="robot_description_planning">
+    <rosparam command="load" file="$(find eurobot2014_gros_arm)/launch/joint_limits.yaml"/>
+  </group>
+
+
+
+  <node name="kinematics_test" pkg="eurobot2014_gros_arm" type="kinematic_model_tutorial" respawn="false" output="screen">
+    <rosparam command="load" file="$(find eurobot2014_gros_arm)/launch/kinematics.yaml"/>
+  </node>
+
+</launch>
