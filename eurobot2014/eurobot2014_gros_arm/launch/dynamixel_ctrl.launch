@@ -21,6 +21,7 @@
           args="--manager=dxl_manager
                 --port arm_port
                 Rlink1_controller
+                Rlink2_controller
                 Rlink3_controller
                 Rlink4_controller
                 Rlink5_controller"

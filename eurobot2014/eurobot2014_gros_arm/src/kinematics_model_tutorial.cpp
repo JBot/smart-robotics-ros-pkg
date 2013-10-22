@@ -40,6 +40,9 @@
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
+#include <moveit/robot_state/link_state.h>
+#include <moveit/robot_state/joint_state.h>
+//#include <moveit/robot_state/joint_state_group.h>
 
 int main(int argc, char **argv)
 {
@@ -63,17 +66,15 @@ int main(int argc, char **argv)
   /* Set all joints in this state to their default values */
   kinematic_state->setToDefaultValues();
 
-  //const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("right_arm");
   const robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("right_arm");
-  //robot_state::JointStateGroup* group_ = kinematic_state->getJointStateGroup("right_arm");
+  robot_state::JointStateGroup* group_ = kinematic_state->getJointStateGroup("right_arm");
 
   /* Get the names of the joints in the right_arm*/
   const std::vector<std::string> &joint_names = joint_model_group->getJointModelNames();
 
   /* Get the joint positions for the right arm*/
   std::vector<double> joint_values;
-  kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-  //group_->copyJointGroupPositions(joint_model_group, joint_values);
+  group_->getVariableValues(joint_values);
 
   /* Print joint names and values */
   for(std::size_t i = 0; i < joint_names.size(); ++i)
@@ -82,20 +83,45 @@ int main(int argc, char **argv)
   }
 
   /* Set one joint in the right arm outside its joint limit */
-  joint_values[0] = 1.57;
-  kinematic_state->setJointGroupPositions(joint_model_group, joint_values);
+  joint_values[0] = 0;
+  joint_values[1] = 1.0;
+  joint_values[2] = 0;
+  joint_values[3] = -1.0;
+  group_->setVariableValues(joint_values); 
 
   /* Check whether any joint is outside its joint limits */
-  ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
+  ROS_INFO_STREAM("Current state is " << (group_->satisfiesBounds() ? "valid" : "not valid"));
 
   /* Enforce the joint limits for this state and check again*/
-  kinematic_state->enforceBounds();
-  ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
+  group_->enforceBounds();
+  ROS_INFO_STREAM("Current state is " << (group_->satisfiesBounds() ? "valid" : "not valid"));
+
+  group_->getVariableValues(joint_values);
+
+  /* Print joint names and values */
+  for(std::size_t i = 0; i < joint_names.size(); ++i)
+  {
+    ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+  }
+
 
   /* FORWARD KINEMATICS */
   /* Compute FK for a set of random joint values*/
-  kinematic_state->setToRandomPositions(joint_model_group);
-  const Eigen::Affine3d &end_effector_state = kinematic_state->getGlobalLinkTransform("link6");
+  //const Eigen::Affine3d &end_effector_state = link_state_->getGlobalLinkTransform();
+  Eigen::Affine3d end_effector_state = group_->getRobotState()->getLinkState("link6")->getGlobalLinkTransform();
+  ROS_INFO("Sauvegarde etat end effector");
+
+
+  group_->getVariableValues(joint_values);
+
+  /* Print joint names and values */
+  for(std::size_t i = 0; i < joint_names.size(); ++i)
+  {
+    ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+  }
+
+  ROS_INFO_STREAM("Current state is " << (group_->satisfiesBounds() ? "valid" : "not valid"));
+
 
   /* Print end-effector pose. Remember that this is in the model frame */
   ROS_INFO_STREAM("Translation: " << end_effector_state.translation());
@@ -103,19 +129,30 @@ int main(int argc, char **argv)
 
   /* INVERSE KINEMATICS */
   /* Set joint state group to a set of random values*/
-  kinematic_state->setToRandomPositions(joint_model_group);
+  group_->setToRandomValues();
+
+  group_->getVariableValues(joint_values);
+
+  /* Print joint names and values */
+  for(std::size_t i = 0; i < joint_names.size(); ++i)
+  {
+    ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+  }
+
 
   /* Do IK on the pose we just generated using forward kinematics
 * Here 10 is the number of random restart and 0.1 is the allowed time after
 * each restart
 */
-  bool found_ik = kinematic_state->setFromIK(joint_model_group, end_effector_state, 10, 0.1);
-  //bool found_ik = group_->setFromIK(joint_model_group, end_effector_state, 10, 0.1);
+  bool found_ik = group_->setFromIK(end_effector_state, 10, 0.1);
+
+    ROS_INFO("Aprés calcul de IK");
 
   /* Get and print the joint values */
   if (found_ik)
   {
-    kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+    //kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+    group_->getVariableValues(joint_values);
     for(std::size_t i=0; i < joint_names.size(); ++i)
     {
       ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
@@ -130,7 +167,7 @@ int main(int argc, char **argv)
   /* Get and print the Jacobian for the right arm*/
   Eigen::Vector3d reference_point_position(0.0,0.0,0.0);
   Eigen::MatrixXd jacobian;
-  kinematic_state->getJacobian(joint_model_group, kinematic_state->getLinkModel(joint_model_group->getLinkModelNames().back()),
+  group_->getJacobian("link6",
                                reference_point_position,
                                jacobian);
   ROS_INFO_STREAM("Jacobian: " << jacobian);

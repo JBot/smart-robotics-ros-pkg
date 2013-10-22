@@ -18,7 +18,7 @@
 
 
 
-  <node name="kinematics_test" pkg="eurobot2014_gros_arm" type="kinematic_model_tutorial" respawn="false" output="screen">
+  <node name="kinematics_test" pkg="eurobot2014_gros_arm" type="kinematics_model_tutorial" respawn="false" output="screen">
     <rosparam command="load" file="$(find eurobot2014_gros_arm)/launch/kinematics.yaml"/>
   </node>
 
