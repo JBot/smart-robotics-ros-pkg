@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<!--This does not replace URDF, and is not an extension of URDF.
+    This is a format for representing semantic information about the robot structure.
+    A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
+-->
+<robot name="indomptable">
+    <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+    <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+    <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+    <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+    <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="right_arm">
+        <link name="Rlink1" />
+        <link name="Rlink2" />
+        <link name="Rlink3" />
+        <link name="Rlink4" />
+        <link name="Rlink5" />
+        <link name="Rlink6" />
+        <joint name="rightarm_joint" />
+        <joint name="Rarm1_joint" />
+        <joint name="Rarm2_joint" />
+        <joint name="Rarm3_joint" />
+        <joint name="Rarm4_joint" />
+        <joint name="Rarm5_joint" />
+    </group>
+    <group name="left_arm">
+        <link name="Llink1" />
+        <link name="Llink2" />
+        <link name="Llink3" />
+        <link name="Llink4" />
+        <link name="Llink5" />
+        <link name="Llink6" />
+        <joint name="leftarm_joint" />
+        <joint name="Ljoint1" />
+        <joint name="Ljoint2" />
+        <joint name="Ljoint3" />
+        <joint name="Ljoint4" />
+        <joint name="Ljoint5" />
+    </group>
+    <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
+    <group_state name="Rstart_pose" group="right_arm">
+        <joint name="Rarm1_joint" value="0" />
+        <joint name="Rarm2_joint" value="-1.57" />
+        <joint name="Rarm3_joint" value="0" />
+        <joint name="Rarm4_joint" value="-1.57" />
+        <joint name="Rarm5_joint" value="1.57" />
+    </group_state>
+    <group_state name="Lstart_pose" group="left_arm">
+        <joint name="Ljoint1" value="0" />
+        <joint name="Ljoint2" value="-1.57" />
+        <joint name="Ljoint3" value="0" />
+        <joint name="Ljoint4" value="-1.57" />
+        <joint name="Ljoint5" value="1.57" />
+    </group_state>
+    <group_state name="Rgrab_fruit1" group="right_arm">
+        <joint name="Rarm1_joint" value="-0.0853" />
+        <joint name="Rarm2_joint" value="-1.3644" />
+        <joint name="Rarm3_joint" value="0" />
+        <joint name="Rarm4_joint" value="1.734" />
+        <joint name="Rarm5_joint" value="1.1655" />
+    </group_state>
+    <group_state name="Rgrab_fruit2" group="right_arm">
+        <joint name="Rarm1_joint" value="-0.0853" />
+        <joint name="Rarm2_joint" value="-0.8528" />
+        <joint name="Rarm3_joint" value="0" />
+        <joint name="Rarm4_joint" value="1.2507" />
+        <joint name="Rarm5_joint" value="1.1655" />
+    </group_state>
+    <group_state name="Rfruit_release" group="right_arm">
+        <joint name="Rarm1_joint" value="0" />
+        <joint name="Rarm2_joint" value="-0.8528" />
+        <joint name="Rarm3_joint" value="0" />
+        <joint name="Rarm4_joint" value="-1.5634" />
+        <joint name="Rarm5_joint" value="0.3695" />
+    </group_state>
+    <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+    <disable_collisions link1="Llink1" link2="Llink2" reason="Adjacent" />
+    <disable_collisions link1="Llink1" link2="Rlink1" reason="Never" />
+    <disable_collisions link1="Llink1" link2="Rlink2" reason="Never" />
+    <disable_collisions link1="Llink1" link2="arm_level_link" reason="Adjacent" />
+    <disable_collisions link1="Llink1" link2="base_laser" reason="Never" />
+    <disable_collisions link1="Llink1" link2="base_link" reason="Never" />
+    <disable_collisions link1="Llink1" link2="hokuyo_laser" reason="Never" />
+    <disable_collisions link1="Llink1" link2="left_panel" reason="Never" />
+    <disable_collisions link1="Llink1" link2="right_panel" reason="Never" />
+    <disable_collisions link1="Llink1" link2="top_level" reason="Never" />
+    <disable_collisions link1="Llink2" link2="Llink3" reason="Adjacent" />
+    <disable_collisions link1="Llink2" link2="Rlink1" reason="Never" />
+    <disable_collisions link1="Llink2" link2="arm_level_link" reason="Never" />
+    <disable_collisions link1="Llink2" link2="base_laser" reason="Never" />
+    <disable_collisions link1="Llink2" link2="base_link" reason="Never" />
+    <disable_collisions link1="Llink2" link2="hokuyo_laser" reason="Never" />
+    <disable_collisions link1="Llink2" link2="left_panel" reason="Never" />
+    <disable_collisions link1="Llink2" link2="right_panel" reason="Never" />
+    <disable_collisions link1="Llink2" link2="top_level" reason="Never" />
+    <disable_collisions link1="Llink3" link2="Llink4" reason="Adjacent" />
+    <disable_collisions link1="Llink3" link2="base_link" reason="Never" />
+    <disable_collisions link1="Llink3" link2="right_panel" reason="Never" />
+    <disable_collisions link1="Llink3" link2="top_level" reason="Never" />
+    <disable_collisions link1="Llink4" link2="Llink5" reason="Adjacent" />
+    <disable_collisions link1="Llink4" link2="base_link" reason="Never" />
+    <disable_collisions link1="Llink4" link2="right_panel" reason="Never" />
+    <disable_collisions link1="Llink4" link2="top_level" reason="Never" />
+    <disable_collisions link1="Llink5" link2="Llink6" reason="Adjacent" />
+    <disable_collisions link1="Llink5" link2="base_link" reason="Never" />
+    <disable_collisions link1="Llink5" link2="top_level" reason="Never" />
+    <disable_collisions link1="Rlink1" link2="Rlink2" reason="Adjacent" />
+    <disable_collisions link1="Rlink1" link2="arm_level_link" reason="Adjacent" />
+    <disable_collisions link1="Rlink1" link2="base_laser" reason="Never" />
+    <disable_collisions link1="Rlink1" link2="base_link" reason="Never" />
+    <disable_collisions link1="Rlink1" link2="hokuyo_laser" reason="Never" />
+    <disable_collisions link1="Rlink1" link2="left_panel" reason="Never" />
+    <disable_collisions link1="Rlink1" link2="right_panel" reason="Never" />
+    <disable_collisions link1="Rlink1" link2="top_level" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="Rlink3" reason="Adjacent" />
+    <disable_collisions link1="Rlink2" link2="arm_level_link" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="base_laser" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="base_link" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="hokuyo_laser" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="left_panel" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="right_panel" reason="Never" />
+    <disable_collisions link1="Rlink2" link2="top_level" reason="Never" />
+    <disable_collisions link1="Rlink3" link2="Rlink4" reason="Adjacent" />
+    <disable_collisions link1="Rlink3" link2="base_link" reason="Never" />
+    <disable_collisions link1="Rlink3" link2="left_panel" reason="Never" />
+    <disable_collisions link1="Rlink3" link2="top_level" reason="Never" />
+    <disable_collisions link1="Rlink4" link2="Rlink5" reason="Adjacent" />
+    <disable_collisions link1="Rlink4" link2="base_link" reason="Never" />
+    <disable_collisions link1="Rlink4" link2="left_panel" reason="Never" />
+    <disable_collisions link1="Rlink4" link2="top_level" reason="Never" />
+    <disable_collisions link1="Rlink5" link2="Rlink6" reason="Adjacent" />
+    <disable_collisions link1="Rlink5" link2="base_link" reason="Never" />
+    <disable_collisions link1="Rlink5" link2="top_level" reason="Never" />
+    <disable_collisions link1="arm_level_link" link2="base_laser" reason="Never" />
+    <disable_collisions link1="arm_level_link" link2="base_link" reason="Adjacent" />
+    <disable_collisions link1="arm_level_link" link2="hokuyo_laser" reason="Never" />
+    <disable_collisions link1="arm_level_link" link2="left_panel" reason="Default" />
+    <disable_collisions link1="arm_level_link" link2="right_panel" reason="Default" />
+    <disable_collisions link1="arm_level_link" link2="top_level" reason="Never" />
+    <disable_collisions link1="base_laser" link2="base_link" reason="Adjacent" />
+    <disable_collisions link1="base_laser" link2="hokuyo_laser" reason="Adjacent" />
+    <disable_collisions link1="base_laser" link2="left_panel" reason="Never" />
+    <disable_collisions link1="base_laser" link2="right_panel" reason="Never" />
+    <disable_collisions link1="base_laser" link2="top_level" reason="Never" />
+    <disable_collisions link1="base_link" link2="hokuyo_laser" reason="Never" />
+    <disable_collisions link1="base_link" link2="left_panel" reason="Adjacent" />
+    <disable_collisions link1="base_link" link2="right_panel" reason="Adjacent" />
+    <disable_collisions link1="base_link" link2="top_level" reason="Adjacent" />
+    <disable_collisions link1="hokuyo_laser" link2="left_panel" reason="Never" />
+    <disable_collisions link1="hokuyo_laser" link2="right_panel" reason="Never" />
+    <disable_collisions link1="hokuyo_laser" link2="top_level" reason="Never" />
+    <disable_collisions link1="left_panel" link2="right_panel" reason="Never" />
+    <disable_collisions link1="left_panel" link2="top_level" reason="Default" />
+    <disable_collisions link1="right_panel" link2="top_level" reason="Default" />
+</robot>

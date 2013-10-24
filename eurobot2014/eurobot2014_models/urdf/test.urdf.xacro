@@ -244,27 +244,27 @@
  	<!-- ============================   Arms   ============================ -->
 
 
-                <xacro:my_box name="link1" lwh="0.04 0.04 0.04" xyz="-0.02 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
+                <xacro:my_box name="Rlink1" lwh="0.04 0.04 0.04" xyz="-0.02 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
                 
-		<xacro:my_box name="link2" lwh="0.0797 0.04 0.04" xyz="0.03985 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:my_box name="Rlink2" lwh="0.0797 0.04 0.04" xyz="0.03985 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="link3" lwh="0.053 0.04 0.04" xyz="0.0265 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                <xacro:my_box name="Rlink3" lwh="0.053 0.04 0.04" xyz="0.0265 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="link4" lwh="0.026 0.04 0.04" xyz="0.013 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="Rlink4" lwh="0.026 0.04 0.04" xyz="0.013 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="link5" lwh="0.0675 0.04 0.04" xyz="0.03375 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                <xacro:my_box name="Rlink5" lwh="0.0675 0.04 0.04" xyz="0.03375 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="link6" lwh="0.04 0.04 0.04" xyz="0.02 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="Rlink6" lwh="0.04 0.04 0.04" xyz="0.02 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
@@ -274,19 +274,19 @@
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="Llink2" lwh="0.052 0.04 0.04" xyz="0.026 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="Llink2" lwh="0.0797 0.04 0.04" xyz="0.03985 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="Llink3" lwh="0.0815 0.04 0.04" xyz="0.04075 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                <xacro:my_box name="Llink3" lwh="0.053 0.04 0.04" xyz="0.0265 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="Llink4" lwh="0.0415 0.04 0.04" xyz="0.02075 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
+                <xacro:my_box name="Llink4" lwh="0.026 0.04 0.04" xyz="0.013 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
 
-                <xacro:my_box name="Llink5" lwh="0.052 0.04 0.04" xyz="0.026 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
+                <xacro:my_box name="Llink5" lwh="0.0675 0.04 0.04" xyz="0.03375 0 0" rpy="0 0 0" mass="0.05" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
 
@@ -316,7 +316,7 @@
 
         <joint name="rightarm_joint" type="fixed">
         <parent link="arm_level_link" />
-        <child link="link1" />
+        <child link="Rlink1" />
         <origin xyz="0.05 -0.06 0.032" rpy="0 0 0" />
         </joint>
 
@@ -366,8 +366,8 @@
  	<!-- =================== RIGHT ARM Definitions ==================== -->
         
         <joint name="Rarm1_joint" type="revolute">
-        <parent link="link1" />
-        <child link="link2" />
+        <parent link="Rlink1" />
+        <child link="Rlink2" />
         <origin xyz="0.0 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 0 1" />
@@ -375,8 +375,8 @@
         </joint>
 
         <joint name="Rarm2_joint" type="revolute">
-        <parent link="link2" />
-        <child link="link3" />
+        <parent link="Rlink2" />
+        <child link="Rlink3" />
         <origin xyz="0.0797 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
@@ -384,8 +384,8 @@
         </joint>
 
         <joint name="Rarm3_joint" type="revolute">
-        <parent link="link3" />
-        <child link="link4" />
+        <parent link="Rlink3" />
+        <child link="Rlink4" />
         <origin xyz="0.053 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="1 0 0" />
@@ -393,8 +393,8 @@
         </joint>
 
         <joint name="Rarm4_joint" type="revolute">
-        <parent link="link4" />
-        <child link="link5" />
+        <parent link="Rlink4" />
+        <child link="Rlink5" />
         <origin xyz="0.026 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
@@ -402,8 +402,8 @@
         </joint>
 
         <joint name="Rarm5_joint" type="revolute">
-        <parent link="link5" />
-        <child link="link6" />
+        <parent link="Rlink5" />
+        <child link="Rlink6" />
         <origin xyz="0.0675 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
@@ -424,7 +424,7 @@
         <joint name="Ljoint2" type="revolute">
         <parent link="Llink2" />
         <child link="Llink3" />
-        <origin xyz="0.052 0 0" rpy="0 0 0" />
+        <origin xyz="0.0797 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
@@ -433,7 +433,7 @@
         <joint name="Ljoint3" type="revolute">
         <parent link="Llink3" />
         <child link="Llink4" />
-        <origin xyz="0.0815 0 0" rpy="0 0 0" />
+        <origin xyz="0.053 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="1 0 0" />
         <dynamics damping="0.0"/>
@@ -442,7 +442,7 @@
         <joint name="Ljoint4" type="revolute">
         <parent link="Llink4" />
         <child link="Llink5" />
-        <origin xyz="0.0415 0 0" rpy="0 0 0" />
+        <origin xyz="0.026 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
@@ -451,7 +451,7 @@
         <joint name="Ljoint5" type="revolute">
         <parent link="Llink5" />
         <child link="Llink6" />
-        <origin xyz="0.052 0 0" rpy="0 0 0" />
+        <origin xyz="0.0675 0 0" rpy="0 0 0" />
         <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>

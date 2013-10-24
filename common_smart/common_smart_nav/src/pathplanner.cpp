@@ -102,7 +102,7 @@ class TrajectoryManager {
 
 
 		ros::NodeHandle nh;
-
+		
 		int status; // STOP PAUSE RUN
 		int cpt;
 
@@ -125,6 +125,15 @@ class TrajectoryManager {
 TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	tf_(tf)
 {
+
+	std::string costmap_name;
+	std::string planner_name;
+	ros::NodeHandle nhp("~");
+
+	//nh.param<std::string>("costmap_name", costmap_name, "ROBOT_costmap");
+	//nh.param<std::string>("planner_name", planner_name, "ROBOT_planner");
+	nhp.getParam("costmap_name", costmap_name);
+	nhp.getParam("planner_name", planner_name);
 
 	status = 0;	
 	cpt = 0;
@@ -168,12 +177,12 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	//tf_ = tf;
 
 	//create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
-	planner_costmap_ = new costmap_2d::Costmap2DROS("NESTOR_costmap", tf_);
+	planner_costmap_ = new costmap_2d::Costmap2DROS(costmap_name, tf_);
 	planner_costmap_->pause();
 
 	//initialize the global planner
 	//bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner");
-	planner_ = new navfn::NavfnROS("NESTOR_planner", planner_costmap_);
+	planner_ = new navfn::NavfnROS(planner_name, planner_costmap_);
 	//planner->initialize("NESTOR_planner", planner_costmap);
 
 	planner_costmap_->start();    

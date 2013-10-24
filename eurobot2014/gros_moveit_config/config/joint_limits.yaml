@@ -1,0 +1,51 @@
+joint_limits:
+  Rarm1_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Rarm2_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Ljoint2:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Ljoint1:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Ljoint5:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Rarm4_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Rarm3_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Rarm5_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Ljoint3:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Ljoint4:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6

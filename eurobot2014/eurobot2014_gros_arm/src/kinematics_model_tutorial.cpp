@@ -108,7 +108,7 @@ int main(int argc, char **argv)
   /* FORWARD KINEMATICS */
   /* Compute FK for a set of random joint values*/
   //const Eigen::Affine3d &end_effector_state = link_state_->getGlobalLinkTransform();
-  Eigen::Affine3d end_effector_state = group_->getRobotState()->getLinkState("link6")->getGlobalLinkTransform();
+  Eigen::Affine3d end_effector_state = group_->getRobotState()->getLinkState("Rlink6")->getGlobalLinkTransform();
   ROS_INFO("Sauvegarde etat end effector");
 
 
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
   /* Get and print the Jacobian for the right arm*/
   Eigen::Vector3d reference_point_position(0.0,0.0,0.0);
   Eigen::MatrixXd jacobian;
-  group_->getJacobian("link6",
+  group_->getJacobian("Rlink6",
                                reference_point_position,
                                jacobian);
   ROS_INFO_STREAM("Jacobian: " << jacobian);

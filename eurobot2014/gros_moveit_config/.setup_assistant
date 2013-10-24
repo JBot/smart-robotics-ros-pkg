@@ -1,0 +1,8 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: eurobot2014_models
+    relative_path: urdf/test.urdf.xacro
+  SRDF:
+    relative_path: config/indomptable.srdf
+  CONFIG:
+    generated_timestamp: 1382519944

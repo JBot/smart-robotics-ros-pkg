@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find eurobot2014_gros_nav)/launch/move_base.launch">
+  </include>
+
+
+
+
+
+</launch>

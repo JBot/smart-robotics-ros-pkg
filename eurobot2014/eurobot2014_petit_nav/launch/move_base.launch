@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
+
+    <param name="costmap_name" type="str" value="PETIT_costmap" />
+    <param name="planner_name" type="str" value="PETIT_planner" />
+
+    <rosparam file="$(find eurobot2014_petit_nav)/launch/nav_params.yaml" command="load" />
+
+        <remap from="/ROBOT/goal" to="/PETIT/goal" />
+        <remap from="/ROBOT/plan" to="/PETIT/plan" />
+        <remap from="/ROBOT/path_done" to="/PETIT/path_done" />
+        <remap from="/ROBOT/compute_path" to="/PETIT/compute_path" />
+        <remap from="/ROBOT/pause" to="/PETIT/pause" />
+        <remap from="/ROBOT/resume" to="/PETIT/resume" />
+
+        <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
+        <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
+
+  </node>
+
+
+  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
+
+        <remap from="/ROBOT/plan" to="/PETIT/plan" />
+        <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
+        <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
+
+  </node>
+
+  <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
+
+        <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
+
+  </node>
+
+
+</launch>

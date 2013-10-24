@@ -3,6 +3,9 @@
 
   <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="NESTOR_pathplanner" output="screen">
 
+    <param name="costmap_name" type="str" value="NESTOR_costmap" />
+    <param name="planner_name" type="str" value="NESTOR_planner" />
+
     <rosparam file="$(find common_smart_nav)/launch/NESTOR_params.yaml" command="load" />
 
         <remap from="/ROBOT/goal" to="/NESTOR/goal" />
