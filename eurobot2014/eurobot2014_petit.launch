@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find eurobot2014_models)/launch/model.launch">
+  </include>
+
+  <include file="$(find eurobot2014_petit_nav)/launch/move_base.launch">
+  </include>
+
+
+
+
+
+
+
+</launch>
