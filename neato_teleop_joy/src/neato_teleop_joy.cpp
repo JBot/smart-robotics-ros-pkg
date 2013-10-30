@@ -27,7 +27,7 @@ TeleopNeato::TeleopNeato():
   linear_(1),
   angular_(2),
   a_scale_(0.3), // 0.2 // 0.6
-  l_scale_(0.3) // 0.18 // 0.2
+  l_scale_(0.1) // 0.18 // 0.2
 {
 
   nh_.param("axis_linear", linear_, linear_);

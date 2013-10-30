@@ -19,6 +19,8 @@
   <depend package="move_base_msgs"/>
   <depend package="actionlib"/>
   <depend package="common_smart_nav"/>
+  <depend package="pcl"/>
+  <depend package="laser_geometry"/>
 
 </package>
 

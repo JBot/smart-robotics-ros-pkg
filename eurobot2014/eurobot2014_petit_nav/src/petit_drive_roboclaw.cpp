@@ -36,8 +36,8 @@
 #define theta1 (3.14159265359 - 2.09439510239)
 #define theta2 (3.14159265359)
 #define theta3 (3.14159265359 + 2.09439510239)
-#define R (0.3)
-#define RAYON (0.05)
+#define R (0.09)
+#define RAYON (0.03)
 
 
 
@@ -149,14 +149,15 @@ else
 
         }
 }
-*/
-/*
+
+
   write_RoboClaw_drive_M1(128, int32_t( 64 + (-speed_motor1/ratio * 12.85) ));
   write_RoboClaw_drive_M2(128, int32_t( 64 + (-speed_motor3/ratio * 12.85) ));
   write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2/ratio * 12.85) ));
 */
-  write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000), int32_t(speed_motor2 * 20000));
-  write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000));  
+
+  write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000.0), -int32_t(speed_motor2 * 20000.0));
+  write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000.0));  
 
 
 }

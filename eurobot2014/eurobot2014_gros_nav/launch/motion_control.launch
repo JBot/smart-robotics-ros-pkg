@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <node pkg="rosserial_python" type="serial_node.py" respawn="false" name="GROS_rosserial_motion_control" output="screen" args="/dev/ttyACM0">
+        <remap from="/color_feedback" to="/color_in" />
+        <remap from="/color" to="/color_out" />
+        <remap from="/alpha_ros" to="/alpha_out" />
+        <remap from="/delta_ros" to="/delta_out" />
+        <remap from="/alpha_feedback" to="/alpha_in" />
+        <remap from="/delta_feedback" to="/delta_in" />
+  </node>
+
+
+  <node pkg="eurobot2014_serial" type="motion_control_serial" respawn="true" name="GROS_motion_control_serial" output="screen">
+        <remap from="/cmd_vel" to="/GROS/cmd_vel" />
+        <remap from="/enable_motors" to="/GROS/enable_motors" />
+        <remap from="/alpha" to="/GROS/alpha" />
+        <remap from="/delta" to="/GROS/delta" />
+        <remap from="/ardugoal" to="/GROS/ardugoal" />
+  </node>
+
+
+</launch>

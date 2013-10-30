@@ -6,6 +6,22 @@
   <include file="$(find eurobot2014_models)/launch/model.launch">
   </include>
 
+  <node pkg="eurobot2014_serial" type="motion_control_serial" respawn="false" name="GROS_motionserial" output="screen">
+<!--
+        <remap from="/ROBOT/goal" to="/GROS/goal" />
+        <remap from="/ROBOT/plan" to="/GROS/plan" />
+        <remap from="/ROBOT/path_done" to="/GROS/path_done" />
+        <remap from="/ROBOT/compute_path" to="/GROS/compute_path" />
+        <remap from="/ROBOT/pause" to="/GROS/pause" />
+        <remap from="/ROBOT/resume" to="/GROS/resume" />
+
+        <remap from="/ROBOT/get_robot_pose" to="/GROS/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/GROS/get_distance" />
+        <remap from="/ROBOT/get_path" to="/GROS/get_path" />
+-->
+  </node>
+
+
   <include file="$(find eurobot2014_gros_nav)/launch/move_base.launch">
   </include>
 <!--

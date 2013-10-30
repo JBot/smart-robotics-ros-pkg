@@ -311,7 +311,7 @@
         <joint name="arm_level_joint" type="fixed">
         <parent link="base_link" />
         <child link="arm_level_link" />
-        <origin xyz="0 0 0.147" rpy="0 0 0" />
+        <origin xyz="0 0 0.130" rpy="0 0 0" />
         </joint>
 
         <joint name="rightarm_joint" type="fixed">

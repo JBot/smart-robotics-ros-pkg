@@ -87,7 +87,7 @@ ObjectiveManager::ObjectiveManager()
     goal_debug = nh.advertise < geometry_msgs::PoseStamped > ("/DEBUG/best_objective", 10);
     path_debug = nh.advertise < nav_msgs::Path > ("/DEBUG/debug_path", 10);
 
-    get_pose = nh.serviceClient<eurobot2014_gros_nav::GetRobotPose>("/ROBOT/get_robot_pose");
+    get_pose = nh.serviceClient<common_smart_nav::GetRobotPose>("/ROBOT/get_robot_pose");
     get_path = nh.serviceClient<common_smart_nav::GetPlan>("/ROBOT/get_path");
     get_distance = nh.serviceClient<common_smart_nav::GetDistance>("/ROBOT/get_distance");
 
