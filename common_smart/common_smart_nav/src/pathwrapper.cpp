@@ -83,10 +83,17 @@ class Pathwrapper {
 
 		char cpt_send;
 		char pause;
+        	std::string map_name;
+        	std::string base_name;
 };
 
 Pathwrapper::Pathwrapper()
 {
+
+        ros::NodeHandle nhp("~");
+        nhp.getParam("map_name", map_name);
+        nhp.getParam("base_name", base_name);
+
 
 	// Goal suscriber
 	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_test/goal", 20, &Pathwrapper::goalCallback, this);
@@ -122,7 +129,7 @@ Pathwrapper::Pathwrapper()
 	final_pose.theta = 0.0;
 
 	//just an arbitrary point in space
-	final_pose2.header.frame_id = "/map";
+	final_pose2.header.frame_id = map_name;
 	final_pose2.header.stamp = ros::Time();
 	final_pose2.pose.position.x = 0.0;
 	final_pose2.pose.position.y = 0.0;
@@ -255,7 +262,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 	if(!pause) {
 
 		geometry_msgs::PoseStamped odom_pose;
-		odom_pose.header.frame_id = "/base_link";
+		odom_pose.header.frame_id = base_name;
 
 		//we'll just use the most recent transform available for our simple example
 		odom_pose.header.stamp = ros::Time::now();
@@ -274,9 +281,9 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 		try{
 			ros::Time now = ros::Time::now();
-			listener.waitForTransform("/map", "/base_link", now, ros::Duration(5.0));
+			listener.waitForTransform(map_name, base_name, now, ros::Duration(5.0));
 			geometry_msgs::PoseStamped base_pose;
-			listener.transformPose("/map", odom_pose, base_pose);
+			listener.transformPose(map_name, odom_pose, base_pose);
 
 			//ROS_INFO("%f %f %f %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y);
 
@@ -372,7 +379,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						my_pose_stamped.header.stamp = now;
 						my_map_pose.header.stamp = now;
 						//tf::Transformer::transformPose("/base_link", my_map_pose, my_pose_stamped);
-						listener.transformPose("/base_link", my_map_pose, my_pose_stamped);
+						listener.transformPose(base_name, my_map_pose, my_pose_stamped);
 						ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (my_map_pose.pose.position.x), (my_map_pose.pose.position.y), getHeadingFromQuat(my_map_pose.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
 						// normalize Vx, Vy
 						if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
@@ -456,9 +463,9 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						while( ( test > 0.02) && ( i < 150 ) ) {
 							usleep(100000);
 							ros::Time now = ros::Time::now();
-							listener.waitForTransform("/map", "/base_link", now, ros::Duration(5.0));
+							listener.waitForTransform(map_name, base_name, now, ros::Duration(5.0));
 							geometry_msgs::PoseStamped base_pose;
-							listener.transformPose("/map", odom_pose, base_pose);
+							listener.transformPose(map_name, odom_pose, base_pose);
 							i++;
 
 
@@ -469,7 +476,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							final_pose2.header.stamp = now;
 							//geometry_msgs::PoseStamped my_map_pose = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
 							//tf::Transformer::transformPose("/base_link", my_map_pose, my_pose_stamped);
-							listener.transformPose("/base_link", final_pose2, my_pose_stamped);
+							listener.transformPose(base_name, final_pose2, my_pose_stamped);
 							ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (final_pose2.pose.position.x), (final_pose2.pose.position.y), getHeadingFromQuat(final_pose2.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
 							//ROS_ERROR("frame1 : %f / frame2 : %f", (my_map_pose.pose.position.x), (my_pose_stamped.pose.position.x));
 							// normalize Vx, Vy
@@ -550,7 +557,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 				my_pose_stamped.header.stamp = now;
 				//geometry_msgs::PoseStamped my_map_pose = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
 				//tf::Transformer::transformPose("/base_link", my_map_pose, my_pose_stamped);
-				listener.transformPose("/base_link", final_pose2, my_pose_stamped);
+				listener.transformPose(base_name, final_pose2, my_pose_stamped);
 				//ROS_ERROR("frame1 : %f / frame2 : %f", (my_map_pose.pose.position.x), (my_pose_stamped.pose.position.x));
 				// normalize Vx, Vy
 				if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))

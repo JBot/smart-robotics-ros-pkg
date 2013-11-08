@@ -119,6 +119,7 @@ class TrajectoryManager {
 		//boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_;
 		//pluginlib::ClassLoader<nav_core::BaseGlobalPlanner> bgp_loader_;
 
+		std::string map_name;
 
 };
 
@@ -134,6 +135,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	//nh.param<std::string>("planner_name", planner_name, "ROBOT_planner");
 	nhp.getParam("costmap_name", costmap_name);
 	nhp.getParam("planner_name", planner_name);
+	nhp.getParam("map_name", map_name);
 
 	status = 0;	
 	cpt = 0;
@@ -167,7 +169,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 		my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
 	}
 
-	my_path.header.frame_id = "/map";
+	my_path.header.frame_id = map_name;
 
 	final_pose.pose.position.x = 0.0;
 	final_pose.pose.position.y = 0.14;
@@ -308,7 +310,7 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
                 }
         }
 
-        tmp_path.header.frame_id = "/map";
+        tmp_path.header.frame_id = map_name;
         tmp_path.poses = global_plan;
 
   	res.plan = tmp_path;
@@ -353,7 +355,7 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
                 }
         }
 
-        tmp_path.header.frame_id = "/map";
+        tmp_path.header.frame_id = map_name;
         tmp_path.poses = global_plan;
 
   	res.distance.data = compute_distance(tmp_path);
@@ -431,7 +433,7 @@ void TrajectoryManager::computePath(void)
 		}
 	}
 
-	tmp_path.header.frame_id = "/map";
+	tmp_path.header.frame_id = map_name;
 	tmp_path.poses = global_plan;
 
 	// lock
