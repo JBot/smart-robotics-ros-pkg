@@ -50,6 +50,9 @@ class DriveRoboClaw {
 	void write_RoboClaw_backward_M1(char addr, int32_t speed);
 	void write_RoboClaw_forward_M2(char addr, int32_t speed);
 	void write_RoboClaw_backward_M2(char addr, int32_t speed);
+
+        void write_RoboClaw_PID_M1(char addr, int32_t D, int32_t P, int32_t I, int32_t QQPS);
+        void write_RoboClaw_PID_M2(char addr, int32_t D, int32_t P, int32_t I, int32_t QQPS);
 	void write_RoboClaw_drive_M1(char addr, int32_t speed);
 	void write_RoboClaw_drive_M2(char addr, int32_t speed);
 	void write_RoboClaw_speed_M1(char addr, int32_t speed);
@@ -105,6 +108,13 @@ DriveRoboClaw::DriveRoboClaw()
 
 	vel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 5, &DriveRoboClaw::velCallback, this);
 
+        //write_RoboClaw_PID_M1(128, 16384, 65536, 32768, 44000);
+        //write_RoboClaw_PID_M2(128, 0x00004000, 0x00010000, 0x00008000, 44000);
+        write_RoboClaw_PID_M1(128, 70384, 170536, 100768, 94000);
+        write_RoboClaw_PID_M2(128, 70384, 170536, 100768, 94000);
+
+        write_RoboClaw_PID_M1(129, 70384, 170536, 100768, 94000);
+
 }
 
 
@@ -156,8 +166,8 @@ else
   write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2/ratio * 12.85) ));
 */
 
-  write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000.0), -int32_t(speed_motor2 * 20000.0));
-  write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000.0));  
+  write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 5000.0), -int32_t(speed_motor2 * 5000.0));
+  write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 5000.0));  
 
 
 }
@@ -278,6 +288,85 @@ void DriveRoboClaw::write_RoboClaw_drive_M2(char addr, int32_t speed)
 
 
 /* With ENCODERS */
+
+// of motor 1
+void DriveRoboClaw::write_RoboClaw_PID_M1(char addr, int32_t D, int32_t P, int32_t I, int32_t QQPS)
+{
+    char checkSUM;
+    checkSUM =
+        (addr + 28 + ((char) ((D >> 24) & 0xFF)) +
+         ((char) ((D >> 16) & 0xFF)) + ((char) ((D >> 8) & 0xFF)) +
+         ((char) (D & 0xFF)) + ((char) ((P >> 24) & 0xFF)) +
+         ((char) ((P >> 16) & 0xFF)) + ((char) ((P >> 8) & 0xFF)) +
+         ((char) (P & 0xFF)) + ((char) ((I >> 24) & 0xFF)) +
+         ((char) ((I >> 16) & 0xFF)) + ((char) ((I >> 8) & 0xFF)) +
+         ((char) (I & 0xFF)) + ((char) ((QQPS >> 24) & 0xFF)) +
+         ((char) ((QQPS >> 16) & 0xFF)) + ((char) ((QQPS >> 8) & 0xFF)) +
+         ((char) (QQPS & 0xFF))) & 0x7F;
+
+        unsigned char commands[19];
+        commands[0] = addr;
+        commands[1] = 28;
+        commands[2] = ((char) ((D >> 24) & 0xFF));
+        commands[3] = ((char) ((D >> 16) & 0xFF));
+        commands[4] = ((char) ((D >> 8) & 0xFF));
+        commands[5] = ((char) (D & 0xFF));
+        commands[6] = ((char) ((P >> 24) & 0xFF));
+        commands[7] = ((char) ((P >> 16) & 0xFF));
+        commands[8] = ((char) ((P >> 8) & 0xFF));
+        commands[9] = ((char) (P & 0xFF));
+        commands[10] = ((char) ((I >> 24) & 0xFF));
+        commands[11] = ((char) ((I >> 16) & 0xFF));
+        commands[12] = ((char) ((I >> 8) & 0xFF));
+        commands[13] = ((char) (I & 0xFF));
+        commands[14] = ((char) ((QQPS >> 24) & 0xFF));
+        commands[15] = ((char) ((QQPS >> 16) & 0xFF));
+        commands[16] = ((char) ((QQPS >> 8) & 0xFF));
+        commands[17] = ((char) (QQPS & 0xFF));
+        commands[18] = checkSUM;
+
+        write(fd, commands, 19);  //Send data
+}
+
+// of motor 2
+void DriveRoboClaw::write_RoboClaw_PID_M2(char addr, int32_t D, int32_t P, int32_t I, int32_t QQPS)
+{
+    char checkSUM;
+    checkSUM =
+        (addr + 29 + ((char) ((D >> 24) & 0xFF)) +
+         ((char) ((D >> 16) & 0xFF)) + ((char) ((D >> 8) & 0xFF)) +
+         ((char) (D & 0xFF)) + ((char) ((P >> 24) & 0xFF)) +
+         ((char) ((P >> 16) & 0xFF)) + ((char) ((P >> 8) & 0xFF)) +
+         ((char) (P & 0xFF)) + ((char) ((I >> 24) & 0xFF)) +
+         ((char) ((I >> 16) & 0xFF)) + ((char) ((I >> 8) & 0xFF)) +
+         ((char) (I & 0xFF)) + ((char) ((QQPS >> 24) & 0xFF)) +
+         ((char) ((QQPS >> 16) & 0xFF)) + ((char) ((QQPS >> 8) & 0xFF)) +
+         ((char) (QQPS & 0xFF))) & 0x7F;
+
+        unsigned char commands[19];
+        commands[0] = addr;
+        commands[1] = 29;
+        commands[2] = ((char) ((D >> 24) & 0xFF));
+        commands[3] = ((char) ((D >> 16) & 0xFF));
+        commands[4] = ((char) ((D >> 8) & 0xFF));
+        commands[5] = ((char) (D & 0xFF));
+        commands[6] = ((char) ((P >> 24) & 0xFF));
+        commands[7] = ((char) ((P >> 16) & 0xFF));
+        commands[8] = ((char) ((P >> 8) & 0xFF));
+        commands[9] = ((char) (P & 0xFF));
+        commands[10] = ((char) ((I >> 24) & 0xFF));
+        commands[11] = ((char) ((I >> 16) & 0xFF));
+        commands[12] = ((char) ((I >> 8) & 0xFF));
+        commands[13] = ((char) (I & 0xFF));
+        commands[14] = ((char) ((QQPS >> 24) & 0xFF));
+        commands[15] = ((char) ((QQPS >> 16) & 0xFF));
+        commands[16] = ((char) ((QQPS >> 8) & 0xFF));
+        commands[17] = ((char) (QQPS & 0xFF));
+        commands[18] = checkSUM;
+
+        write(fd, commands, 19);  //Send data
+}
+
 
 // Used to change the speed value of motor 1
 void DriveRoboClaw::write_RoboClaw_speed_M1(char addr, int32_t speed)
