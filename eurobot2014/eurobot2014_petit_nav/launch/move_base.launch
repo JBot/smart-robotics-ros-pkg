@@ -3,6 +3,12 @@
 <launch>
   <master auto="start"/>
 
+  <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
+    <param name="firmware_version" value="2" />
+    <param name="port" type="str" value="/dev/ttyUSB1" />
+  </node>
+
+
   <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
     <param name="costmap_name" type="str" value="PETIT_costmap" />
     <param name="planner_name" type="str" value="PETIT_planner" />
@@ -24,7 +30,10 @@
 
 
   <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
-        <remap from="/ROBOT/plan" to="/PETIT/plan" />
+    <param name="map_name" type="str" value="petit_map" />
+    <param name="base_name" type="str" value="petit_base_link" /> 
+
+       <remap from="/ROBOT/plan" to="/PETIT/plan" />
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
@@ -42,7 +51,7 @@
 
   <node pkg="map_server" type="map_server" respawn="false" name="PETIT_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
         <param name="frame_id" type="str" value="/petit_map" />
-        <remap from="/map" to="/petit_map" />
+        <remap from="/map" to="/PETIT/map" />
   </node>
 
 

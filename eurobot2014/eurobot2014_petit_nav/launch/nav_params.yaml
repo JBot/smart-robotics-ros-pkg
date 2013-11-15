@@ -14,7 +14,7 @@ PETIT_costmap:
   static_map: true
   resolution: 0.05
   unknown_cost_value: 50
-  map_topic: /petit_map
+  map_topic: /PETIT/map
   map_type: costmap
   track_unknown_space: true
 
