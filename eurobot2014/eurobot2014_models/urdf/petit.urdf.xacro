@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+
+<!-- XML namespaces -->
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro" 
+	   name="petit">
+
+	<!--
+	<include filename="$(find pi_robot_description)/urdf/sensors/hokuyo_laser_gazebo.xacro" />
+	-->
+	
+	<xacro:macro name="cyan1">
+		<material name="cyan1">
+			<color rgba="0 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+
+	<xacro:macro name="cyan2">	
+		<material name="cyan2">
+	     <color rgba="0 0.7 0.7 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="cyan3">	
+		<material name="cyan3">
+	     <color rgba="0 0.5 0.5 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black">
+		<material name="black">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black1">
+		<material name="black1">
+			<color rgba="0.2 0.2 0.2 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="yellow2">
+		<material name="yellow2">
+			<color rgba="0.8 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green1">
+		<material name="green1">
+			<color rgba="0 1 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green2">
+		<material name="green2">
+			<color rgba="0.1 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green3">
+		<material name="green3">
+			<color rgba="0.1 0.5 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey1">
+		<material name="grey1">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey2">
+		<material name="grey2">
+			<color rgba="0.6 0.6 0.6 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey3">
+		<material name="grey3">
+			<color rgba="0.8 0.8 0.8 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="blue1">
+		<material name="blue1">
+			<color rgba="0 0 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12_color">
+		<material name="ax12_color">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="bracket_color">
+		<material name="bracket_color">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.5 0.32 0.38" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.5 0.32 0.38" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.055" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/FlatBlack" />
+	</xacro:macro>
+	
+	<xacro:macro name="bracket1" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.05 0.025 0.038" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.05 0.025 0.038" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.02" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/WhiteEmissive" />
+	</xacro:macro>
+	
+	<xacro:macro name="my_box" params="name lwh xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="${lwh}" />
+				</geometry>
+			    <xacro:insert_block name="rviz_color" />             
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="${lwh}" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="${mass}" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+	<xacro:macro name="my_cylinder" params="name l r xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>	
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<cylinder length="${l}" radius="${r}" />
+				</geometry>
+            	<xacro:insert_block name="rviz_color" />
+            </visual>
+            <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<cylinder length="${l}" radius="${r}" />
+					</geometry>
+            </collision>
+            <xacro:default_inertial mass="${mass}" />
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+    <xacro:macro name="default_inertial" params="mass">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                     iyy="0.001" iyz="0.0"
+                     izz="0.001" />                     
+			</inertial>
+    </xacro:macro>
+    
+    <xacro:macro name="default_gazebo" params="name material">
+ 		<gazebo reference="${name}">
+			<material>${material}</material>
+			<selfCollide>false</selfCollide>
+			<turnGravityOff>true</turnGravityOff>
+		</gazebo>
+    </xacro:macro>
+
+
+ 	<!-- ============================   Body   ============================ -->
+ 	
+ 	<!--
+ 	<link name="world" />
+ 	-->
+
+        <xacro:my_cylinder name="petit_base_link" l="0.002" r="0.1" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_cylinder>
+ 	
+        <xacro:my_cylinder name="petit_lvl1_link" l="0.002" r="0.1" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_cylinder>
+ 	
+        <xacro:my_cylinder name="petit_body_link" l="0.280" r="0.1" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_cylinder>
+ 	
+        <xacro:my_cylinder name="petit_base_laser_link" l="0.002" r="0.05" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_cylinder>
+ 	
+        <xacro:my_cylinder name="petit_neato_link" l="0.002" r="0.05" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_cylinder>
+
+	<!-- =================== Joint Definitions ==================== -->
+	
+	<!--
+	<joint name="base_world_link" type="continuous">
+    	<parent link="world"/>
+    	<child link="base_link"/>
+    	<axis xyz="0 0 0"/>
+    	<origin rpy="0 0 0" xyz="0 0 0"/>
+    	<dynamics damping="0.05"/>
+  	</joint>
+  	-->
+
+        <joint name="petit_lvl1_joint" type="fixed">
+        <parent link="petit_base_link" />
+        <child link="petit_lvl1_link" />
+        <origin xyz="0 0 0.07" rpy="0 0 0" />
+        </joint>
+
+        <joint name="petit_body_joint" type="fixed">
+        <parent link="petit_lvl1_link" />
+        <child link="petit_body_link" />
+        <origin xyz="0.0 0.0 0.140" rpy="0 0 0" />
+        </joint>
+
+	<!-- =================== LASER Definitions ==================== -->
+
+        <joint name="petit_base_laser_joint" type="fixed">
+        <parent link="petit_lvl1_link" />
+        <child link="petit_base_laser_link" />
+        <origin xyz="0.0 0.0 -0.005" rpy="0 0 0" />
+        </joint>
+
+        <joint name="petit_neato_joint" type="fixed">
+        <parent link="petit_base_laser_link" />
+        <child link="petit_neato_link" />
+        <origin xyz="0 0.0 0.0" rpy="3.141592653 0 0" />
+        </joint>
+
+
+
+	<gazebo reference="petit">
+  	</gazebo>
+</robot>
+

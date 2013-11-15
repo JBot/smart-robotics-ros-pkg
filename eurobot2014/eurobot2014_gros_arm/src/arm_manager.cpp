@@ -73,14 +73,42 @@ class ARM_manager {
 	ros::Publisher Ljoint_mini_pub;
 
 
+        ros::ServiceClient speed_Rjoint1;
+        ros::ServiceClient speed_Rjoint2;
+        ros::ServiceClient speed_Rjoint3;
+        ros::ServiceClient speed_Rjoint4;
+        ros::ServiceClient speed_Rjoint5;
 
-	void joint_publish(void);
+        ros::ServiceClient slope_Rjoint1;
+        ros::ServiceClient slope_Rjoint2;
+        ros::ServiceClient slope_Rjoint3;
+        ros::ServiceClient slope_Rjoint4;
+        ros::ServiceClient slope_Rjoint5;
+
+        ros::ServiceClient speed_Ljoint1;
+        ros::ServiceClient speed_Ljoint2;
+        ros::ServiceClient speed_Ljoint3;
+        ros::ServiceClient speed_Ljoint4;
+        ros::ServiceClient speed_Ljoint5;
+
+        ros::ServiceClient slope_Ljoint1;
+        ros::ServiceClient slope_Ljoint2;
+        ros::ServiceClient slope_Ljoint3;
+        ros::ServiceClient slope_Ljoint4;
+        ros::ServiceClient slope_Ljoint5;
+
+
+
+
+	void joint_publish(uint8_t type);
+	void compute_RIK(geometry_msgs::PoseStamped pose);
 
 
     private:
 	void actionCallback(const std_msgs::Int32::ConstPtr & ptr);
 	void fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & ptr);
 	void fruitcolorCallback(const std_msgs::Int32::ConstPtr & ptr);
+	void compute_LIK(geometry_msgs::PoseStamped pose);
 
 	ros::NodeHandle nh;
 
@@ -102,36 +130,36 @@ class ARM_manager {
 ARM_manager::ARM_manager()
 {
 
-  /* Load the robot model */
+  // Load the robot model 
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   my_robot_model_loader = robot_model_loader;
 
-  /* Get a shared pointer to the model */
+  // Get a shared pointer to the model 
   my_kinematic_model = my_robot_model_loader.getModel();
 
-  /* Get and print the name of the coordinate frame in which the transforms for this model are computed*/
+  // Get and print the name of the coordinate frame in which the transforms for this model are computed
   ROS_INFO("Model frame: %s", my_kinematic_model->getModelFrame().c_str());
 
-  /* WORKING WITH THE KINEMATIC STATE */
-  /* Create a kinematic state - this represents the configuration for the robot represented by kinematic_model */
+  // WORKING WITH THE KINEMATIC STATE 
+  // Create a kinematic state - this represents the configuration for the robot represented by kinematic_model 
   robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(my_kinematic_model));
   my_kinematic_state = kinematic_state;
 
-  /* Set all joints in this state to their default values */
+  // Set all joints in this state to their default values 
   my_kinematic_state->setToDefaultValues();
 
 
   RA_joint_model_group = my_kinematic_model->getJointModelGroup("right_arm");
   RA_group_ = my_kinematic_state->getJointStateGroup("right_arm");
 
-  /* Get the names of the joints in the right_arm*/
+  // Get the names of the joints in the right_arm
   RA_joint_names = RA_joint_model_group->getJointModelNames();
 
   LA_joint_model_group = my_kinematic_model->getJointModelGroup("left_arm");
   LA_group_ = my_kinematic_state->getJointStateGroup("left_arm");
 
-  /* Get the names of the joints in the left_arm*/
-  LA_joint_names = RA_joint_model_group->getJointModelNames();
+  // Get the names of the joints in the left_arm
+  LA_joint_names = LA_joint_model_group->getJointModelNames();
 
 
 
@@ -141,6 +169,7 @@ ARM_manager::ARM_manager()
 
   alpha_pub = nh.advertise < std_msgs::Int32 > ("ROBOT/alpha_ros", 5);
   delta_pub = nh.advertise < std_msgs::Int32 > ("ROBOT/delta_ros", 5);
+  grip_pub = nh.advertise < std_msgs::Int8 > ("ROBOT/grip", 5);
 
   Rjoint1_pub = nh.advertise < std_msgs::Float64 > ("Rarm1_joint", 5);
   Rjoint2_pub = nh.advertise < std_msgs::Float64 > ("Rarm2_joint", 5);
@@ -154,8 +183,121 @@ ARM_manager::ARM_manager()
   Ljoint4_pub = nh.advertise < std_msgs::Float64 > ("Larm4_joint", 5);
   Ljoint5_pub = nh.advertise < std_msgs::Float64 > ("Larm5_joint", 5);
 
+  speed_Rjoint1 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink1_controller/set_speed", true);
+  speed_Rjoint2 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink2_controller/set_speed", true);
+  speed_Rjoint3 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink3_controller/set_speed", true);
+  speed_Rjoint4 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink4_controller/set_speed", true);
+  speed_Rjoint5 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink5_controller/set_speed", true);
+
+  slope_Rjoint1 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Rlink1_controller/set_compliance_slope", true);
+  slope_Rjoint2 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Rlink2_controller/set_compliance_slope", true);
+  slope_Rjoint3 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Rlink3_controller/set_compliance_slope", true);
+  slope_Rjoint4 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Rlink4_controller/set_compliance_slope", true);
+  slope_Rjoint5 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Rlink5_controller/set_compliance_slope", true);
+
+  speed_Ljoint1 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Llink1_controller/set_speed", true);
+  speed_Ljoint2 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Llink2_controller/set_speed", true);
+  speed_Ljoint3 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Llink3_controller/set_speed", true);
+  speed_Ljoint4 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Llink4_controller/set_speed", true);
+  speed_Ljoint5 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Llink5_controller/set_speed", true);
+
+  slope_Ljoint1 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Llink1_controller/set_compliance_slope", true);
+  slope_Ljoint2 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Llink2_controller/set_compliance_slope", true);
+  slope_Ljoint3 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Llink3_controller/set_compliance_slope", true);
+  slope_Ljoint4 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Llink4_controller/set_compliance_slope", true);
+  slope_Ljoint5 = nh.serviceClient<dynamixel_controllers::SetComplianceSlope>("/Llink5_controller/set_compliance_slope", true);
+
 
   done_pub = nh.advertise < std_msgs::Empty > ("ROBOT/done", 5);
+
+
+
+
+    usleep(1000000);
+
+    dynamixel_controllers::SetComplianceSlope tmp_slope;
+
+    tmp_slope.request.slope = 90;
+    if (slope_Rjoint1.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Rjoint2.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Rjoint3.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Rjoint4.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Rjoint5.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Ljoint1.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Ljoint2.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Ljoint3.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Ljoint4.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
+    if (slope_Ljoint5.call(tmp_slope))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSlope");
+    }
 
 
 }
@@ -172,7 +314,7 @@ void ARM_manager::fruitcolorCallback(const std_msgs::Int32::ConstPtr & ptr)
 {
 }
 
-void ARM_manager::joint_publish(void)
+void ARM_manager::compute_RIK(geometry_msgs::PoseStamped pose)
 {
 
   /* Get the names of the joints in the right_arm*/
@@ -212,7 +354,6 @@ void ARM_manager::joint_publish(void)
     ROS_INFO("Joint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
   }
 
-
   /* FORWARD KINEMATICS */
   /* Compute FK for a set of random joint values*/
   //const Eigen::Affine3d &end_effector_state = link_state_->getGlobalLinkTransform();
@@ -245,7 +386,6 @@ void ARM_manager::joint_publish(void)
     ROS_INFO("Joint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
   }
 
-
   /* Do IK on the pose we just generated using forward kinematics
 * Here 10 is the number of random restart and 0.1 is the allowed time after
 * each restart
@@ -267,6 +407,51 @@ void ARM_manager::joint_publish(void)
     ROS_INFO("Did not find IK solution");
   }
 
+
+}
+
+void ARM_manager::compute_LIK(geometry_msgs::PoseStamped pose)
+{
+}
+
+void ARM_manager::joint_publish(uint8_t type)
+{
+
+	if(type == 0) { // Only right ARM
+		std::vector<double> joint_values;
+		RA_group_->getVariableValues(joint_values);
+
+		std_msgs::Float64 tmp;
+		tmp.data = joint_values[0];
+    		Rjoint1_pub.publish(tmp);
+		tmp.data = joint_values[1];
+    		Rjoint2_pub.publish(tmp);
+		tmp.data = joint_values[2];
+    		Rjoint3_pub.publish(tmp);
+		tmp.data = joint_values[3];
+    		Rjoint4_pub.publish(tmp);
+		tmp.data = joint_values[4];
+    		Rjoint5_pub.publish(tmp);
+	}
+	else if(type == 1) { // Only left ARM
+                std::vector<double> joint_values;
+                LA_group_->getVariableValues(joint_values);
+
+                std_msgs::Float64 tmp;
+                tmp.data = joint_values[0];
+                Ljoint1_pub.publish(tmp);
+                tmp.data = joint_values[1];
+                Ljoint2_pub.publish(tmp);
+                tmp.data = joint_values[2];
+                Ljoint3_pub.publish(tmp);
+                tmp.data = joint_values[3];
+                Ljoint4_pub.publish(tmp);
+                tmp.data = joint_values[4];
+                Ljoint5_pub.publish(tmp);
+	}
+	else if(type == 2) { // Both ARM
+
+	}
 
 
 
@@ -290,9 +475,13 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "ARM_manager");
     ARM_manager arm_manager;
     // Refresh rate
-    ros::Rate loop_rate(10);                                // 35 with bluetooth
+    ros::Rate loop_rate(1);                                // 35 with bluetooth
+
+    geometry_msgs::PoseStamped testpose;
+    arm_manager.compute_RIK(testpose);
+
     while (ros::ok()) {
-	arm_manager.joint_publish();
+	arm_manager.joint_publish(0);
         ros::spinOnce();
         loop_rate.sleep();
     }

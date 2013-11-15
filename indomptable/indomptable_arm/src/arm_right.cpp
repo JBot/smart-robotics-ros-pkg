@@ -1669,40 +1669,6 @@ void indomptableARM::releaseBAR(void){
 //--------------------------------------------------------------------
 //  ;[SERVO DRIVER] Updates the positions of the servos    
 void indomptableARM::ServoDriver(void){
-    /*
-       char Serout[260]={0};
-       int temp = 0;
-
-
-       temp = (int)( (double)(CoxaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET0;
-       sprintf(Serout, "%s #%dP%d", Serout, 0, temp);
-
-       temp = (int)( (double)(FemurAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET4;
-       sprintf(Serout, "%s #%dP%d", Serout, 4, temp);
-
-       temp = (int)( (double)(TibiaAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET8;
-       sprintf(Serout, "%s #%dP%d", Serout, 8, temp);
-
-       temp = (int)( (double)(AnkleAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650 + SERVO_OFFSET12;
-       sprintf(Serout, "%s #%dP%d", Serout, 12, temp);
-
-       temp = (int)( (double)(RollAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
-       sprintf(Serout, "%s #%dP%d", Serout, 24, temp);
-
-       temp = (int)( (double)(HandAngle* 180.0 / 3.141592 +90)/0.10588238 ) + 650;
-       sprintf(Serout, "%s #%dP%d", Serout, 20, temp);
-
-
-    // Time and <CR>
-    sprintf(Serout, "%s T%d\r", Serout, ActualGaitSpeed);
-
-    // write to serial if connected
-    if ( ser_fd_ssc ) {
-    write(ser_fd_ssc, &Serout, sizeof(Serout));
-    printf("%s \n",Serout);
-    }
-    //printf("%s \n",Serout);
-     */
 
     printf("%f %f %f %f\n", CoxaAngle, FemurAngle, TibiaAngle, AnkleAngle);
 

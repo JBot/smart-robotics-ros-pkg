@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- The semantic description that corresponds to the URDF -->
+  <param name="robot_description_semantic" textfile="$(find gros_moveit_config)/config/indomptable.srdf" />
+
+  <!-- Load to the parameter server yaml files -->
+  <group ns="robot_description_planning">
+    <rosparam command="load" file="$(find gros_moveit_config)/config/joint_limits.yaml"/>
+  </group>
+
+
+
+  <node name="GROS_arm_manager" pkg="eurobot2014_gros_arm" type="arm_manager" respawn="false" output="screen">
+    <rosparam command="load" file="$(find gros_moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+</launch>
