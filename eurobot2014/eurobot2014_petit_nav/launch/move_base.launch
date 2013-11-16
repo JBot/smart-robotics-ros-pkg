@@ -3,9 +3,14 @@
 <launch>
   <master auto="start"/>
 
+  <node pkg="tf" type="static_transform_publisher" name="world2petit_broadcaster" args="0 0 0 0 0 0 /world /petit_map 100"/>
+
   <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
     <param name="firmware_version" value="2" />
     <param name="port" type="str" value="/dev/ttyUSB1" />
+    <param name="frame_id" type="str" value="petit_neato_link" />
+    
+    <remap from="/scan" to="/PETIT/neato" />
   </node>
 
 
@@ -26,6 +31,10 @@
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
         <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
         <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
+
+        <remap from="/map" to="/PETIT/map" />
+
+
   </node>
 
 
@@ -37,7 +46,7 @@
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
-
+<!--
   <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
@@ -48,7 +57,7 @@
         <remap from="/ROBOT/init_pose" to="/PETIT/init_pose" />
         <remap from="/ROBOT/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
-
+-->
   <node pkg="map_server" type="map_server" respawn="false" name="PETIT_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
         <param name="frame_id" type="str" value="/petit_map" />
         <remap from="/map" to="/PETIT/map" />
