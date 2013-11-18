@@ -32,13 +32,13 @@
 #include <termios.h> // POSIX terminal control definitionss
 #include <time.h>   // time calls
 
-#define YELLOW_START_X 1.2
-#define YELLOW_START_Y 1.2
-#define YELLOW_START_Z 0.0
+#define YELLOW_START_X 1.300
+#define YELLOW_START_Y 1.850
+#define YELLOW_START_Z -1.5707963
 
-#define RED_START_X -1.2
-#define RED_START_Y 1.2
-#define RED_START_Z 1.57
+#define RED_START_X -1.300
+#define RED_START_Y 1.850
+#define RED_START_Z -1.5707963
 
 
 class InitPose {
@@ -47,6 +47,7 @@ class InitPose {
 
 		ros::Subscriber pose_sub;
 		ros::Publisher cmd_vel_pub;
+		ros::Publisher start_path_pub;
 
 		void broadcast(void);
 
@@ -78,6 +79,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 	pose_sub = nh.subscribe<std_msgs::Empty>("ROBOT/init_pose", 5, &InitPose::poseCallback, this);
 	cmd_vel_pub = nh.advertise < geometry_msgs::Twist > ("/ROBOT/cmd_vel", 5);
+	start_path_pub = nh.advertise < std_msgs::Empty > ("/ROBOT/resume_pathwrapper", 5);
 
 
 	init_done = 0;
@@ -91,7 +93,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(5000000);
+	usleep(500000);
 
 	/* Turn on himself to build the map */
 	final_cmd_vel.linear.x = 0;
@@ -99,7 +101,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	final_cmd_vel.angular.z = 0.2;
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(5000000);
+	usleep(500000);
 
 	/* Go forward to build the map */
 	final_cmd_vel.linear.x = 0.1;
@@ -107,7 +109,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	final_cmd_vel.angular.z = 0;
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(5000000);
+	usleep(500000);
 
 	/* Go backward to build the map */
 	final_cmd_vel.linear.x = -0.1;
@@ -115,7 +117,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	final_cmd_vel.angular.z = 0;
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(10000000);
+	usleep(1000000);
 
 	if(color_name == "Yellow") {
 		/* Go on the left to join the starting zone */
@@ -131,7 +133,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	}
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(5000000);
+	usleep(500000);
 
 	/* Stop and wait the init pose signal */
 	final_cmd_vel.linear.x = 0;
@@ -195,6 +197,10 @@ void InitPose::poseCallback(const std_msgs::Empty::ConstPtr& vel)
                 init_done = 1;
 	}
 
+	usleep(10000);
+
+	std_msgs::Empty empty_mess;
+	start_path_pub.publish(empty_mess);
 
 }
 

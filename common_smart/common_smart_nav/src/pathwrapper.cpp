@@ -248,6 +248,8 @@ void Pathwrapper::init_pose() {
 
 	common_smart_nav::GetRobotPose tmp_pose;
 
+	usleep(500000);
+
 	if (get_pose.call(tmp_pose))
 	{
 		//ROS_INFO("Sum: %ld", get_path.response.plan);
@@ -309,7 +311,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
 						final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
 						final_pose2.header.stamp = ros::Time::now();
-						ROS_INFO("%f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
+						ROS_INFO("-- %f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
 						Pathwrapper::pose2D_pub.publish(final_pose);
 
 
@@ -473,7 +475,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 			}
 			else {
-				ROS_INFO("%f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
+				ROS_INFO("--- %f %f %f %f / %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y, sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
 				// Recompute speeds (motion control)
 
 				// transform in base_link frame

@@ -238,6 +238,13 @@
                 <xacro:ax12_color />
         </xacro:my_cylinder>
 
+        <xacro:my_cylinder name="gros_base_laser_link" l="0.002" r="0.05" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_cylinder>
+
+        <xacro:my_cylinder name="gros_neato_link" l="0.002" r="0.05" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_cylinder>
 
 
 	
@@ -361,6 +368,17 @@
         <origin xyz="0 0 -0.035" rpy="0 0 1.5707963267" />
         </joint>
 
+        <joint name="gros_base_laser_joint" type="fixed">
+        <parent link="top_level" />
+        <child link="gros_base_laser_link" />
+        <origin xyz="0.0 0.0 -0.04" rpy="0 0 0" />
+        </joint>
+
+        <joint name="gros_neato_joint" type="fixed">
+        <parent link="gros_base_laser_link" />
+        <child link="gros_neato_link" />
+        <origin xyz="0 0.0 0.0" rpy="3.141592653 0 0" />
+        </joint>
 
 
  	<!-- =================== RIGHT ARM Definitions ==================== -->

@@ -27,7 +27,7 @@
     <param name="planner_name" type="str" value="PETIT_planner" />
     <param name="map_name" type="str" value="petit_map" />
 
-    <rosparam file="$(find eurobot2014_petit_nav)/launch/nav_params.yaml" command="load" />
+    <rosparam file="$(find eurobot2014_petit_nav)/launch/nav_params_groovy.yaml" command="load" />
 
         <remap from="/ROBOT/goal" to="/PETIT/goal" />
         <remap from="/ROBOT/plan" to="/PETIT/plan" />

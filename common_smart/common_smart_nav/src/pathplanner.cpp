@@ -159,6 +159,18 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	distance_service = nh.advertiseService("/ROBOT/get_distance", &TrajectoryManager::getDistance, this);
 
 
+        //just an arbitrary point in space
+        current_pose.header.frame_id = map_name;
+        current_pose.header.stamp = ros::Time();
+        current_pose.pose.position.x = 0.0;
+        current_pose.pose.position.y = 0.0;
+        current_pose.pose.position.z = 0.0;
+
+        current_pose.pose.orientation.x = 0.0;
+        current_pose.pose.orientation.y = 0.0;
+        current_pose.pose.orientation.z = 0.0;
+        current_pose.pose.orientation.w = 1.0;
+
 
 
 
@@ -449,8 +461,28 @@ void TrajectoryManager::publishPath(void)
 
 void TrajectoryManager::planThread(void)
 {
-	ros::Rate r(1);
+	ros::Rate r(20);
 	while(nh.ok()) {
+
+        //make sure we have a costmap for our planner
+        if(planner_costmap_ == NULL){
+                ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
+                //return false;
+        }
+
+        tf::Stamped<tf::Pose> global_pose;
+        if(!planner_costmap_->getRobotPose(global_pose)){
+                ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
+                //return false;
+        }
+
+        geometry_msgs::PoseStamped start;
+        //if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
+        //if(req.start.header.frame_id == "")
+        tf::poseStampedTFToMsg(global_pose, start);
+
+        current_pose = start;
+
 
 		switch(status) {
 			case STOP:
