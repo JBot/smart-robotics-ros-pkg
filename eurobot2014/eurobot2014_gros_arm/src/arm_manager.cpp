@@ -23,6 +23,7 @@
 
 
 
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -42,6 +43,9 @@
 //#include <algorithm>
 
 #include <vector>
+
+#define min(x1,x2) ((x1) > (x2) ? (x2):(x1))
+#define max(x1,x2) ((x1) > (x2) ? (x1):(x2))
 
 class ARM_manager {
     public:
@@ -125,6 +129,12 @@ class ARM_manager {
 	robot_state::JointStateGroup* LA_group_;
 	std::vector<std::string> LA_joint_names;
 
+	double prev_Rjoint1;
+	double prev_Rjoint2;
+	double prev_Rjoint3;
+	double prev_Rjoint4;
+	double prev_Rjoint5;
+	double max_speed;
 };
 
 ARM_manager::ARM_manager()
@@ -171,17 +181,17 @@ ARM_manager::ARM_manager()
   delta_pub = nh.advertise < std_msgs::Int32 > ("ROBOT/delta_ros", 5);
   grip_pub = nh.advertise < std_msgs::Int8 > ("ROBOT/grip", 5);
 
-  Rjoint1_pub = nh.advertise < std_msgs::Float64 > ("Rarm1_joint", 5);
-  Rjoint2_pub = nh.advertise < std_msgs::Float64 > ("Rarm2_joint", 5);
-  Rjoint3_pub = nh.advertise < std_msgs::Float64 > ("Rarm3_joint", 5);
-  Rjoint4_pub = nh.advertise < std_msgs::Float64 > ("Rarm4_joint", 5);
-  Rjoint5_pub = nh.advertise < std_msgs::Float64 > ("Rarm5_joint", 5);
+  Rjoint1_pub = nh.advertise < std_msgs::Float64 > ("/Rlink1_controller/command", 5);
+  Rjoint2_pub = nh.advertise < std_msgs::Float64 > ("/Rlink2_controller/command", 5);
+  Rjoint3_pub = nh.advertise < std_msgs::Float64 > ("/Rlink3_controller/command", 5);
+  Rjoint4_pub = nh.advertise < std_msgs::Float64 > ("/Rlink4_controller/command", 5);
+  Rjoint5_pub = nh.advertise < std_msgs::Float64 > ("/Rlink5_controller/command", 5);
 
-  Ljoint1_pub = nh.advertise < std_msgs::Float64 > ("Larm1_joint", 5);
-  Ljoint2_pub = nh.advertise < std_msgs::Float64 > ("Larm2_joint", 5);
-  Ljoint3_pub = nh.advertise < std_msgs::Float64 > ("Larm3_joint", 5);
-  Ljoint4_pub = nh.advertise < std_msgs::Float64 > ("Larm4_joint", 5);
-  Ljoint5_pub = nh.advertise < std_msgs::Float64 > ("Larm5_joint", 5);
+  Ljoint1_pub = nh.advertise < std_msgs::Float64 > ("/Llink1_controller/command", 5);
+  Ljoint2_pub = nh.advertise < std_msgs::Float64 > ("/Llink2_controller/command", 5);
+  Ljoint3_pub = nh.advertise < std_msgs::Float64 > ("/Llink3_controller/command", 5);
+  Ljoint4_pub = nh.advertise < std_msgs::Float64 > ("/Llink4_controller/command", 5);
+  Ljoint5_pub = nh.advertise < std_msgs::Float64 > ("/Llink5_controller/command", 5);
 
   speed_Rjoint1 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink1_controller/set_speed", true);
   speed_Rjoint2 = nh.serviceClient<dynamixel_controllers::SetSpeed>("/Rlink2_controller/set_speed", true);
@@ -210,7 +220,12 @@ ARM_manager::ARM_manager()
 
   done_pub = nh.advertise < std_msgs::Empty > ("ROBOT/done", 5);
 
-
+  prev_Rjoint1 = 0.0;
+  prev_Rjoint2 = 0.0;
+  prev_Rjoint3 = 0.0;
+  prev_Rjoint4 = 0.0;
+  prev_Rjoint5 = 0.0;
+  max_speed = 5.0;
 
 
     usleep(1000000);
@@ -308,13 +323,11 @@ void ARM_manager::actionCallback(const std_msgs::Int32::ConstPtr & ptr)
 
 void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & ptr)
 {
+    compute_RIK(*ptr);
+    joint_publish(0);
 }
 
 void ARM_manager::fruitcolorCallback(const std_msgs::Int32::ConstPtr & ptr)
-{
-}
-
-void ARM_manager::compute_RIK(geometry_msgs::PoseStamped pose)
 {
 
   /* Get the names of the joints in the right_arm*/
@@ -334,7 +347,8 @@ void ARM_manager::compute_RIK(geometry_msgs::PoseStamped pose)
   joint_values[0] = 0;
   joint_values[1] = 1.0;
   joint_values[2] = 0;
-  joint_values[3] = -1.0;
+  joint_values[3] = 1.0;
+  joint_values[4] = 1.0;
   RA_group_->setVariableValues(joint_values);
 
 
@@ -410,6 +424,41 @@ void ARM_manager::compute_RIK(geometry_msgs::PoseStamped pose)
 
 }
 
+void ARM_manager::compute_RIK(geometry_msgs::PoseStamped pose)
+{
+  /* Get the names of the joints in the right_arm*/
+  RA_joint_names = RA_joint_model_group->getJointModelNames();
+
+  /* Get the joint positions for the right arm*/
+  std::vector<double> joint_values;
+  RA_group_->getVariableValues(joint_values);
+
+
+
+  /* Do IK on the pose we just generated using forward kinematics
+* Here 10 is the number of random restart and 0.1 is the allowed time after
+* each restart
+*/
+  bool found_ik = RA_group_->setFromIK(pose.pose, "Rlink6", 10, 0.1);
+
+  /* Get and print the joint values */
+  if (found_ik)
+  {
+    //kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+    RA_group_->getVariableValues(joint_values);
+    for(std::size_t i=0; i < RA_joint_names.size(); ++i)
+    {
+      ROS_INFO("Joint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
+    }
+  }
+  else
+  {
+    ROS_INFO("Did not find IK solution");
+  }
+
+
+}
+
 void ARM_manager::compute_LIK(geometry_msgs::PoseStamped pose)
 {
 }
@@ -420,6 +469,86 @@ void ARM_manager::joint_publish(uint8_t type)
 	if(type == 0) { // Only right ARM
 		std::vector<double> joint_values;
 		RA_group_->getVariableValues(joint_values);
+
+
+    dynamixel_controllers::SetSpeed tmp_speed;
+
+    double dist_Rjoint1 = fabs(prev_Rjoint1 - joint_values[0]);
+    double dist_Rjoint2 = fabs(prev_Rjoint2 - joint_values[1]);
+    double dist_Rjoint3 = fabs(prev_Rjoint3 - joint_values[2]);
+    double dist_Rjoint4 = fabs(prev_Rjoint4 - joint_values[3]);
+    double dist_Rjoint5 = fabs(prev_Rjoint5 - joint_values[4]);
+
+    double distance_max = max(dist_Rjoint1, dist_Rjoint2);
+    distance_max = max(distance_max, dist_Rjoint3);
+    distance_max = max(distance_max, dist_Rjoint4);
+    distance_max = max(distance_max, dist_Rjoint5);
+
+    double speed_RJoint1 = max_speed * dist_Rjoint1 / distance_max;
+    double speed_RJoint2 = max_speed * dist_Rjoint2 / distance_max;
+    double speed_RJoint3 = max_speed * dist_Rjoint3 / distance_max;
+    double speed_RJoint4 = max_speed * dist_Rjoint4 / distance_max;
+    double speed_RJoint5 = max_speed * dist_Rjoint5 / distance_max;
+
+
+    prev_Rjoint1 = joint_values[0];
+    prev_Rjoint2 = joint_values[1];
+    prev_Rjoint3 = joint_values[2];
+    prev_Rjoint4 = joint_values[3];
+    prev_Rjoint5 = joint_values[4];
+
+
+    tmp_speed.request.speed = speed_RJoint1;
+    if (speed_Rjoint1.call(tmp_speed))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSpeed1");
+    }
+
+    tmp_speed.request.speed = speed_RJoint2;
+    if (speed_Rjoint2.call(tmp_speed))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSpeed2");
+    }
+
+    tmp_speed.request.speed = speed_RJoint3;
+    if (speed_Rjoint3.call(tmp_speed))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSpeed3");
+    }
+
+    tmp_speed.request.speed = speed_RJoint4;
+    if (speed_Rjoint4.call(tmp_speed))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSpeed4");
+    }
+
+    tmp_speed.request.speed = speed_RJoint5;
+    if (speed_Rjoint5.call(tmp_speed))
+    {
+        //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service SetSpeed4");
+    }
+
+
 
 		std_msgs::Float64 tmp;
 		tmp.data = joint_values[0];
@@ -478,10 +607,19 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(1);                                // 35 with bluetooth
 
     geometry_msgs::PoseStamped testpose;
+    testpose.pose.position.x = 0.27;
+    testpose.pose.position.y = -0.06;
+    testpose.pose.position.z = 0.16;
+
+    testpose.pose.orientation.x = 0.0;
+    testpose.pose.orientation.y = 0.0;
+    testpose.pose.orientation.z = 0.0;
+    testpose.pose.orientation.w = 1.0;
+
     arm_manager.compute_RIK(testpose);
 
     while (ros::ok()) {
-	arm_manager.joint_publish(0);
+	//arm_manager.joint_publish(0);
         ros::spinOnce();
         loop_rate.sleep();
     }

@@ -15,7 +15,7 @@
     </node>
 
 
-    <!-- Start tilt joint controller -->
+    <!-- Start ARM joint controller -->
     <rosparam file="$(find eurobot2014_gros_arm)/launch/right_arm.yaml" command="load"/>
     <node name="right_arm_controller_spawner" pkg="dynamixel_controllers" type="controller_spawner.py"
           args="--manager=dxl_manager
