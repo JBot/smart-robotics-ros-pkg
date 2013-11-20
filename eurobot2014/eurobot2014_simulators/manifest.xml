@@ -1,0 +1,24 @@
+<package>
+  <description brief="eurobot2014_simulators">
+
+     eurobot2014_simulators
+
+  </description>
+  <author>joffrey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/eurobot2014_simulators</url>
+  <depend package="roscpp"/>
+  <depend package="move_base"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="move_base_msgs"/>
+  <depend package="common_smart_nav"/>
+  <depend package="dynamixel_controllers"/>
+
+</package>
+
+

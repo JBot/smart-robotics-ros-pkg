@@ -77,7 +77,6 @@ class Pathwrapper {
 		ros::NodeHandle nh;
 
 		nav_msgs::Path my_path;
-		geometry_msgs::Pose2D final_pose;
 		geometry_msgs::Twist final_cmd_vel;
 		geometry_msgs::PoseStamped final_pose2;
 
@@ -124,9 +123,6 @@ Pathwrapper::Pathwrapper()
 
 
 
-	final_pose.x = 0.0;
-	final_pose.y = 0.14;
-	final_pose.theta = 0.0;
 
 	//just an arbitrary point in space
 	final_pose2.header.frame_id = map_name;
@@ -217,10 +213,6 @@ void Pathwrapper::pathCallback(const nav_msgs::Path::ConstPtr & path)
 		my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 
 		// TEST
-
-		final_pose.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-		final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-
 		final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
 		final_pose2.header.stamp = ros::Time::now();
 		// TEST
@@ -235,11 +227,8 @@ void Pathwrapper::pathCallback(const nav_msgs::Path::ConstPtr & path)
 
 void Pathwrapper::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
-	final_pose.x = pose->pose.position.x;
-	final_pose.y = pose->pose.position.y;
 	final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
 	final_pose2.header.stamp = ros::Time::now();
-	Pathwrapper::pose2D_pub.publish(final_pose);
 	ROS_INFO("Goal sent.");
 
 }
@@ -254,8 +243,6 @@ void Pathwrapper::init_pose() {
 	{
 		//ROS_INFO("Sum: %ld", get_path.response.plan);
 		final_pose2 = tmp_pose.response.pose;
-		final_pose.x = tmp_pose.response.pose.pose.position.x;
-		final_pose.y = tmp_pose.response.pose.pose.position.y;
 	}
 	else
 	{
@@ -294,7 +281,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 			geometry_msgs::PoseStamped base_pose;
 			listener.transformPose(map_name, odom_pose, base_pose);
 
-			if( sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ) < MAX_DIST_SKIP ) {
+			if( sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2) ) < MAX_DIST_SKIP ) {
 
 				if( !(my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
 					if(my_path.poses.std::vector<geometry_msgs::PoseStamped >::size() > NB_STEP_SKIP) {
@@ -307,23 +294,24 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 
 						}
-						final_pose.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-						final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
 						final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
+						// test 
+						final_pose2.pose.orientation = my_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.orientation;
+						// test
 						final_pose2.header.stamp = ros::Time::now();
-						ROS_INFO("-- %f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
-						Pathwrapper::pose2D_pub.publish(final_pose);
+						//ROS_INFO("-- %f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
 
 
 						// transform in base_link frame
 						//const string trans_frame = "base_link";
 						geometry_msgs::PoseStamped my_pose_stamped;
 						geometry_msgs::PoseStamped my_map_pose = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
+						my_map_pose.pose.orientation = my_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.orientation;
 						my_pose_stamped.header.stamp = now;
 						my_map_pose.header.stamp = now;
 						//tf::Transformer::transformPose("/base_link", my_map_pose, my_pose_stamped);
 						listener.transformPose(base_name, my_map_pose, my_pose_stamped);
-						ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (my_map_pose.pose.position.x), (my_map_pose.pose.position.y), getHeadingFromQuat(my_map_pose.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
+						//ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (my_map_pose.pose.position.x), (my_map_pose.pose.position.y), getHeadingFromQuat(my_map_pose.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
 						// normalize Vx, Vy
 						if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 						{
@@ -371,12 +359,11 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						//ROS_INFO("%f %f", my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 
 						//		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
 
-						final_pose.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-						final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
 						final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
+						// test
+						final_pose2.pose.orientation = my_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.orientation;
+						// test
 						final_pose2.header.stamp = ros::Time::now();
-						//final_pose.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-						Pathwrapper::pose2D_pub.publish(final_pose);
 
 						my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 					}
@@ -385,7 +372,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						usleep(100000);
 						int i = 0;
 						// Test if path is finished (i.e. robot is at his final pose)
-						double test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
+						double test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
 						// TODO Check angular
 						while( ( test > 0.02) && ( i < 150 ) ) {
 							usleep(100000);
@@ -404,7 +391,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							//geometry_msgs::PoseStamped my_map_pose = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
 							//tf::Transformer::transformPose("/base_link", my_map_pose, my_pose_stamped);
 							listener.transformPose(base_name, final_pose2, my_pose_stamped);
-							ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (final_pose2.pose.position.x), (final_pose2.pose.position.y), getHeadingFromQuat(final_pose2.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
+							//ROS_ERROR("frame1 : %f %f %f / frame2 : %f %f %f ", (final_pose2.pose.position.x), (final_pose2.pose.position.y), getHeadingFromQuat(final_pose2.pose.orientation), (my_pose_stamped.pose.position.x), (my_pose_stamped.pose.position.y), getHeadingFromQuat(my_pose_stamped.pose.orientation));
 							//ROS_ERROR("frame1 : %f / frame2 : %f", (my_map_pose.pose.position.x), (my_pose_stamped.pose.position.x));
 							// normalize Vx, Vy
 							if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
@@ -446,8 +433,8 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 
-							test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
-							ROS_ERROR("final // i : %d / dist : %f", i, test);
+							test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
+							//ROS_ERROR("final // i : %d / dist : %f", i, test);
 						}
 
 						final_cmd_vel.linear.x = 0.0;
@@ -475,7 +462,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 			}
 			else {
-				ROS_INFO("--- %f %f %f %f / %f", final_pose.x, final_pose.y, base_pose.pose.position.x, base_pose.pose.position.y, sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
+				ROS_INFO("--- %f %f %f %f / %f", final_pose2.pose.position.x, final_pose2.pose.position.y, base_pose.pose.position.x, base_pose.pose.position.y, sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2) ));
 				// Recompute speeds (motion control)
 
 				// transform in base_link frame

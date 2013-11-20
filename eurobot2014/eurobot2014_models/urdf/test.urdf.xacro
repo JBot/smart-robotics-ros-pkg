@@ -430,7 +430,7 @@
 
 	<!-- =================== LEFT ARM Definitions ==================== -->
 
-        <joint name="Ljoint1" type="revolute">
+        <joint name="Larm1_joint" type="revolute">
         <parent link="Llink1" />
         <child link="Llink2" />
         <origin xyz="0.0 0 0" rpy="0 0 0" />
@@ -439,7 +439,7 @@
         <dynamics damping="0.0"/>
         </joint>
 
-        <joint name="Ljoint2" type="revolute">
+        <joint name="Larm2_joint" type="revolute">
         <parent link="Llink2" />
         <child link="Llink3" />
         <origin xyz="0.0797 0 0" rpy="0 0 0" />
@@ -448,7 +448,7 @@
         <dynamics damping="0.0"/>
         </joint>
 
-        <joint name="Ljoint3" type="revolute">
+        <joint name="Larm3_joint" type="revolute">
         <parent link="Llink3" />
         <child link="Llink4" />
         <origin xyz="0.053 0 0" rpy="0 0 0" />
@@ -457,7 +457,7 @@
         <dynamics damping="0.0"/>
         </joint>
 
-        <joint name="Ljoint4" type="revolute">
+        <joint name="Larm4_joint" type="revolute">
         <parent link="Llink4" />
         <child link="Llink5" />
         <origin xyz="0.026 0 0" rpy="0 0 0" />
@@ -466,7 +466,7 @@
         <dynamics damping="0.0"/>
         </joint>
 
-        <joint name="Ljoint5" type="revolute">
+        <joint name="Larm5_joint" type="revolute">
         <parent link="Llink5" />
         <child link="Llink6" />
         <origin xyz="0.0675 0 0" rpy="0 0 0" />
