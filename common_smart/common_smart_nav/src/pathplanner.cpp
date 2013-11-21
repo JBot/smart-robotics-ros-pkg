@@ -102,7 +102,7 @@ class TrajectoryManager {
 
 
 		ros::NodeHandle nh;
-		
+
 		int status; // STOP PAUSE RUN
 		int cpt;
 
@@ -159,17 +159,17 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	distance_service = nh.advertiseService("/ROBOT/get_distance", &TrajectoryManager::getDistance, this);
 
 
-        //just an arbitrary point in space
-        current_pose.header.frame_id = map_name;
-        current_pose.header.stamp = ros::Time();
-        current_pose.pose.position.x = 0.0;
-        current_pose.pose.position.y = 0.0;
-        current_pose.pose.position.z = 0.0;
+	//just an arbitrary point in space
+	current_pose.header.frame_id = map_name;
+	current_pose.header.stamp = ros::Time();
+	current_pose.pose.position.x = 0.0;
+	current_pose.pose.position.y = 0.0;
+	current_pose.pose.position.z = 0.0;
 
-        current_pose.pose.orientation.x = 0.0;
-        current_pose.pose.orientation.y = 0.0;
-        current_pose.pose.orientation.z = 0.0;
-        current_pose.pose.orientation.w = 1.0;
+	current_pose.pose.orientation.x = 0.0;
+	current_pose.pose.orientation.y = 0.0;
+	current_pose.pose.orientation.z = 0.0;
+	current_pose.pose.orientation.w = 1.0;
 
 
 
@@ -245,134 +245,134 @@ void TrajectoryManager::rotate(double heading, double attitude, double bank, geo
 
 double TrajectoryManager::compute_distance(nav_msgs::Path path_to_compute)
 {
-    double distance = 0.0;
-    geometry_msgs::Pose2D current_pose;
+	double distance = 0.0;
+	geometry_msgs::Pose2D current_pose;
 
-    if ( !(path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ) {
-        current_pose.x = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-        current_pose.y = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-        path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::erase (path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+	if ( !(path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ) {
+		current_pose.x = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+		current_pose.y = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+		path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::erase (path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 
-	//ROS_ERROR("current X : %f, X : %f / current Y : %f, Y : %f", current_pose.x, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, current_pose.y, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+		//ROS_ERROR("current X : %f, X : %f / current Y : %f, Y : %f", current_pose.x, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, current_pose.y, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
 
-        while ( !(path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ) {
-            distance += sqrt( pow(current_pose.x - path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 2) + pow(current_pose.y - path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y, 2) );
+		while ( !(path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ) {
+			distance += sqrt( pow(current_pose.x - path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 2) + pow(current_pose.y - path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y, 2) );
 
-            current_pose.x = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-            current_pose.y = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-            path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::erase (path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::begin());
+			current_pose.x = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
+			current_pose.y = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
+			path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::erase (path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::begin());
 
-	//ROS_ERROR("current X : %f, X : %f / current Y : %f, Y : %f", current_pose.x, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, current_pose.y, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
-        }
+			//ROS_ERROR("current X : %f, X : %f / current Y : %f, Y : %f", current_pose.x, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, current_pose.y, path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
+		}
 
-    }
-    //ROS_ERROR("Distance : %f", distance);
+	}
+	//ROS_ERROR("Distance : %f", distance);
 
-    return distance;
+	return distance;
 
 }
 
 
 
 bool TrajectoryManager::getRobotPose(common_smart_nav::GetRobotPose::Request  &req,
-                                        common_smart_nav::GetRobotPose::Response &res )
+		common_smart_nav::GetRobotPose::Response &res )
 {
-  res.pose = current_pose;
-  //res.sum = req.a + req.b;
-  //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-  //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
-  return true;
+	res.pose = current_pose;
+	//res.sum = req.a + req.b;
+	//ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+	//ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+	return true;
 }
 
 bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
-                                        common_smart_nav::GetPlan::Response &res )
+		common_smart_nav::GetPlan::Response &res )
 {
-  //res.sum = req.a + req.b;
-  //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-  //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+	//res.sum = req.a + req.b;
+	//ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+	//ROS_INFO("sending back response: [%ld]", (long int)res.sum);
 
-        std::vector<geometry_msgs::PoseStamped> global_plan;
-        nav_msgs::Path tmp_path;
-
-
-        //make sure we have a costmap for our planner
-        if(planner_costmap_ == NULL){
-                ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
-                //return false;
-        }
-
-        tf::Stamped<tf::Pose> global_pose;
-        if(!planner_costmap_->getRobotPose(global_pose)){
-                ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
-                //return false;
-        }
-
-        geometry_msgs::PoseStamped start;
-        //if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
-        //if(req.start.header.frame_id == "")
-        tf::poseStampedTFToMsg(global_pose, start);
-
-        current_pose = start;
-
-        if(planner_->makePlan(start, req.goal, global_plan)){
-                //ROS_ERROR("planner makes plan");
-                if(!global_plan.empty()){
-                        global_plan.push_back(req.goal);
-                        //ROS_ERROR("globalplan filled");
-                }
-        }
-
-        tmp_path.header.frame_id = map_name;
-        tmp_path.poses = global_plan;
-
-  	res.plan = tmp_path;
+	std::vector<geometry_msgs::PoseStamped> global_plan;
+	nav_msgs::Path tmp_path;
 
 
+	//make sure we have a costmap for our planner
+	if(planner_costmap_ == NULL){
+		ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
+		//return false;
+	}
 
-  return true;
+	tf::Stamped<tf::Pose> global_pose;
+	if(!planner_costmap_->getRobotPose(global_pose)){
+		ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
+		//return false;
+	}
+
+	geometry_msgs::PoseStamped start;
+	//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
+	//if(req.start.header.frame_id == "")
+	tf::poseStampedTFToMsg(global_pose, start);
+
+	current_pose = start;
+
+	if(planner_->makePlan(start, req.goal, global_plan)){
+		//ROS_ERROR("planner makes plan");
+		if(!global_plan.empty()){
+			global_plan.push_back(req.goal);
+			//ROS_ERROR("globalplan filled");
+		}
+	}
+
+	tmp_path.header.frame_id = map_name;
+	tmp_path.poses = global_plan;
+
+	res.plan = tmp_path;
+
+
+
+	return true;
 }
 
 bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req,
-                                        common_smart_nav::GetDistance::Response &res )
+		common_smart_nav::GetDistance::Response &res )
 {
 
-        std::vector<geometry_msgs::PoseStamped> global_plan;
-        nav_msgs::Path tmp_path;
+	std::vector<geometry_msgs::PoseStamped> global_plan;
+	nav_msgs::Path tmp_path;
 
 
-        //make sure we have a costmap for our planner
-        if(planner_costmap_ == NULL){
-                ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
-                //return false;
-        }
+	//make sure we have a costmap for our planner
+	if(planner_costmap_ == NULL){
+		ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
+		//return false;
+	}
 
-        tf::Stamped<tf::Pose> global_pose;
-        if(!planner_costmap_->getRobotPose(global_pose)){
-                ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
-                //return false;
-        }
+	tf::Stamped<tf::Pose> global_pose;
+	if(!planner_costmap_->getRobotPose(global_pose)){
+		ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
+		//return false;
+	}
 
-        geometry_msgs::PoseStamped start;
-        //if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
-        //if(req.start.header.frame_id == "")
-        tf::poseStampedTFToMsg(global_pose, start);
+	geometry_msgs::PoseStamped start;
+	//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
+	//if(req.start.header.frame_id == "")
+	tf::poseStampedTFToMsg(global_pose, start);
 
-        current_pose = start;
+	current_pose = start;
 
-        if(planner_->makePlan(start, req.goal, global_plan)){
-                //ROS_ERROR("planner makes plan");
-                if(!global_plan.empty()){
-                        global_plan.push_back(req.goal);
-                        //ROS_ERROR("globalplan filled");
-                }
-        }
+	if(planner_->makePlan(start, req.goal, global_plan)){
+		//ROS_ERROR("planner makes plan");
+		if(!global_plan.empty()){
+			global_plan.push_back(req.goal);
+			//ROS_ERROR("globalplan filled");
+		}
+	}
 
-        tmp_path.header.frame_id = map_name;
-        tmp_path.poses = global_plan;
+	tmp_path.header.frame_id = map_name;
+	tmp_path.poses = global_plan;
 
-  	res.distance.data = compute_distance(tmp_path);
+	res.distance.data = compute_distance(tmp_path);
 
-  return true;
+	return true;
 }
 
 
@@ -464,24 +464,24 @@ void TrajectoryManager::planThread(void)
 	ros::Rate r(20);
 	while(nh.ok()) {
 
-        //make sure we have a costmap for our planner
-        if(planner_costmap_ == NULL){
-                ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
-                //return false;
-        }
+		//make sure we have a costmap for our planner
+		if(planner_costmap_ == NULL){
+			ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
+			//return false;
+		}
 
-        tf::Stamped<tf::Pose> global_pose;
-        if(!planner_costmap_->getRobotPose(global_pose)){
-                ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
-                //return false;
-        }
+		tf::Stamped<tf::Pose> global_pose;
+		if(!planner_costmap_->getRobotPose(global_pose)){
+			ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
+			//return false;
+		}
 
-        geometry_msgs::PoseStamped start;
-        //if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
-        //if(req.start.header.frame_id == "")
-        tf::poseStampedTFToMsg(global_pose, start);
+		geometry_msgs::PoseStamped start;
+		//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
+		//if(req.start.header.frame_id == "")
+		tf::poseStampedTFToMsg(global_pose, start);
 
-        current_pose = start;
+		current_pose = start;
 
 
 		switch(status) {

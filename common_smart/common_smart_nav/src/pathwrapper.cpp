@@ -295,9 +295,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 						}
 						final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
-						// test 
 						final_pose2.pose.orientation = my_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.orientation;
-						// test
 						final_pose2.header.stamp = ros::Time::now();
 						//ROS_INFO("-- %f", sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2) ));
 
@@ -360,9 +358,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						//		my_maximus_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y);
 
 						final_pose2 = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front();
-						// test
 						final_pose2.pose.orientation = my_path.poses.std::vector<geometry_msgs::PoseStamped >::back().pose.orientation;
-						// test
 						final_pose2.header.stamp = ros::Time::now();
 
 						my_path.poses.std::vector<geometry_msgs::PoseStamped >::erase (my_path.poses.std::vector<geometry_msgs::PoseStamped >::begin());

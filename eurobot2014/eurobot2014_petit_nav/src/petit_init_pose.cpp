@@ -180,21 +180,21 @@ void InitPose::poseCallback(const std_msgs::Empty::ConstPtr& vel)
 
 		t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(YELLOW_START_Z - 2*acos(base_pose.pose.orientation.w)), //tf::Quaternion(0, 0, 0, 1), 
 					tf::Vector3(YELLOW_START_X - base_pose.pose.position.x, YELLOW_START_Y - base_pose.pose.position.y, 0.0)), 
-					ros::Time::now(), "/petit_map", "/fake_map");
+				ros::Time::now(), "/petit_map", "/fake_map");
 
 		broadcaster.sendTransform(t);
 		init_done = 1;
 	}
 	else {                
-                /* Initialize the starting pose */
-                ROS_ERROR("RED x : %f / y : %f", base_pose.pose.position.x, base_pose.pose.position.y);
+		/* Initialize the starting pose */
+		ROS_ERROR("RED x : %f / y : %f", base_pose.pose.position.x, base_pose.pose.position.y);
 
-                t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(RED_START_Z - 2*acos(base_pose.pose.orientation.w)), //tf::Quaternion(0, 0, 0, 1), 
-                                        tf::Vector3(RED_START_X - base_pose.pose.position.x, RED_START_Y - base_pose.pose.position.y, 0.0)), 
-                                        ros::Time::now(), "/petit_map", "/fake_map");
+		t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(RED_START_Z - 2*acos(base_pose.pose.orientation.w)), //tf::Quaternion(0, 0, 0, 1), 
+					tf::Vector3(RED_START_X - base_pose.pose.position.x, RED_START_Y - base_pose.pose.position.y, 0.0)), 
+				ros::Time::now(), "/petit_map", "/fake_map");
 
-                broadcaster.sendTransform(t);
-                init_done = 1;
+		broadcaster.sendTransform(t);
+		init_done = 1;
 	}
 
 	usleep(10000);

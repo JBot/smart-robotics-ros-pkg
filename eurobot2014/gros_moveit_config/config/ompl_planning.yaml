@@ -49,5 +49,5 @@ left_arm:
     - TRRTkConfigDefault
     - PRMkConfigDefault
     - PRMstarkConfigDefault
-  projection_evaluator: joints(Ljoint1,Ljoint2)
+  projection_evaluator: joints(Larm1_joint,Larm2_joint)
   longest_valid_segment_fraction: 0.05

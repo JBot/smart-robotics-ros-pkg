@@ -1,25 +1,30 @@
 joint_limits:
-  Ljoint1:
+  Larm6_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true
     max_acceleration: 0.6
-  Ljoint2:
+  Larm4_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true
     max_acceleration: 0.6
-  Ljoint3:
+  Larm5_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true
     max_acceleration: 0.6
-  Ljoint4:
+  Larm3_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true
     max_acceleration: 0.6
-  Ljoint5:
+  Larm2_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Rarm3_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true
@@ -34,7 +39,7 @@ joint_limits:
     max_velocity: 3
     has_acceleration_limits: true
     max_acceleration: 0.6
-  Rarm3_joint:
+  Larm1_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true
@@ -45,6 +50,11 @@ joint_limits:
     has_acceleration_limits: true
     max_acceleration: 0.6
   Rarm5_joint:
+    has_velocity_limits: true
+    max_velocity: 3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+  Rarm6_joint:
     has_velocity_limits: true
     max_velocity: 3
     has_acceleration_limits: true

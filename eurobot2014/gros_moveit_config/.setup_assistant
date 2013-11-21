@@ -5,4 +5,4 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/indomptable.srdf
   CONFIG:
-    generated_timestamp: 1382970457
+    generated_timestamp: 1385048852
