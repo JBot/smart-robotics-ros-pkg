@@ -9,9 +9,9 @@
         <param name="publish_frequency" value="20.0"/>
 	<remap from="robot_description" to="field_description" />
     </node>
-
+<!--
     <node name="map_server" pkg="map_server" type="map_server" args="$(find eurobot2014_models)/map2014.yaml">
     </node>
-
+-->
 </launch>
 

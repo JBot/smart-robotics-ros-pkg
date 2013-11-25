@@ -374,7 +374,7 @@ void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & 
 
 	joint_publish(2);
 
-	usleep(1000000);
+	usleep(2000000);
 
 
 	tmp_pose.pose.position.x = 0.27;
@@ -399,7 +399,7 @@ void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & 
 
 	joint_publish(2);
 
-	usleep(1000000);
+	usleep(2000000);
 
 	tmp_pose.pose.position.x = 0.27;
 	tmp_pose.pose.position.y = -0.07;
@@ -423,7 +423,7 @@ void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & 
 
 	joint_publish(2);
 
-	usleep(1000000);
+	usleep(2000000);
 
 	tmp_pose.pose.position.x = 0.27;
 	tmp_pose.pose.position.y = -0.09;
@@ -447,10 +447,10 @@ void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & 
 
 	joint_publish(2);
 
-	usleep(1000000);
+	usleep(2000000);
 
 	tmp_pose.pose.position.x = 0.25;
-	tmp_pose.pose.position.y = -0.08;
+	tmp_pose.pose.position.y = -0.09;
 	tmp_pose.pose.position.z = 0.22;
 	tmp_pose.pose.orientation.x = 0.0;
 	tmp_pose.pose.orientation.y = 0.707;
@@ -459,8 +459,8 @@ void ARM_manager::fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & 
 
 	compute_RIK(tmp_pose);
 
-	tmp_pose.pose.position.x = 0.2;
-	tmp_pose.pose.position.y = 0.0;
+	tmp_pose.pose.position.x = 0.21;
+	tmp_pose.pose.position.y = 0.02;
 	tmp_pose.pose.position.z = 0.16;
 	tmp_pose.pose.orientation.x = 0.0;
 	tmp_pose.pose.orientation.y = 0.707;

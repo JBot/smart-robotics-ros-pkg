@@ -24,7 +24,13 @@
                 Rlink2_controller
                 Rlink3_controller
                 Rlink4_controller
-                Rlink5_controller"
+                Rlink5_controller
+                Llink1_controller
+                Llink2_controller
+                Llink3_controller
+                Llink4_controller
+                Llink5_controller"
           output="screen"/>
+
 
 </launch>
