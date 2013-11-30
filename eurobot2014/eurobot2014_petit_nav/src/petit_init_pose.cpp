@@ -98,21 +98,29 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	/* Turn on himself to build the map */
 	final_cmd_vel.linear.x = 0;
 	final_cmd_vel.linear.y = 0;
-	final_cmd_vel.angular.z = 0.2;
+	final_cmd_vel.angular.z = 0.15;
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(500000);
+        usleep(2000000);
+
+        /* Turn on himself to build the map */
+        final_cmd_vel.linear.x = 0;
+        final_cmd_vel.linear.y = 0;
+        final_cmd_vel.angular.z = -0.15;
+        cmd_vel_pub.publish(final_cmd_vel);
+
+	usleep(2000000);
 
 	/* Go forward to build the map */
-	final_cmd_vel.linear.x = 0.1;
+	final_cmd_vel.linear.x = 0.02;
 	final_cmd_vel.linear.y = 0;
 	final_cmd_vel.angular.z = 0;
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(500000);
+	usleep(1000000);
 
 	/* Go backward to build the map */
-	final_cmd_vel.linear.x = -0.1;
+	final_cmd_vel.linear.x = -0.02;
 	final_cmd_vel.linear.y = 0;
 	final_cmd_vel.angular.z = 0;
 	cmd_vel_pub.publish(final_cmd_vel);
@@ -122,18 +130,18 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	if(color_name == "Yellow") {
 		/* Go on the left to join the starting zone */
 		final_cmd_vel.linear.x = 0;
-		final_cmd_vel.linear.y = 0.1;
+		final_cmd_vel.linear.y = 0.02;
 		final_cmd_vel.angular.z = 0;
 	}
 	else {
 		/* Go on the right to join the starting zone */
 		final_cmd_vel.linear.x = 0;
-		final_cmd_vel.linear.y = -0.1;
+		final_cmd_vel.linear.y = -0.02;
 		final_cmd_vel.angular.z = 0;
 	}
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(500000);
+	usleep(1000000);
 
 	/* Stop and wait the init pose signal */
 	final_cmd_vel.linear.x = 0;

@@ -196,7 +196,7 @@ void Pathwrapper::pauseCallback(const std_msgs::Empty::ConstPtr & empty)
 
 void Pathwrapper::resumeCallback(const std_msgs::Empty::ConstPtr & empty)
 {
-
+	usleep(1500000);
 	init_pose();
 
 	pause = 0;
@@ -243,6 +243,9 @@ void Pathwrapper::init_pose() {
 	{
 		//ROS_INFO("Sum: %ld", get_path.response.plan);
 		final_pose2 = tmp_pose.response.pose;
+
+		ROS_INFO("init ---------- %f %f", final_pose2.pose.position.x, final_pose2.pose.position.y );
+
 	}
 	else
 	{

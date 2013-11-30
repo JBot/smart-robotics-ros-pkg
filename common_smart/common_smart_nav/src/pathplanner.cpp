@@ -481,6 +481,7 @@ void TrajectoryManager::planThread(void)
 		//if(req.start.header.frame_id == "")
 		tf::poseStampedTFToMsg(global_pose, start);
 
+		//ROS_ERROR("PathPlanner : Compute current pose");
 		current_pose = start;
 
 

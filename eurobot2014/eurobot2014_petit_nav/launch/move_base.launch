@@ -56,11 +56,10 @@
   </node>
 
   <!-- Low level motor driver => RoboClaw -->
-<!--
   <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
--->
+
 
   <node pkg="eurobot2014_petit_nav" type="petit_init_pose" respawn="false" name="PETIT_initial_pose" output="screen">
         <param name="color_name" type="str" value="Yellow" />
