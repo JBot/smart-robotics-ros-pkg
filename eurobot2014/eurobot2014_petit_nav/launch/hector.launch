@@ -35,11 +35,11 @@
     <param name="laser_min_dist" value="0.13"/>
     <param name="laser_max_dist" value="4.5"/>
 
-    <param name="map_pub_period" value="20.0"/>
+    <param name="map_pub_period" value="0.5"/>
 
     <!-- Debug parameters -->
-      <param name="output_timing" value="true"/>
     <!--
+      <param name="output_timing" value="true"/>
       <param name="pub_drawings" value="true"/>
       <param name="pub_debug_output" value="true"/>
     -->
