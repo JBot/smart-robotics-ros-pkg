@@ -4,6 +4,7 @@ raytrace_range: 4.0
 robot_radius: 0.3
 inflation_radius: 0.31
 transform_tolerance: 0.3
+allow_unknown: true
 
 observation_sources: laser_scan_sensor 
 

@@ -1,7 +1,9 @@
 TrajectoryPlannerROS:
   holonomic_robot: true
   controller_frequency: 0.5
+  allow_unknown: true
 
 NavfnROS:
   holonomic_robot: true
   controller_frequency: 0.5
+  allow_unknown: true
