@@ -41,7 +41,7 @@
 #define NB_STEP_SKIP	3//8
 #define MAX_DIST_SKIP	0.10//0.14
 
-#define MAX_SPEED_LIN	0.05 // 0.08
+#define MAX_SPEED_LIN	0.035 // 0.08
 #define MAX_SPEED_ANG	0.13 // 0.15
 
 
@@ -396,7 +396,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 							{
 								double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
-								double max_speed_lin = my_pose_stamped.pose.position.x * 1.5; //2
+								double max_speed_lin = my_pose_stamped.pose.position.x * 1.0; //2
 								if(max_speed_lin > MAX_SPEED_LIN)
 									max_speed_lin = MAX_SPEED_LIN;
 								if(max_speed_lin < -MAX_SPEED_LIN)
@@ -408,7 +408,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							else
 							{
 								double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
-								double max_speed_lin = my_pose_stamped.pose.position.y * 1.5; //2
+								double max_speed_lin = my_pose_stamped.pose.position.y * 1.0; //2
 								if(max_speed_lin > MAX_SPEED_LIN)
 									max_speed_lin = MAX_SPEED_LIN;
 								if(max_speed_lin < -MAX_SPEED_LIN)
@@ -476,7 +476,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 				if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 				{
 					double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
-					double max_speed_lin = my_pose_stamped.pose.position.x * 1.5; //2
+					double max_speed_lin = my_pose_stamped.pose.position.x * 1.0; //2
 					if(max_speed_lin > MAX_SPEED_LIN)
 						max_speed_lin = MAX_SPEED_LIN;
 					if(max_speed_lin < -MAX_SPEED_LIN)
@@ -488,7 +488,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 				else
 				{
 					double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
-					double max_speed_lin = my_pose_stamped.pose.position.y * 1.5; // 2
+					double max_speed_lin = my_pose_stamped.pose.position.y * 1.0; // 2
 					if(max_speed_lin > MAX_SPEED_LIN)
 						max_speed_lin = MAX_SPEED_LIN;
 					if(max_speed_lin < -MAX_SPEED_LIN)

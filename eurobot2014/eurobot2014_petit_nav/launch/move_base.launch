@@ -40,7 +40,10 @@
         <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
         <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
 
+<!--
         <remap from="/map" to="/PETIT/map" />
+-->
+
   </node>
 
   <!-- Path wrapper = Path follower -->
