@@ -10,3 +10,4 @@ TrajectoryPlannerROS:
   acc_lim_y: 0.02
 
   holonomic_robot: true
+  allow_unknown: true

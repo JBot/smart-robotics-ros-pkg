@@ -121,31 +121,31 @@ void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 
 double ratio = 1.0;
 
-if( fabs(speed_motor1) > fabs(speed_motor2) )
+if( fabs(speed_motor1  * 12.85 ) > fabs(speed_motor2 * 12.85) )
 {
-	if( fabs(speed_motor1) > fabs(speed_motor3) )
+	if( fabs(speed_motor1 * 12.85) > fabs(speed_motor3 * 12.85) )
 	{ // speed_motor1 is the biggest
-		if( fabs(speed_motor1) > 63.0 )
-			ratio = fabs(speed_motor1) / 63.0;
+		if( fabs(speed_motor1 * 12.85) > 63.0 )
+			ratio = fabs(speed_motor1 * 12.85) / 63.0;
 	}
 	else // speed_motor3 is the biggest
 	{
-		if( fabs(speed_motor3) > 63.0 )
-			ratio = fabs(speed_motor3) / 63.0;
+		if( fabs(speed_motor3 * 12.85) > 63.0 )
+			ratio = fabs(speed_motor3 * 12.85) / 63.0;
 	}
 }
 else
 {
-	if( fabs(speed_motor2) > fabs(speed_motor3) )
+	if( fabs(speed_motor2 * 12.85) > fabs(speed_motor3 * 12.85) )
         { // speed_motor2 is the biggest
-		if( fabs(speed_motor2) > 63.0 )
-			ratio = fabs(speed_motor2) / 63.0;
+		if( fabs(speed_motor2 * 12.85) > 63.0 )
+			ratio = fabs(speed_motor2 * 12.85) / 63.0;
 
         }
         else // speed_motor3 is the biggest
         {
-		if( fabs(speed_motor3) > 63.0 )
-			ratio = fabs(speed_motor3) / 63.0;
+		if( fabs(speed_motor3 * 12.85) > 63.0 )
+			ratio = fabs(speed_motor3 * 12.85) / 63.0;
 
         }
 }
