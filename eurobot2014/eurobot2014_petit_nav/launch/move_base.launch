@@ -6,6 +6,15 @@
   <!-- Static transform from world to the map of the PETIT robot -->
   <node pkg="tf" type="static_transform_publisher" name="world2petit_broadcaster" args="0 0 0 0 0 0 /world /petit_map 100"/>
 
+  <!-- IMU for PETIT robot -->
+  <node pkg="um6" type="um6_driver" respawn="false" name="PETIT_imu_driver" output="screen">
+        <param name="port" type="str" value="/dev/ttyUSB2" />
+  </node>
+
+  <!-- Fake odom from IMU -->
+  <node pkg="eurobot2014_petit_nav" type="petit_odom" respawn="false" name="PETIT_fake_odom_IMU" output="screen">
+  </node>
+
   <!-- Map server for PETIT robot -->
   <node pkg="map_server" type="map_server" respawn="false" name="PETIT_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
         <param name="frame_id" type="str" value="/petit_map" />
