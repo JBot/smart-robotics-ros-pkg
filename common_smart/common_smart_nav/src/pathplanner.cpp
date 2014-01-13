@@ -379,7 +379,10 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 
 void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
 {
-	status = PAUSE;
+	//planner_costmap_->resetMaps();
+	//planner_costmap_->resetLayers();
+	//planner_costmap_->resetMapOutsideWindow(0.001, 0.001);
+	//status = PAUSE;
 }
 
 void TrajectoryManager::pauseCallback(const std_msgs::Empty::ConstPtr & pose)

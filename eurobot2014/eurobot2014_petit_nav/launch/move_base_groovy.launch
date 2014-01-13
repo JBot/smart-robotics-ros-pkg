@@ -13,14 +13,14 @@
   </node>
 
   <!-- Laser driver => Neato XV11-->
-  <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
+<!--  <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
     <param name="firmware_version" value="2" />
     <param name="port" type="str" value="/dev/ttyUSB1" />
     <param name="frame_id" type="str" value="petit_neato_link" />
     
     <remap from="/scan" to="/PETIT/neato" />
   </node>
-
+-->
   <!-- Path planner / Costmap -->
   <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
     <param name="costmap_name" type="str" value="PETIT_costmap" />
@@ -39,12 +39,13 @@
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
         <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
         <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
-
+<!--
         <remap from="/map" to="/PETIT/map" />
+-->
   </node>
 
   <!-- Path wrapper = Path follower -->
-  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
+<!--  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
     <param name="map_name" type="str" value="petit_map" />
     <param name="base_name" type="str" value="petit_base_link" /> 
 
@@ -54,14 +55,14 @@
         <remap from="/resume_nav" to="/PETIT/resume_pathwrapper" />
         <remap from="/pause_nav" to="/GLOBAL/stop" />
   </node>
-
+-->
   <!-- Low level motor driver => RoboClaw -->
 <!--
   <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
 -->
-
+<!--
   <node pkg="eurobot2014_petit_nav" type="petit_init_pose" respawn="false" name="PETIT_initial_pose" output="screen">
         <param name="color_name" type="str" value="Yellow" />
 
@@ -69,6 +70,6 @@
         <remap from="/ROBOT/cmd_vel" to="/PETIT/cmd_vel" />
         <remap from="/ROBOT/resume_pathwrapper" to="/PETIT/resume_pathwrapper" />
   </node>
-
+-->
   
 </launch>

@@ -1,7 +1,7 @@
 PETIT_costmap:
   global_frame: /petit_map
   robot_base_frame: /petit_base_link
-  transform_tolerance: 0.1
+  transform_tolerance: 0.6
   update_frequency: 1.0
   publish_frequency: 1.0
   max_obstacle_height: 0.5
@@ -14,6 +14,10 @@ PETIT_costmap:
   map_type: costmap
   rolling_window: false 
  
+  observation_sources: PETIT_neato_laser pc_map
+  PETIT_neato_laser: {sensor_frame: /petit_neato_link, data_type: LaserScan, topic: /PETIT/neato, marking: true, clearing: true}
+  pc_map: {sensor_frame: /world, data_type: PointCloud, topic: /cloud, marking: true, clearing: false}
+
 # static_map:
 #   map_topic: /PETIT/map
 #   unknown_cost_value: 50
@@ -30,7 +34,7 @@ PETIT_costmap:
 
   global_frame: /petit_map
   robot_base_frame: /petit_base_link
-  transform_tolerance: 0.05
+  transform_tolerance: 0.6
   update_frequency: 2.0
   publish_frequency: 2.0
   max_obstacle_height: 2.0

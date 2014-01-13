@@ -54,6 +54,7 @@ class ARM_manager {
 		ros::Subscriber action_sub_;
 		ros::Subscriber firepose_sub_;
 		ros::Subscriber fruitcolor_sub_;
+		ros::Subscriber start_game_sub_;
 
 		ros::Subscriber Rdebug_sub_;
 		ros::Subscriber Ldebug_sub_;
@@ -116,6 +117,7 @@ class ARM_manager {
 		void actionCallback(const std_msgs::Int32::ConstPtr & ptr);
 		void fireposeCallback(const geometry_msgs::PoseStamped::ConstPtr & ptr);
 		void fruitcolorCallback(const std_msgs::Int32::ConstPtr & ptr);
+		void startgameCallback(const std_msgs::Empty::ConstPtr & ptr);
 		void compute_RIK(geometry_msgs::PoseStamped pose);
 		void compute_LIK(geometry_msgs::PoseStamped pose);
 
@@ -127,6 +129,7 @@ class ARM_manager {
 		void swap_color(geometry_msgs::PoseStamped pose);
 		void take_color(geometry_msgs::PoseStamped pose);
 		void standard_pose(void);
+		void init_pose(void);
 
 
 		ros::NodeHandle nh;
@@ -198,6 +201,7 @@ ARM_manager::ARM_manager()
 	action_sub_ = nh.subscribe < std_msgs::Int32 > ("/ROBOT/action", 5, &ARM_manager::actionCallback, this);
 	firepose_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/firepose", 5, &ARM_manager::fireposeCallback, this); // inclure la couleur dans le twist
 	fruitcolor_sub_ = nh.subscribe < std_msgs::Int32 > ("/ROBOT/fruitcolor", 5, &ARM_manager::fruitcolorCallback, this);
+	start_game_sub_ = nh.subscribe < std_msgs::Empty > ("/GENERAL/start_game", 5, &ARM_manager::startgameCallback, this);
 
 	Rdebug_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/DEBUG/right_arm_pose", 5, &ARM_manager::RdebugCallback, this); // inclure la couleur dans le twist
 	Ldebug_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/DEBUG/left_arm_pose", 5, &ARM_manager::LdebugCallback, this); // inclure la couleur dans le twist
@@ -346,7 +350,7 @@ ARM_manager::ARM_manager()
 
 	usleep(500000);
 
-	standard_pose();
+	init_pose();
 
 }
 
@@ -587,7 +591,7 @@ void ARM_manager::fruitcolorCallback(const std_msgs::Int32::ConstPtr & ptr)
 		RA_group_->getVariableValues(joint_values);
 		for(std::size_t i=0; i < RA_joint_names.size(); ++i)
 		{
-			ROS_INFO("Joint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
+			//ROS_INFO("Joint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
 		}
 	}
 	else
@@ -595,6 +599,33 @@ void ARM_manager::fruitcolorCallback(const std_msgs::Int32::ConstPtr & ptr)
 		ROS_INFO("Did not find IK solution");
 	}
 
+
+}
+
+void ARM_manager::startgameCallback(const std_msgs::Empty::ConstPtr & ptr)
+{
+        // Get the names of the joints in the right_arm
+        RA_joint_names = RA_joint_model_group->getJointModelNames();
+        LA_joint_names = LA_joint_model_group->getJointModelNames();
+
+        // Get the joint positions for the right arm
+        std::vector<double> joint_values;
+        RA_group_->getVariableValues(joint_values);
+
+        // Set one joint in the right arm outside its joint limit 
+        joint_values[0] = 0;
+        joint_values[1] = -0.25;
+        joint_values[2] = 0;
+        joint_values[3] = -2.3;
+        joint_values[4] = 1.07;
+        RA_group_->setVariableValues(joint_values);
+        LA_group_->setVariableValues(joint_values);
+
+        joint_publish(2);
+
+        usleep(1500000);
+
+	standard_pose();
 
 }
 
@@ -622,7 +653,7 @@ void ARM_manager::compute_RIK(geometry_msgs::PoseStamped pose)
 		RA_group_->getVariableValues(joint_values);
 		for(std::size_t i=0; i < RA_joint_names.size(); ++i)
 		{
-			ROS_INFO("RJoint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
+			//ROS_INFO("RJoint %s: %f", RA_joint_names[i].c_str(), joint_values[i]);
 		}
 	}
 	else
@@ -657,7 +688,7 @@ void ARM_manager::compute_LIK(geometry_msgs::PoseStamped pose)
 		LA_group_->getVariableValues(joint_values);
 		for(std::size_t i=0; i < LA_joint_names.size(); ++i)
 		{
-			ROS_INFO("LJoint %s: %f", LA_joint_names[i].c_str(), joint_values[i]);
+			//ROS_INFO("LJoint %s: %f", LA_joint_names[i].c_str(), joint_values[i]);
 		}
 	}
 	else
@@ -875,12 +906,51 @@ void ARM_manager::take_color(geometry_msgs::PoseStamped pose)
 
 }
 
+void ARM_manager::init_pose(void)
+{
+        /* Get the names of the joints in the right_arm*/
+        RA_joint_names = RA_joint_model_group->getJointModelNames();
+        LA_joint_names = LA_joint_model_group->getJointModelNames();
+
+        /* Get the joint positions for the right arm*/
+        std::vector<double> joint_values;
+        RA_group_->getVariableValues(joint_values);
+
+        /* Set one joint in the right arm outside its joint limit */
+        joint_values[0] = 0;
+        joint_values[1] = -0.25;
+        joint_values[2] = 0;
+        joint_values[3] = -2.3;
+        joint_values[4] = 1.07;
+        RA_group_->setVariableValues(joint_values);
+        LA_group_->setVariableValues(joint_values);
+
+	joint_publish(2);
+
+	usleep(2500000);
+
+        /* Set one joint in the right arm outside its joint limit */
+        joint_values[0] = 0;
+        joint_values[1] = -1.5;
+        joint_values[2] = 0;
+        joint_values[3] = -2.27;
+        joint_values[4] = 1.76;
+        RA_group_->setVariableValues(joint_values);
+        LA_group_->setVariableValues(joint_values);
+
+        joint_publish(2);
+
+        usleep(2500000);
+
+
+}
+
 void ARM_manager::standard_pose(void)
 {
 	geometry_msgs::PoseStamped tmp_pose;
 
 
-        tmp_pose.pose.position.x = 0.21;
+        tmp_pose.pose.position.x = 0.23;
         tmp_pose.pose.position.y = -0.06;
         tmp_pose.pose.position.z = 0.18;
         tmp_pose.pose.orientation.x = 0.0;
@@ -890,7 +960,7 @@ void ARM_manager::standard_pose(void)
 
         compute_RIK(tmp_pose);
 
-        tmp_pose.pose.position.x = 0.21;
+        tmp_pose.pose.position.x = 0.23;
         tmp_pose.pose.position.y = 0.06;
         tmp_pose.pose.position.z = 0.18;
         tmp_pose.pose.orientation.x = 0.0;
@@ -905,7 +975,7 @@ void ARM_manager::standard_pose(void)
         usleep(500000);
 
 
-	tmp_pose.pose.position.x = 0.18;
+	tmp_pose.pose.position.x = 0.20;
 	tmp_pose.pose.position.y = -0.06;
 	tmp_pose.pose.position.z = 0.24;
 	tmp_pose.pose.orientation.x = 0.0;
@@ -915,7 +985,7 @@ void ARM_manager::standard_pose(void)
 
 	compute_RIK(tmp_pose);
 
-	tmp_pose.pose.position.x = 0.18;
+	tmp_pose.pose.position.x = 0.20;
 	tmp_pose.pose.position.y = 0.06;
 	tmp_pose.pose.position.z = 0.24;
 	tmp_pose.pose.orientation.x = 0.0;
