@@ -372,8 +372,9 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						int i = 0;
 						// Test if path is finished (i.e. robot is at his final pose)
 						double test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
+						double test2 = 10000; //fabs( getHeadingFromQuat(my_pose_stamped.pose.orientation) - getHeadingFromQuat(my_pose_stamped.pose.orientation) );
 						// TODO Check angular
-						while( ( test > 0.02) && ( i < 150 ) ) {
+						while( ( test > 0.03) && ( test2 > 0.02) && ( i < 150 ) ) {
 							usleep(100000);
 							ros::Time now = ros::Time::now();
 							listener.waitForTransform(map_name, base_name, now, ros::Duration(5.0));
@@ -433,7 +434,8 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 							test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
-							//ROS_ERROR("final // i : %d / dist : %f", i, test);
+							test2 = fabs( getHeadingFromQuat(my_pose_stamped.pose.orientation) - getHeadingFromQuat(final_pose2.pose.orientation) );
+							ROS_ERROR("dist : %f // ang : %f", test, test2);
 						}
 
 						final_cmd_vel.linear.x = 0.0;

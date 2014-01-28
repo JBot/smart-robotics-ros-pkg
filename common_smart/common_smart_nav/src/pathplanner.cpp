@@ -382,7 +382,7 @@ void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
 	//planner_costmap_->resetMaps();
 	//planner_costmap_->resetLayers();
 	//planner_costmap_->resetMapOutsideWindow(0.001, 0.001);
-	//status = PAUSE;
+	status = PAUSE;
 }
 
 void TrajectoryManager::pauseCallback(const std_msgs::Empty::ConstPtr & pose)
@@ -494,8 +494,13 @@ void TrajectoryManager::planThread(void)
 			case PAUSE:
 				break;
 			case RUN:
-				//computePath();
-				//publishPath();
+				cpt++;
+				if(cpt > 20) 
+					cpt = 0;
+				else {
+					computePath();
+					publishPath();
+				}
 				break;	
 			default:
 				break;

@@ -211,7 +211,7 @@ ARM_manager::ARM_manager()
 	delta_pub = nh.advertise < std_msgs::Int32 > ("/ROBOT/delta_ros", 5);
 	grip_pub = nh.advertise < std_msgs::Int8 > ("/ROBOT/grip", 5);
 
-	rpump_pub = nh.advertise < std_msgs::Int8 > ("/ROBOT/rpump", 5);
+	rpump_pub = nh.advertise < std_msgs::Int8 > ("pump_ros", 5);
 	lpump_pub = nh.advertise < std_msgs::Int8 > ("/ROBOT/lpump", 5);
 
 	done_pub = nh.advertise < std_msgs::Empty > ("/ROBOT/done", 5);
@@ -350,8 +350,8 @@ ARM_manager::ARM_manager()
 
 	usleep(500000);
 
-	init_pose();
-
+	//init_pose();
+	standard_pose();
 }
 
 void ARM_manager::actionCallback(const std_msgs::Int32::ConstPtr & ptr)
@@ -710,6 +710,7 @@ void ARM_manager::unstack_heart(uint8_t type)
 void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 {
 	geometry_msgs::PoseStamped tmp_pose;
+	std_msgs::Int8 my_pump;
 	ROS_INFO("SWAP");
 
 	if(pose.pose.position.y > 0) { // left arm take the fire
@@ -717,7 +718,7 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 		// Phase 1
 
 		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = -0.1;
+		tmp_pose.pose.position.y = -0.11;
 		tmp_pose.pose.position.z = 0.25;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = 0.5;
@@ -738,19 +739,20 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		joint_publish(2);
 
-		//lpump_pub
+		my_pump.data = 2;
+		rpump_pub.publish(my_pump);
 
 		usleep(1500000);
 
 		// Phase 2
 
 		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = -0.09;
+		tmp_pose.pose.position.y = -0.1;
 		tmp_pose.pose.position.z = 0.25;
 		tmp_pose.pose.orientation.x = 0.5;
-		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.y = 0.58;
 		tmp_pose.pose.orientation.z = 0.5;
-		tmp_pose.pose.orientation.w = 0.5;
+		tmp_pose.pose.orientation.w = 0.58;
 
 		compute_RIK(tmp_pose);
 
@@ -782,43 +784,46 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		joint_publish(1);
 
-		usleep(1000000);
+		usleep(500000);
 
 		// Phase 4
 
-		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = 0.09;
-		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.position.x = 0.25;
+		tmp_pose.pose.position.y = 0.1;
+		tmp_pose.pose.position.z = 0.25 + 0.02;
 		tmp_pose.pose.orientation.x = 0.5;
-		tmp_pose.pose.orientation.y = -0.5;
+		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
-		tmp_pose.pose.orientation.w = -0.5;
+		tmp_pose.pose.orientation.w = -0.58;
 
 		compute_LIK(tmp_pose);
 
 		joint_publish(1);
 
-		usleep(1500000);
+		my_pump.data = 3;
+		rpump_pub.publish(my_pump);
+
+		usleep(1000000);
 
 		// Phase 5
 
 		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = -0.07;
+		tmp_pose.pose.position.y = -0.05;
 		tmp_pose.pose.position.z = 0.25;
 		tmp_pose.pose.orientation.x = 0.5;
-		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.y = 0.58;
 		tmp_pose.pose.orientation.z = 0.5;
-		tmp_pose.pose.orientation.w = 0.5;
+		tmp_pose.pose.orientation.w = 0.58;
 
 		compute_RIK(tmp_pose);
 
-		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = 0.07;
-		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.position.x = 0.25;
+		tmp_pose.pose.position.y = 0.05;
+		tmp_pose.pose.position.z = 0.25 + 0.02;
 		tmp_pose.pose.orientation.x = 0.5;
-		tmp_pose.pose.orientation.y = -0.5;
+		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
-		tmp_pose.pose.orientation.w = -0.5;
+		tmp_pose.pose.orientation.w = -0.58;
 
 		compute_LIK(tmp_pose);
 
@@ -826,31 +831,33 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		//rpump_pub
 
-		usleep(1000000);
+		usleep(1100000);
 
 		//lpump_pub
+		my_pump.data = 1;
+		rpump_pub.publish(my_pump);
 
-		usleep(300000);
+		usleep(800000);
 
 		// Phase 6
 
 		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = -0.09;
+		tmp_pose.pose.position.y = -0.1;
 		tmp_pose.pose.position.z = 0.25;
 		tmp_pose.pose.orientation.x = 0.5;
-		tmp_pose.pose.orientation.y = 0.5;
+		tmp_pose.pose.orientation.y = 0.58;
 		tmp_pose.pose.orientation.z = 0.5;
-		tmp_pose.pose.orientation.w = 0.5;
+		tmp_pose.pose.orientation.w = 0.58;
 
 		compute_RIK(tmp_pose);
 
 		tmp_pose.pose.position.x = 0.27;
-		tmp_pose.pose.position.y = 0.09;
+		tmp_pose.pose.position.y = 0.1;
 		tmp_pose.pose.position.z = 0.25;
 		tmp_pose.pose.orientation.x = 0.5;
-		tmp_pose.pose.orientation.y = -0.5;
+		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
-		tmp_pose.pose.orientation.w = -0.5;
+		tmp_pose.pose.orientation.w = -0.58;
 
 		compute_LIK(tmp_pose);
 
@@ -885,9 +892,11 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		joint_publish(2);
 
-		usleep(1500000);
+		usleep(1000000);
 
 		//rpump_pub
+		my_pump.data = 0;
+		rpump_pub.publish(my_pump);
 
 		usleep(500000);
 

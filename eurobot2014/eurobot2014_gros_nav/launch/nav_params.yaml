@@ -18,7 +18,14 @@ GROS_costmap:
   map_type: costmap
   track_unknown_space: true
 
+  observation_sources: pc_map #GROS_neato_laser
+  #GROS_neato_laser: {sensor_frame: /gros_neato_link, data_type: LaserScan, topic: /GROS/neato, marking: true, clearing: true}
+  pc_map: {sensor_frame: /world, data_type: PointCloud, topic: /cloud, marking: true, clearing: false}
+
+
 GROS_planner:
   allow_unknown: true
   visualize_potential: true
-
+  global_frame: /gros_map
+  robot_base_frame: /base_link
+  map_topic: /GROS/map
