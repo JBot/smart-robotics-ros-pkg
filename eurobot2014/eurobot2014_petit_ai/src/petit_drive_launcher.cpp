@@ -39,7 +39,7 @@ class DriveLauncher {
 		void fireCallback(const std_msgs::Empty::ConstPtr& empty);
 		void openCallback(const std_msgs::Empty::ConstPtr& empty);
 		void closeCallback(const std_msgs::Empty::ConstPtr& empty);
-		
+
 		void power_on(void);
 		void power_off(void);
 		void fire(void);
@@ -103,22 +103,24 @@ void DriveLauncher::powerOnCallback(const std_msgs::Empty::ConstPtr& empty)
 
 void DriveLauncher::powerOffCallback(const std_msgs::Empty::ConstPtr& empty)
 {
-        power_off();
+	power_off();
 }
 
 void DriveLauncher::fireCallback(const std_msgs::Empty::ConstPtr& empty)
 {
-        fire();
+	power_on();
+	usleep(300000);
+	fire();
 }
 
 void DriveLauncher::openCallback(const std_msgs::Empty::ConstPtr& empty)
 {
-        my_open();
+	my_open();
 }
 
 void DriveLauncher::closeCallback(const std_msgs::Empty::ConstPtr& empty)
 {
-        my_close();
+	my_close();
 }
 
 
@@ -127,41 +129,41 @@ void DriveLauncher::closeCallback(const std_msgs::Empty::ConstPtr& empty)
 void DriveLauncher::power_on(void)
 {
 	unsigned char commands[1];
-        commands[0] = '+';
+	commands[0] = '+';
 
 	write(fd, commands, 1);  //Send data
 }
 
 void DriveLauncher::power_off(void)
 {
-        unsigned char commands[1];
-        commands[0] = '-';
+	unsigned char commands[1];
+	commands[0] = '-';
 
-        write(fd, commands, 1);  //Send data
+	write(fd, commands, 1);  //Send data
 }
 
 void DriveLauncher::fire(void)
 {
-        unsigned char commands[1];
-        commands[0] = 'o';
+	unsigned char commands[1];
+	commands[0] = 'o';
 
-        write(fd, commands, 1);  //Send data
+	write(fd, commands, 1);  //Send data
 }
 
 void DriveLauncher::my_open(void)
 {
-        unsigned char commands[1];
-        commands[0] = 'p';
+	unsigned char commands[1];
+	commands[0] = 'p';
 
-        write(fd, commands, 1);  //Send data
+	write(fd, commands, 1);  //Send data
 }
 
 void DriveLauncher::my_close(void)
 {
-        unsigned char commands[1];
-        commands[0] = 'c';
+	unsigned char commands[1];
+	commands[0] = 'c';
 
-        write(fd, commands, 1);  //Send data
+	write(fd, commands, 1);  //Send data
 }
 
 
@@ -189,4 +191,3 @@ int main(int argc, char **argv)
 
 	ros::shutdown();
 }
-

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!--  -->
+  <node pkg="eurobot2014_petit_ai" type="petit_drive_launcher" respawn="false" name="petit_drive_launcher" output="screen">
+        <remap from="/LAUNCHER/power_on" to="/LAUNCHER/power_on" />
+        <remap from="/LAUNCHER/power_off" to="/LAUNCHER/power_off" />
+        <remap from="/LAUNCHER/fire" to="/LAUNCHER/fire" />
+        <remap from="/LAUNCHER/open" to="/LAUNCHER/open" />
+        <remap from="/LAUNCHER/close" to="/LAUNCHER/close" />
+  </node>
+
+  <!--  -->
+  <node pkg="eurobot2014_petit_ai" type="petit_objective_manager" respawn="false" name="petit_objective_manager" output="screen">
+        <remap from="/PETIT/best_objective" to="/DEBUG/best_objective" />
+        <remap from="/PETIT/debug_path" to="/DEBUG/debug_path" />
+        <remap from="/PETIT/get_robot_pose" to="/PETIT/get_robot_pose" />
+        <remap from="/move_base_PETIT/NavfnROS/make_plan" to="/TO_DEFINE/make_plan" />
+        <remap from="/PETIT/get_distance" to="/PETIT/get_distance" />
+        <remap from="/PETIT/get_objective" to="/PETIT/get_objective" />
+        <remap from="/PETIT/delet_objective" to="/PETIT/delet_objective" />
+        <remap from="/PETIT/update_priority" to="/PETIT/update_priority" />
+        <remap from="/GENERAL/color" to="/GENERAL/color" />
+<!--
+        <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
+        <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
+-->
+  </node>
+
+  <!--  -->
+  <node pkg="eurobot2014_petit_ai" type="petit_main_ai" respawn="false" name="petit_main_ai" output="screen">
+        <remap from="/PETIT/goal" to="/PETIT/goal" />
+        <remap from="/PETIT/path_done" to="/PETIT/path_done" />
+        <remap from="/PETIT/pause_AI" to="/PETIT/pause_AI" />
+        <remap from="/PETIT/resume_AI" to="/PETIT/resume_AI" />
+        <remap from="/PETIT/get_objective" to="/PETIT/get_objective" />
+        <remap from="/PETIT/update_priority" to="/PETIT/update_priority" />
+        <remap from="/PETIT/delet_objective" to="/PETIT/delet_objective" />
+        <remap from="/PETIT/release_objects" to="/LAUNCHER/fire" />
+        <remap from="/PETIT/goal_unreachable" to="/PETIT/goal_unreachable" />
+        <remap from="/GENERAL/start_match" to="/GENERAL/start_game" />
+        <remap from="/GENERAL/stop_match" to="/GENERAL/stop_game" />
+        <remap from="/GENERAL/color" to="/GENERAL/color" />
+
+        <remap from="/PETIT/get_robot_pose" to="/PETIT/get_robot_pose" />
+  </node>
+
+  
+</launch>

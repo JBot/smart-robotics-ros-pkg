@@ -772,6 +772,8 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		// Phase 3
 
+		max_speed = 2.0;
+
 		tmp_pose.pose.position.x = pose.pose.position.x;
 		tmp_pose.pose.position.y = pose.pose.position.y;
 		tmp_pose.pose.position.z = pose.pose.position.z + 0.050;
@@ -784,13 +786,13 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		joint_publish(1);
 
-		usleep(500000);
+		usleep(1000000);
 
 		// Phase 4
 
 		tmp_pose.pose.position.x = 0.25;
 		tmp_pose.pose.position.y = 0.1;
-		tmp_pose.pose.position.z = 0.25 + 0.02;
+		tmp_pose.pose.position.z = 0.25;// + 0.02;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -803,7 +805,7 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 		my_pump.data = 3;
 		rpump_pub.publish(my_pump);
 
-		usleep(1000000);
+		usleep(1500000);
 
 		// Phase 5
 
@@ -819,7 +821,7 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		tmp_pose.pose.position.x = 0.25;
 		tmp_pose.pose.position.y = 0.05;
-		tmp_pose.pose.position.z = 0.25 + 0.02;
+		tmp_pose.pose.position.z = 0.25;// + 0.02;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -831,7 +833,7 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		//rpump_pub
 
-		usleep(1100000);
+		usleep(1500000);
 
 		//lpump_pub
 		my_pump.data = 1;
@@ -863,7 +865,7 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		joint_publish(2);
 
-		usleep(1000000);
+		usleep(1500000);
 
 		// Phase 7
 
@@ -892,13 +894,15 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		joint_publish(2);
 
-		usleep(1000000);
+		usleep(1500000);
 
 		//rpump_pub
 		my_pump.data = 0;
 		rpump_pub.publish(my_pump);
 
 		usleep(500000);
+
+		max_speed = 5.0;
 
 		standard_pose();
 

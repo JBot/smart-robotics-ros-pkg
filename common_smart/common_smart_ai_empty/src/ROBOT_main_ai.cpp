@@ -19,8 +19,8 @@
 #include "common_smart_nav/GetRobotPose.h"
 
 /* TO MODIFY */
-#include "eurobot2014_petit_ai/GetObjective.h"
-#include "eurobot2014_petit_ai/UpdatePriority.h"
+#include "ROBOT_ai/GetObjective.h"
+#include "ROBOT_ai/UpdatePriority.h"
 //#include "indomptable_vision/ImageResult.h"
 /*****END*****/
 
@@ -117,10 +117,10 @@ class MainAI {
         uint8_t state; // Working / Pause / X / X // X / X / X / Position
 
 /* TO MODIFY */
-        list<pair<uint32_t, geometry_msgs::Pose2D> > mammouth; 
-        list<pair<uint32_t, geometry_msgs::Pose2D> > frescoes;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > mammouth_opp;
-        list<pair<uint32_t, geometry_msgs::Pose2D> > end; 
+        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_self_n; 
+        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_self_s;
+        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_opp_n;
+        list<pair<uint32_t, geometry_msgs::Pose2D> > totem_opp_s; 
 /*****END*****/
 
         int color;
@@ -135,29 +135,29 @@ MainAI::MainAI()
     started = 0;
 
 /* TO MODIFY */
-    goal_pub = nh.advertise < geometry_msgs::PoseStamped > ("/PETIT/goal", 5);
-    object_pub = nh.advertise < geometry_msgs::PoseStamped > ("/PETIT/object_pose", 5);
-    alpha_pub = nh.advertise < std_msgs::Int32 > ("/PETIT/alpha_ros", 5);
-    delta_pub = nh.advertise < std_msgs::Int32 > ("/PETIT/delta_ros", 5);
+    goal_pub = nh.advertise < geometry_msgs::PoseStamped > ("/ROBOT/goal", 5);
+    object_pub = nh.advertise < geometry_msgs::PoseStamped > ("/ROBOT/object_pose", 5);
+    alpha_pub = nh.advertise < std_msgs::Int32 > ("/ROBOT/alpha_ros", 5);
+    delta_pub = nh.advertise < std_msgs::Int32 > ("/ROBOT/delta_ros", 5);
 
-    path_sub_ = nh.subscribe < std_msgs::Empty > ("/PETIT/path_done", 20, &MainAI::pathCallback, this);
-
-
-    pause_sub = nh.subscribe < std_msgs::Empty > ("/PETIT/pause_AI", 20, &MainAI::pauseCallback, this);
-    resume_sub = nh.subscribe < std_msgs::Empty > ("/PETIT/resume_AI", 20, &MainAI::resumeCallback, this);
+    path_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/path_done", 20, &MainAI::pathCallback, this);
 
 
-    get_pose = nh.serviceClient<common_smart_nav::GetRobotPose>("/PETIT/get_robot_pose");
+    pause_sub = nh.subscribe < std_msgs::Empty > ("/ROBOTpause_AI", 20, &MainAI::pauseCallback, this);
+    resume_sub = nh.subscribe < std_msgs::Empty > ("/ROBOT/resume_AI", 20, &MainAI::resumeCallback, this);
 
-    get_objective = nh.serviceClient<eurobot2014_petit_ai::GetObjective>("/PETIT/get_objective");
 
-    update_objective = nh.serviceClient<eurobot2014_petit_ai::UpdatePriority>("/PETIT/update_priority");
+    get_pose = nh.serviceClient<common_smart_nav::GetRobotPose>("/ROBOT/get_robot_pose");
 
-    delet_pub = nh.advertise < geometry_msgs::PoseStamped > ("/PETIT/delet_objective", 5);
+    get_objective = nh.serviceClient<ROBOT_ai::GetObjective>("/ROBOT/get_objective");
 
-    release_pub = nh.advertise < std_msgs::Empty > ("/PETIT/release_objects", 5);
+    update_objective = nh.serviceClient<ROBOT_ai::UpdatePriority>("/ROBOT/update_priority");
 
-    pathimpossible_sub = nh.subscribe < std_msgs::Empty > ("/PETIT/goal_unreachable", 20, &MainAI::pathimpossibleCallback, this);
+    delet_pub = nh.advertise < geometry_msgs::PoseStamped > ("/ROBOT/delet_objective", 5);
+
+    release_pub = nh.advertise < std_msgs::Empty > ("/ROBOT/release_objects", 5);
+
+    pathimpossible_sub = nh.subscribe < std_msgs::Empty > ("/ROBOT/goal_unreachable", 20, &MainAI::pathimpossibleCallback, this);
 
     start_sub = nh.subscribe < std_msgs::Empty > ("/GENERAL/start_match", 20, &MainAI::startCallback, this);
     stop_sub = nh.subscribe < std_msgs::Empty > ("/GENERAL/stop_match", 20, &MainAI::stopCallback, this);
@@ -165,8 +165,8 @@ MainAI::MainAI()
 
     //get_image_result = nh.serviceClient<indomptable_vision::ImageResult>("/indomptable/image_result");
 
-    deltafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("/PETIT/delta_feedback", 1, &MainAI::deltaCallback, this);
-    alphafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("/PETIT/alpha_feedback", 1, &MainAI::alphaCallback, this);
+    deltafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("/ROBOT/delta_feedback", 1, &MainAI::deltaCallback, this);
+    alphafeedback_sub_ = nh.subscribe < std_msgs::Int8 > ("/ROBOT/alpha_feedback", 1, &MainAI::alphaCallback, this);
 /*****END*****/
 
     delta_ok = 0;
@@ -188,80 +188,70 @@ void MainAI::fill_trees(void)
 {
 /* TO MODIFY */
     geometry_msgs::Pose2D tmp;
-    tmp.x = color * (0.750);
-    tmp.y = 1.55;
-    tmp.theta = -1.5707963 + 0.02;
-    mammouth.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = 0;
-    mammouth.push_back(make_pair(RELEASE, tmp));
-    tmp.x = color * (0.750);
-    tmp.y = 1.55;
-    tmp.theta = -1.5707963;
-    mammouth.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = 0;
-    mammouth.push_back(make_pair(RELEASE, tmp));
-    tmp.x = color * (0.750);
-    tmp.y = 1.55;
-    tmp.theta = -1.5707963 - 0.02;
-    mammouth.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = 0;
-    mammouth.push_back(make_pair(RELEASE, tmp));
-
-
-    tmp.x = color * (0.150);
-    tmp.y = 1.800;
-    tmp.theta = 0.0;
-    frescoes.push_back(make_pair(POSITION, tmp));
+    tmp.x = color * (1.5 - 0.600);
+    tmp.y = 1.0;
+    tmp.theta = 1.57079 + (color * 1.57079);
+    totem_self_n.push_back(make_pair(POSITION, tmp));
     tmp.x = 0.0;
-    tmp.y = +1.000;
+    tmp.y = 0.0;
+    tmp.theta = 1.57079 + (color * 1.57079);
+    //totem_self_n.push_back(make_pair(ANGLE, tmp));
+    tmp.x = color * (1.5 - 0.705);
+    tmp.y = 1.000;
     tmp.theta = 0.0;
-    frescoes.push_back(make_pair(DISTANCE, tmp));
+    totem_self_n.push_back(make_pair(DISTANCE, tmp));
+
+    tmp.x = 0.07;
+    tmp.y = 0.0;
+    tmp.theta = 0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
     tmp.x = 0.0;
-    tmp.y = -1.000;
+    tmp.y = 0.0;
+    tmp.theta = -0.072;
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    totem_self_n.push_back(make_pair(FIND_OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
     tmp.theta = 0.0;
-    frescoes.push_back(make_pair(DISTANCE, tmp));
+    totem_self_n.push_back(make_pair(OBJECT, tmp));
+
+    tmp.x = -color * (1.5 - 0.600);
+    tmp.y = 1.0;
+    tmp.theta = 1.57079 + (-color * 1.57079);
+    totem_opp_n.push_back(make_pair(POSITION, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1.57079 + (-color * 1.57079);
+    //totem_opp_n.push_back(make_pair(ANGLE, tmp));
+    tmp.x = -color * (1.5 - 0.710);
+    tmp.y = 1.000;
+    tmp.theta = 0.0;
+    totem_opp_n.push_back(make_pair(DISTANCE, tmp));
+
+    tmp.x = 0.135;
+    tmp.y = -0.140;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.07;
+    tmp.y = 0.0;
+    tmp.theta = 0.072;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
+    tmp.x = 0.0;
+    tmp.y = 0.0;
+    tmp.theta = 1; // Find CD
+    totem_opp_n.push_back(make_pair(FIND_OBJECT, tmp));
+    tmp.x = 0.08;
+    tmp.y = 0.0;
+    tmp.theta = 0.0;
+    totem_opp_n.push_back(make_pair(OBJECT, tmp));
 
 
-    tmp.x = -color * (0.750);
-    tmp.y = 1.55;
-    tmp.theta = -1.5707963 + 0.02;
-    mammouth_opp.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = 0;
-    mammouth_opp.push_back(make_pair(RELEASE, tmp));
-    tmp.x = -color * (0.750);
-    tmp.y = 1.55;
-    tmp.theta = -1.5707963;
-    mammouth_opp.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = 0;
-    mammouth_opp.push_back(make_pair(RELEASE, tmp));
-    tmp.x = -color * (0.750);
-    tmp.y = 1.55;
-    tmp.theta = -1.5707963 - 0.02;
-    mammouth_opp.push_back(make_pair(POSITION, tmp));
-    tmp.x = 0;
-    tmp.y = 0;
-    tmp.theta = 0;
-    mammouth_opp.push_back(make_pair(RELEASE, tmp));
 
 
-    tmp.x = color * (0.0);
-    tmp.y = 1.7;
-    tmp.theta = 1.5707963;
-    end.push_back(make_pair(POSITION, tmp));
-    
-
-
-    current_list = mammouth;
+    current_list = totem_self_n;
 
 
 /*****END*****/
@@ -289,8 +279,8 @@ void MainAI::main_loop(void)
     std_msgs::Empty tmprelease;
     common_smart_nav::GetRobotPose tmp_pose;
 /* TO MODIFY */
-    eurobot2014_petit_ai::GetObjective tmp_obj;
-    eurobot2014_petit_ai::UpdatePriority update_prio;
+    ROBOT_ai::GetObjective tmp_obj;
+    ROBOT_ai::UpdatePriority update_prio;
     //indomptable_vision::ImageResult tmp_img_res;
 /* TO MODIFY */
     
@@ -315,21 +305,41 @@ void MainAI::main_loop(void)
 
 
 /* TO MODIFY */
-            if( (tmppose.pose.position.x == color*(0.750)) && (tmppose.pose.position.y == 1.550) ) {
-                current_list = mammouth;
-                ROS_ERROR("Go kill your mammouth !");
+            if( (tmppose.pose.position.x == 0.0) && (tmppose.pose.position.y == 0.0) ) {
+                current_list = random_move;
+                ROS_ERROR("Random");
             }
-            if( (tmppose.pose.position.x == -color*(0.750)) && (tmppose.pose.position.y == 1.550) ) {
-                current_list = mammouth_opp;
-                ROS_ERROR("Go kill opponent mammouth !");
+            if( (tmppose.pose.position.x == color*(1.500 - 0.600)) && (tmppose.pose.position.y == 1.000) ) {
+                current_list = totem_self_n;
+                ROS_ERROR("Totem Self N");
             }
-            if( (tmppose.pose.position.x == color*(0.150)) && (tmppose.pose.position.y == 1.800) ) {
-                current_list = frescoes;
-                ROS_ERROR("Put the frescoes");
+            if( (tmppose.pose.position.x == color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) ) {
+                current_list = release;
+                ROS_ERROR("Release");
             }
-            if( (tmppose.pose.position.x == color*(0)) && (tmppose.pose.position.y == 1.700) ) {
-                current_list = end;
-                ROS_ERROR("final position");
+            if( (tmppose.pose.position.x == color*(1.500 - 0.640)) && (tmppose.pose.position.y == 1.700) ) {
+                current_list = bottle_1;
+                ROS_ERROR("Bottle 1");
+            }
+            if( (tmppose.pose.position.x == color*(-1.500 + 0.640 + 0.477)) && (tmppose.pose.position.y == 1.700) ) {
+                current_list = bottle_2;
+                ROS_ERROR("Bottle 2");
+            }
+            if( (tmppose.pose.position.x == color*(0)) && (tmppose.pose.position.y == (2.000 - 0.347)) ) {
+                current_list = gold_middle;
+                ROS_ERROR("Gold");
+            }
+            if( (tmppose.pose.position.x == -color*(1.500 - 0.250)) && (tmppose.pose.position.y == 0.800) ) {
+                current_list = steal_opp;
+                ROS_ERROR("Steal");
+            }
+            if( (tmppose.pose.position.x == -color*(1.500 - 0.600)) && (tmppose.pose.position.y == 1.000) ) {
+                current_list = totem_opp_n;
+                ROS_ERROR("Totem Opp N");
+            }
+            if( (tmppose.pose.position.x == 0) && (tmppose.pose.position.y == 0.400) ) {
+                current_list = totem_opp_s;
+                ROS_ERROR("MAP");
             }
 /*****END*****/
 
@@ -340,7 +350,7 @@ void MainAI::main_loop(void)
             if(!current_list.empty()) {
                 switch(current_list.front().first) {
                     case POSITION :
-                        tmppose.header.frame_id = "/petit_map";
+                        tmppose.header.frame_id = "/map";
                         tmppose.pose.position.x = current_list.front().second.x;
                         tmppose.pose.position.y = current_list.front().second.y;
                         rotate(0.0, current_list.front().second.theta, 0.0, &tmppose);
@@ -375,7 +385,6 @@ void MainAI::main_loop(void)
                         break;
                     case DISTANCE :
 			usleep(300000);
-/*
                         if (current_list.front().second.theta == 0.0) {
 
                             if (get_pose.call(tmp_pose))
@@ -407,6 +416,7 @@ void MainAI::main_loop(void)
                                 ROS_ERROR("Failed to call service GetRobotPose");
                             }
                             usleep(700000);
+
                         }
                         else {
                             tmpaction.data = current_list.front().second.theta * 1000;
@@ -414,7 +424,6 @@ void MainAI::main_loop(void)
                             ROS_ERROR("Sending distance %d", tmpaction.data);
                             usleep(800000);
                         }
-*/
 			current_list.pop_front();
                         break;
                     case OBJECT :
@@ -452,7 +461,7 @@ void MainAI::main_loop(void)
                         release_pub.publish(tmprelease);
                         ROS_ERROR("Releasing objects");
 			current_list.pop_front();
-                        usleep(1000000);
+                        usleep(2100000);
                         break;
                     case FIND_OBJECT :
 
@@ -663,7 +672,7 @@ int main(int argc, char **argv)
      * part of the ROS system.
      */
 /* TO MODIFY */
-    ros::init(argc, argv, "PETIT_main_ai");
+    ros::init(argc, argv, "ROBOT_main_ai");
 /*****END*****/
     MainAI mainai;
     tf::TransformListener listener(ros::Duration(10));
