@@ -122,7 +122,7 @@ ObjectiveManager::ObjectiveManager()
     final_pose.y = 0.14;
     final_pose.theta = 0.0;
 
-    best_objective.header.frame_id = "/map";
+    best_objective.header.frame_id = "/petit_map";
     best_objective.pose.position.x = 0.0;
     best_objective.pose.position.y = 0.0;
     best_objective.pose.position.z = 0.0;
@@ -138,7 +138,7 @@ void ObjectiveManager::fill_trees(void)
 {   
 
     geometry_msgs::PoseStamped tmp_obj;
-    tmp_obj.header.frame_id = "/world";
+    tmp_obj.header.frame_id = "/petit_map";
     tmp_obj.pose.position.z = 0;
 
     tmp_obj.pose.position.x = color*(0.750); // our mammouth

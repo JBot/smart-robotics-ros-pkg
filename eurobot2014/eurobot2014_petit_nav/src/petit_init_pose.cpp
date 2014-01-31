@@ -125,7 +125,7 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	final_cmd_vel.angular.z = 0;
 	cmd_vel_pub.publish(final_cmd_vel);
 
-	usleep(5000000);
+	usleep(15000000);
 
 	if(color_name == "Yellow") {
 		/* Go on the left to join the starting zone */

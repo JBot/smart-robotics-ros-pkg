@@ -17,15 +17,15 @@
     <param name="pub_map_odom_transform" value="true"/>
     
     <!-- Map size / start point -->
-    <param name="map_resolution" value="0.01"/>
+    <param name="map_resolution" value="0.009"/>
     <param name="map_size" value="700"/>
     <param name="map_start_x" value="0.5"/>
     <param name="map_start_y" value="0.5" />
-    <param name="map_multi_res_levels" value="5" />
+    <param name="map_multi_res_levels" value="3" />
     
     <!-- Map update parameters -->
     <param name="update_factor_free" value="0.4"/>
-    <param name="update_factor_occupied" value="0.8" />    
+    <param name="update_factor_occupied" value="0.7" />    
     <param name="map_update_distance_thresh" value="0.05"/>
     <param name="map_update_angle_thresh" value="0.01" />
     
@@ -33,8 +33,8 @@
     <param name="advertise_map_service" value="true"/>
     
     <!-- Laser parameters -->
-    <param name="laser_min_dist" value="0.08"/>
-    <param name="laser_max_dist" value="4.5"/>
+    <param name="laser_min_dist" value="0.07"/>
+    <param name="laser_max_dist" value="3.5"/>
 
     <param name="map_pub_period" value="0.3"/>
 

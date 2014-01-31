@@ -495,11 +495,13 @@ void TrajectoryManager::planThread(void)
 				break;
 			case RUN:
 				cpt++;
-				if(cpt > 20) 
+				if(cpt > 20) {
 					cpt = 0;
-				else {
 					computePath();
 					publishPath();
+				}
+				else {
+				
 				}
 				break;	
 			default:

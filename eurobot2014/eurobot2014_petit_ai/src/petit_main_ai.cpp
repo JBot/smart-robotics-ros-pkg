@@ -190,7 +190,7 @@ void MainAI::fill_trees(void)
     geometry_msgs::Pose2D tmp;
     tmp.x = color * (0.750);
     tmp.y = 1.55;
-    tmp.theta = -1.5707963 + 0.02;
+    tmp.theta = 1.5707963 + 0.02;
     mammouth.push_back(make_pair(POSITION, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -198,7 +198,7 @@ void MainAI::fill_trees(void)
     mammouth.push_back(make_pair(RELEASE, tmp));
     tmp.x = color * (0.750);
     tmp.y = 1.55;
-    tmp.theta = -1.5707963;
+    tmp.theta = 1.5707963;
     mammouth.push_back(make_pair(POSITION, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -206,7 +206,7 @@ void MainAI::fill_trees(void)
     mammouth.push_back(make_pair(RELEASE, tmp));
     tmp.x = color * (0.750);
     tmp.y = 1.55;
-    tmp.theta = -1.5707963 - 0.02;
+    tmp.theta = 1.5707963 - 0.02;
     mammouth.push_back(make_pair(POSITION, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -230,7 +230,7 @@ void MainAI::fill_trees(void)
 
     tmp.x = -color * (0.750);
     tmp.y = 1.55;
-    tmp.theta = -1.5707963 + 0.02;
+    tmp.theta = 1.5707963 + 0.02;
     mammouth_opp.push_back(make_pair(POSITION, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -238,7 +238,7 @@ void MainAI::fill_trees(void)
     mammouth_opp.push_back(make_pair(RELEASE, tmp));
     tmp.x = -color * (0.750);
     tmp.y = 1.55;
-    tmp.theta = -1.5707963;
+    tmp.theta = 1.5707963;
     mammouth_opp.push_back(make_pair(POSITION, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -246,7 +246,7 @@ void MainAI::fill_trees(void)
     mammouth_opp.push_back(make_pair(RELEASE, tmp));
     tmp.x = -color * (0.750);
     tmp.y = 1.55;
-    tmp.theta = -1.5707963 - 0.02;
+    tmp.theta = 1.5707963 - 0.02;
     mammouth_opp.push_back(make_pair(POSITION, tmp));
     tmp.x = 0;
     tmp.y = 0;
@@ -285,6 +285,7 @@ void MainAI::main_loop(void)
 {
 
     geometry_msgs::PoseStamped tmppose;
+    tmppose.header.frame_id = "/petit_map";
     std_msgs::Int32 tmpaction;
     std_msgs::Empty tmprelease;
     common_smart_nav::GetRobotPose tmp_pose;

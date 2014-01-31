@@ -434,7 +434,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 							test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
-							test2 = fabs( getHeadingFromQuat(my_pose_stamped.pose.orientation) - getHeadingFromQuat(final_pose2.pose.orientation) );
+							test2 = fabs( getHeadingFromQuat(my_pose_stamped.pose.orientation) );
 							ROS_ERROR("dist : %f // ang : %f", test, test2);
 						}
 
