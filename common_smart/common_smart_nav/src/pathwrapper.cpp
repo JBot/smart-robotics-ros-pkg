@@ -374,7 +374,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						double test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
 						double test2 = 10000; //fabs( getHeadingFromQuat(my_pose_stamped.pose.orientation) - getHeadingFromQuat(my_pose_stamped.pose.orientation) );
 						// TODO Check angular
-						while( (( test > 0.03) || ( test2 > 0.02)) && ( i < 150 ) ) {
+						while( (( test > 0.07) || ( test2 > 0.01)) && ( i < 150 ) ) {
 							usleep(100000);
 							ros::Time now = ros::Time::now();
 							listener.waitForTransform(map_name, base_name, now, ros::Duration(5.0));
@@ -397,7 +397,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 							{
 								double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
-								double max_speed_lin = my_pose_stamped.pose.position.x * 1.0; //2
+								double max_speed_lin = my_pose_stamped.pose.position.x * 1.1; //2
 								if(max_speed_lin > MAX_SPEED_LIN)
 									max_speed_lin = MAX_SPEED_LIN;
 								if(max_speed_lin < -MAX_SPEED_LIN)
@@ -409,7 +409,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							else
 							{
 								double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
-								double max_speed_lin = my_pose_stamped.pose.position.y * 1.0; //2
+								double max_speed_lin = my_pose_stamped.pose.position.y * 1.1; //2
 								if(max_speed_lin > MAX_SPEED_LIN)
 									max_speed_lin = MAX_SPEED_LIN;
 								if(max_speed_lin < -MAX_SPEED_LIN)
@@ -435,7 +435,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 							test = sqrt( pow(final_pose2.pose.position.x - base_pose.pose.position.x, 2) + pow(final_pose2.pose.position.y - base_pose.pose.position.y, 2));
 							test2 = fabs( getHeadingFromQuat(my_pose_stamped.pose.orientation) );
-							ROS_ERROR("dist : %f // ang : %f", test, test2);
+							ROS_ERROR("dist : %f // ang : %f // x : %f // y : %f ", test, test2, fabs(my_pose_stamped.pose.position.x), fabs(my_pose_stamped.pose.position.y));
 						}
 
 						final_cmd_vel.linear.x = 0.0;

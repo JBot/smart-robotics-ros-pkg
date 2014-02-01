@@ -419,13 +419,19 @@ int main(int argc, char **argv)
     tf::TransformListener listener(ros::Duration(10));
 
     // Refresh rate
-    ros::Rate loop_rate(2);
+    ros::Rate loop_rate(3);
     float rotation = 0.0;
+    int cpt = 0;
     while (ros::ok()) {
 
         ros::spinOnce();
         loop_rate.sleep();
-        objectivemanager.loop();
+	cpt ++;
+	if( cpt > 6 ) {
+		objectivemanager.loop();
+		cpt = 0;
+	}
+
     }
 
     ros::Duration(2.0).sleep();

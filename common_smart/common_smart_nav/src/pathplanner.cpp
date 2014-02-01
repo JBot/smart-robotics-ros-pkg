@@ -105,6 +105,7 @@ class TrajectoryManager {
 
 		int status; // STOP PAUSE RUN
 		int cpt;
+		char sem;
 
 		nav_msgs::Path my_path;
 		geometry_msgs::PoseStamped final_pose;
@@ -140,6 +141,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	status = 0;	
 	cpt = 0;
 	cpt_pathimp = 0;
+	sem = 1;
 	// Goal suscriber
 	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/goal", 2, &TrajectoryManager::goalCallback, this);
 
@@ -294,6 +296,10 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
 	std::vector<geometry_msgs::PoseStamped> global_plan;
 	nav_msgs::Path tmp_path;
 
+        while (sem < 1) {
+                usleep(10000);
+        }
+        sem = 0;
 
 	//make sure we have a costmap for our planner
 	if(planner_costmap_ == NULL){
@@ -327,7 +333,7 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
 
 	res.plan = tmp_path;
 
-
+	sem = 1;
 
 	return true;
 }
@@ -339,6 +345,10 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 	std::vector<geometry_msgs::PoseStamped> global_plan;
 	nav_msgs::Path tmp_path;
 
+        while (sem < 1) {
+                usleep(10000);
+        }
+        sem = 0;
 
 	//make sure we have a costmap for our planner
 	if(planner_costmap_ == NULL){
@@ -371,6 +381,8 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 	tmp_path.poses = global_plan;
 
 	res.distance.data = compute_distance(tmp_path);
+
+	sem = 1;
 
 	return true;
 }
@@ -420,6 +432,10 @@ void TrajectoryManager::computePath(void)
 	std::vector<geometry_msgs::PoseStamped> global_plan;
 	nav_msgs::Path tmp_path;
 
+	while (sem < 1) {
+		usleep(10000);
+	}
+	sem = 0;
 
 	//make sure we have a costmap for our planner
 	if(planner_costmap_ == NULL){
@@ -454,6 +470,7 @@ void TrajectoryManager::computePath(void)
 	// lock
 	my_path = tmp_path;
 	// unlock
+	sem = 1;
 
 }
 
@@ -495,7 +512,7 @@ void TrajectoryManager::planThread(void)
 				break;
 			case RUN:
 				cpt++;
-				if(cpt > 20) {
+				if(cpt > 30) {
 					cpt = 0;
 					computePath();
 					publishPath();

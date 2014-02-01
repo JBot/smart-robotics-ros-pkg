@@ -95,6 +95,26 @@ InitPose::InitPose(tf::TransformListener& tf) :
 
 	usleep(500000);
 
+
+
+        /* Go forward to build the map */
+        final_cmd_vel.linear.x = 0.02;
+        final_cmd_vel.linear.y = 0;
+        final_cmd_vel.angular.z = 0;
+        cmd_vel_pub.publish(final_cmd_vel);
+
+        usleep(5000000);
+
+        /* Go backward to build the map */
+        final_cmd_vel.linear.x = -0.02;
+        final_cmd_vel.linear.y = 0;
+        final_cmd_vel.angular.z = 0;
+        cmd_vel_pub.publish(final_cmd_vel);
+
+        usleep(5000000);
+
+
+
 	/* Turn on himself to build the map */
 	final_cmd_vel.linear.x = 0;
 	final_cmd_vel.linear.y = 0;
