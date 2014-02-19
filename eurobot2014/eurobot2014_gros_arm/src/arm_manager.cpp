@@ -350,8 +350,8 @@ ARM_manager::ARM_manager()
 
 	usleep(500000);
 
-	//init_pose();
-	standard_pose();
+	init_pose();
+	//standard_pose();
 }
 
 void ARM_manager::actionCallback(const std_msgs::Int32::ConstPtr & ptr)
@@ -614,10 +614,10 @@ void ARM_manager::startgameCallback(const std_msgs::Empty::ConstPtr & ptr)
 
         // Set one joint in the right arm outside its joint limit 
         joint_values[0] = 0;
-        joint_values[1] = -0.25;
+        joint_values[1] = -0.4;
         joint_values[2] = 0;
         joint_values[3] = -2.3;
-        joint_values[4] = 1.07;
+        joint_values[4] = 1.0;
         RA_group_->setVariableValues(joint_values);
         LA_group_->setVariableValues(joint_values);
 
@@ -931,10 +931,10 @@ void ARM_manager::init_pose(void)
 
         /* Set one joint in the right arm outside its joint limit */
         joint_values[0] = 0;
-        joint_values[1] = -0.25;
+        joint_values[1] = -0.4;
         joint_values[2] = 0;
         joint_values[3] = -2.3;
-        joint_values[4] = 1.07;
+        joint_values[4] = 1.0;
         RA_group_->setVariableValues(joint_values);
         LA_group_->setVariableValues(joint_values);
 
@@ -944,10 +944,10 @@ void ARM_manager::init_pose(void)
 
         /* Set one joint in the right arm outside its joint limit */
         joint_values[0] = 0;
-        joint_values[1] = -1.5;
+        joint_values[1] = -1.27;
         joint_values[2] = 0;
-        joint_values[3] = -2.27;
-        joint_values[4] = 1.76;
+        joint_values[3] = -2.32;
+        joint_values[4] = 1.65;
         RA_group_->setVariableValues(joint_values);
         LA_group_->setVariableValues(joint_values);
 
