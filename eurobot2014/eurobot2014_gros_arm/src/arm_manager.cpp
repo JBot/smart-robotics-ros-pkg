@@ -717,9 +717,9 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		// Phase 1
 
-		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.x = 0.26;
 		tmp_pose.pose.position.y = -0.11;
-		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.position.z = 0.25 - 0.03;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = 0.5;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -746,9 +746,9 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		// Phase 2
 
-		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.x = 0.25;
 		tmp_pose.pose.position.y = -0.1;
-		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.position.z = 0.25 - 0.03;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = 0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -790,9 +790,9 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		// Phase 4
 
-		tmp_pose.pose.position.x = 0.25;
+		tmp_pose.pose.position.x = 0.24 - 0.02;
 		tmp_pose.pose.position.y = 0.1;
-		tmp_pose.pose.position.z = 0.25;// + 0.02;
+		tmp_pose.pose.position.z = 0.25;// + 0.04;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -809,9 +809,9 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		// Phase 5
 
-		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.x = 0.25;
 		tmp_pose.pose.position.y = -0.05;
-		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.position.z = 0.25 - 0.03;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = 0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -819,9 +819,9 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		compute_RIK(tmp_pose);
 
-		tmp_pose.pose.position.x = 0.25;
+		tmp_pose.pose.position.x = 0.24 - 0.02;
 		tmp_pose.pose.position.y = 0.05;
-		tmp_pose.pose.position.z = 0.25;// + 0.02;
+		tmp_pose.pose.position.z = 0.25;// + 0.04;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = -0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -843,9 +843,9 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		// Phase 6
 
-		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.x = 0.25;
 		tmp_pose.pose.position.y = -0.1;
-		tmp_pose.pose.position.z = 0.25;
+		tmp_pose.pose.position.z = 0.25 - 0.03;
 		tmp_pose.pose.orientation.x = 0.5;
 		tmp_pose.pose.orientation.y = 0.58;
 		tmp_pose.pose.orientation.z = 0.5;
@@ -853,7 +853,7 @@ void ARM_manager::swap_color(geometry_msgs::PoseStamped pose)
 
 		compute_RIK(tmp_pose);
 
-		tmp_pose.pose.position.x = 0.27;
+		tmp_pose.pose.position.x = 0.25;
 		tmp_pose.pose.position.y = 0.1;
 		tmp_pose.pose.position.z = 0.25;
 		tmp_pose.pose.orientation.x = 0.5;
