@@ -320,6 +320,8 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
 
 	current_pose = start;
 
+	boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
+
 	if(planner_->makePlan(start, req.goal, global_plan)){
 		//ROS_ERROR("planner makes plan");
 		if(!global_plan.empty()){
@@ -368,6 +370,10 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 	tf::poseStampedTFToMsg(global_pose, start);
 
 	current_pose = start;
+
+	//costmap_2d::Costmap2D* pCostmap = planner_costmap_->getCostmap();
+	//boost::unique_lock< boost::shared_mutex > lock(*(pCostmap->getLock()));
+	boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
 
 	if(planner_->makePlan(start, req.goal, global_plan)){
 		//ROS_ERROR("planner makes plan");
@@ -420,6 +426,7 @@ void TrajectoryManager::computePathCallback(const std_msgs::Empty::ConstPtr & po
 void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
 	final_pose = *pose;
+	ROS_ERROR("NEW POSE");
 
 	computePath();
 	publishPath();
@@ -437,7 +444,6 @@ void TrajectoryManager::computePath(void)
 	}
 	sem = 0;
 
-	boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
 	//make sure we have a costmap for our planner
 	if(planner_costmap_ == NULL){
 		ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
@@ -445,6 +451,9 @@ void TrajectoryManager::computePath(void)
 	}
 
 	tf::Stamped<tf::Pose> global_pose;
+
+	
+
 	if(!planner_costmap_->getRobotPose(global_pose)){
 		ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
 		//return false;
@@ -454,8 +463,11 @@ void TrajectoryManager::computePath(void)
 	//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
 	//if(req.start.header.frame_id == "")
 	tf::poseStampedTFToMsg(global_pose, start);
-
+	//start = current_pose;
 	current_pose = start;
+
+	//costmap_2d::Costmap2D* pCostmap = planner_costmap_->getCostmap();
+	boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
 
 	if(planner_->makePlan(start, final_pose, global_plan)){
 		//ROS_ERROR("planner makes plan");
@@ -464,7 +476,6 @@ void TrajectoryManager::computePath(void)
 			//ROS_ERROR("globalplan filled");
 		}
 	}
-	boost::unique_lock< boost::shared_mutex > unlock(*(planner_costmap_->getCostmap()->getLock()));
 
 	tmp_path.header.frame_id = map_name;
 	tmp_path.poses = global_plan;
@@ -487,8 +498,12 @@ void TrajectoryManager::planThread(void)
 	while(nh.ok()) {
 
 
-		boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
+		//boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
+		//boost::unique_lock< boost::shared_mutex > unlock(*(planner_costmap_->getCostmap()->getLock()));
 		//make sure we have a costmap for our planner
+/*		
+		costmap_2d::Costmap2D* pCostmap = planner_costmap_->getCostmap();
+		boost::unique_lock< boost::shared_mutex > lock(*(pCostmap->getLock()));
 		if(planner_costmap_ == NULL){
 			ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
 			//return false;
@@ -505,15 +520,35 @@ void TrajectoryManager::planThread(void)
 		//if(req.start.header.frame_id == "")
 		tf::poseStampedTFToMsg(global_pose, start);
 
-		boost::unique_lock< boost::shared_mutex > unlock(*(planner_costmap_->getCostmap()->getLock()));
 		//ROS_ERROR("PathPlanner : Compute current pose");
 		current_pose = start;
+*/
 
-
+		tf::Stamped<tf::Pose> global_pose;
+		geometry_msgs::PoseStamped start;
 		switch(status) {
 			case STOP:
 				break;
 			case PAUSE:
+				//                costmap_2d::Costmap2D* pCostmap = planner_costmap_->getCostmap();
+				//                boost::unique_lock< boost::shared_mutex > lock(*(pCostmap->getLock()));
+				if(planner_costmap_ == NULL){
+					ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
+					//return false;
+				}
+
+				if(!planner_costmap_->getRobotPose(global_pose)){
+					ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
+					//return false;
+				}
+
+				//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
+				//if(req.start.header.frame_id == "")
+				tf::poseStampedTFToMsg(global_pose, start);
+
+				//ROS_ERROR("PathPlanner : Compute current pose");
+				current_pose = start;
+
 				break;
 			case RUN:
 				cpt++;
