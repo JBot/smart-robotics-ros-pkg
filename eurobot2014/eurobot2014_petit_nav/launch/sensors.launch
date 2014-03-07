@@ -8,7 +8,7 @@
 
   <!-- IMU for PETIT robot -->
   <node pkg="um6" type="um6_driver" respawn="false" name="PETIT_imu_driver" output="screen">
-        <param name="port" type="str" value="/dev/ttyUSB1" />
+        <param name="port" type="str" value="/dev/ttyUM6" />
   </node>
 
   <!-- Fake odom from IMU -->
@@ -24,7 +24,7 @@
   <!-- Laser driver => Neato XV11-->
   <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
     <param name="firmware_version" value="2" />
-    <param name="port" type="str" value="/dev/ttyUSB2" />
+    <param name="port" type="str" value="/dev/ttyNEATO" />
     <param name="frame_id" type="str" value="petit_neato_link" />
     
     <remap from="/scan" to="/PETIT/neato" />

@@ -437,6 +437,7 @@ void TrajectoryManager::computePath(void)
 	}
 	sem = 0;
 
+	boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
 	//make sure we have a costmap for our planner
 	if(planner_costmap_ == NULL){
 		ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
@@ -463,6 +464,7 @@ void TrajectoryManager::computePath(void)
 			//ROS_ERROR("globalplan filled");
 		}
 	}
+	boost::unique_lock< boost::shared_mutex > unlock(*(planner_costmap_->getCostmap()->getLock()));
 
 	tmp_path.header.frame_id = map_name;
 	tmp_path.poses = global_plan;
@@ -484,6 +486,8 @@ void TrajectoryManager::planThread(void)
 	ros::Rate r(20);
 	while(nh.ok()) {
 
+
+		boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
 		//make sure we have a costmap for our planner
 		if(planner_costmap_ == NULL){
 			ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
@@ -501,6 +505,7 @@ void TrajectoryManager::planThread(void)
 		//if(req.start.header.frame_id == "")
 		tf::poseStampedTFToMsg(global_pose, start);
 
+		boost::unique_lock< boost::shared_mutex > unlock(*(planner_costmap_->getCostmap()->getLock()));
 		//ROS_ERROR("PathPlanner : Compute current pose");
 		current_pose = start;
 

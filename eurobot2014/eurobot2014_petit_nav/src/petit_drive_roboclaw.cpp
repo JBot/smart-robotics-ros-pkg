@@ -8,14 +8,6 @@
 #include <geometry_msgs/Twist.h>
 
 
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <stdio.h>                                         // for in-/output
-#include <string.h>                                        // strcat
-
-//Include system headers
 #include <cstring>
 #include <iostream>
 #include <cstdio>
@@ -24,13 +16,9 @@
 #include <math.h>
 #include <vector>
 
-#include <stdio.h> // standard input / output functions
-#include <string.h> // string function definitions
-#include <unistd.h> // UNIX standard function definitions
-#include <fcntl.h> // File control definitions
-#include <errno.h> // Error number definitions
-#include <termios.h> // POSIX terminal control definitionss
-#include <time.h>   // time calls
+#include <boost/asio.hpp>
+#include <boost/asio/serial_port.hpp>
+#include <boost/array.hpp>
 
 
 #define theta1 (3.14159265359 - 2.09439510239)
@@ -66,8 +54,18 @@ class DriveRoboClaw {
 		ros::NodeHandle nh;
 		ros::Subscriber vel_sub;
 
-		int fd; // file description for the serial port
-		struct termios port_settings;      // structure to store the port settings in
+
+            	std::string port_; ///< @brief The serial port the driver is attached to
+            	uint32_t baud_rate_; ///< @brief The baud rate for the serial connection
+            	
+		
+		//boost::asio::serial_port serial_;
+		//boost::asio::serial_port *serial;
+		boost::shared_ptr<boost::asio::serial_port> serial_;
+
+    		boost::asio::io_service io;
+    		boost::array < uint8_t, 16 > raw_bytes_;
+    		boost::array < uint8_t, 2 > speed_;
 
 		double speed_motor1;
 		double speed_motor2;
@@ -78,12 +76,32 @@ class DriveRoboClaw {
 DriveRoboClaw::DriveRoboClaw()
 {
 
-	fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
+	port_="/dev/ttyROBOCLAW";
+	baud_rate_=115200;
+
+    	try {
+        	//boost::asio::serial_port serial_(io, port_);
+		serial_ = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io, port_));
+        	//serial_.set_option(boost::asio::serial_port_base::baud_rate(baud_rate_));
+		//boost::asio::write(serial_,boost::asio::buffer(sendThis,1));
+		serial_->set_option(boost::asio::serial_port_base::character_size(8));
+		serial_->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
+		serial_->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
+		serial_->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+	}
+    	catch(boost::system::system_error ex) {
+        	ROS_ERROR("Error instantiating laser object. Are you sure you have the correct port and baud rate? Error was %s", ex.what());
+        	//return -1;
+    	}
+
+
+/*
+	fd = open("/dev/ttyROBOCLAW", O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if(fd == -1) // if open is unsucessful
 	{
 		//perror("open_port: Unable to open /dev/ttyS0 - ");
-		printf("open_port: Unable to open /dev/ttyUSB0. \n");
+		printf("open_port: Unable to open /dev/ttyROBOCLAW. \n");
 	}
 	else
 	{
@@ -101,6 +119,7 @@ DriveRoboClaw::DriveRoboClaw()
 	port_settings.c_cflag |= CS8;
 
 	tcsetattr(fd, TCSANOW, &port_settings);    // apply the settings to the port
+*/
 
 	speed_motor1 = 0;
 	speed_motor2 = 0;
@@ -202,7 +221,9 @@ void DriveRoboClaw::write_RoboClaw_forward_M1(char addr, int32_t speed)
 	commands[2] = ((char) (speed & 0xFF));
 	commands[3] = checkSUM;
 
-	write(fd, commands, 4);  //Send data
+	//write(fd, commands, 4);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,4));
+	serial_->write_some(boost::asio::buffer(commands, 4));
 }
 
 // Used to change the speed value of motor 1
@@ -218,7 +239,9 @@ void DriveRoboClaw::write_RoboClaw_backward_M1(char addr, int32_t speed)
 	commands[2] = ((char) (speed & 0xFF));
 	commands[3] = checkSUM;
 
-	write(fd, commands, 4);  //Send data
+	//write(fd, commands, 4);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,4));
+	serial_->write_some(boost::asio::buffer(commands, 4));
 }
 
 // Used to change the speed value of motor 2
@@ -234,7 +257,9 @@ void DriveRoboClaw::write_RoboClaw_forward_M2(char addr, int32_t speed)
 	commands[2] = ((char) (speed & 0xFF));
 	commands[3] = checkSUM;
 
-	write(fd, commands, 4);  //Send data
+	//write(fd, commands, 4);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,4));
+	serial_->write_some(boost::asio::buffer(commands, 4));
 }
 
 // Used to change the speed value of motor 2
@@ -250,7 +275,9 @@ void DriveRoboClaw::write_RoboClaw_backward_M2(char addr, int32_t speed)
 	commands[2] = ((char) (speed & 0xFF));
 	commands[3] = checkSUM;
 
-	write(fd, commands, 4);  //Send data
+	//write(fd, commands, 4);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,4));
+	serial_->write_some(boost::asio::buffer(commands, 4));
 }
 
 // Used to change the speed value of motor 2
@@ -266,7 +293,9 @@ void DriveRoboClaw::write_RoboClaw_drive_M1(char addr, int32_t speed)
 	commands[2] = ((char) (speed & 0xFF));
 	commands[3] = checkSUM;
 
-	write(fd, commands, 4);  //Send data
+	//write(fd, commands, 4);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,4));
+	serial_->write_some(boost::asio::buffer(commands, 4));
 }
 
 // Used to change the speed value of motor 2
@@ -282,7 +311,9 @@ void DriveRoboClaw::write_RoboClaw_drive_M2(char addr, int32_t speed)
 	commands[2] = ((char) (speed & 0xFF));
 	commands[3] = checkSUM;
 
-	write(fd, commands, 4);  //Send data
+	//write(fd, commands, 4);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,4));
+	serial_->write_some(boost::asio::buffer(commands, 4));
 }
 
 
@@ -325,7 +356,9 @@ void DriveRoboClaw::write_RoboClaw_PID_M1(char addr, int32_t D, int32_t P, int32
 	commands[17] = ((char) (QQPS & 0xFF));
 	commands[18] = checkSUM;
 
-	write(fd, commands, 19);  //Send data
+	//write(fd, commands, 19);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,19));
+	serial_->write_some(boost::asio::buffer(commands, 19));
 }
 
 // of motor 2
@@ -364,7 +397,9 @@ void DriveRoboClaw::write_RoboClaw_PID_M2(char addr, int32_t D, int32_t P, int32
 	commands[17] = ((char) (QQPS & 0xFF));
 	commands[18] = checkSUM;
 
-	write(fd, commands, 19);  //Send data
+	//write(fd, commands, 19);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,19));
+	serial_->write_some(boost::asio::buffer(commands, 19));
 }
 
 
@@ -386,7 +421,9 @@ void DriveRoboClaw::write_RoboClaw_speed_M1(char addr, int32_t speed)
 	commands[5] = ((char) (speed & 0xFF));
 	commands[6] = checkSUM;
 
-	write(fd, commands, 7);  //Send data
+	//write(fd, commands, 7);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,7));
+	serial_->write_some(boost::asio::buffer(commands, 7));
 }
 
 // Used to change the speed value of motor 2
@@ -407,7 +444,9 @@ void DriveRoboClaw::write_RoboClaw_speed_M2(char addr, int32_t speed)
 	commands[5] = ((char) (speed & 0xFF));
 	commands[6] = checkSUM;
 
-	write(fd, commands, 7);  //Send data
+	//write(fd, commands, 7);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,7));
+	serial_->write_some(boost::asio::buffer(commands, 7));
 }
 
 // Used to change the speed value of motors 1 and 2
@@ -437,7 +476,9 @@ void DriveRoboClaw::write_RoboClaw_speed_M1M2(char addr, int32_t speedM1, int32_
 	commands[9] = ((char) (speedM2 & 0xFF));
 	commands[10] = checkSUM;
 
-	write(fd, commands, 11);  //Send data
+	//write(fd, commands, 11);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,11));
+	serial_->write_some(boost::asio::buffer(commands, 11));
 }
 
 // Used to change the speed value of motor 1 and 2 during a specific distance
@@ -485,7 +526,9 @@ void DriveRoboClaw::write_RoboClaw_speed_dist_M1M2(char addr, int32_t speedM1,
 	commands[18] = 1;
 	commands[19] = checkSUM;
 
-	write(fd, commands, 20);  //Send data
+	//write(fd, commands, 20);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,20));
+	serial_->write_some(boost::asio::buffer(commands, 20));
 }
 
 
@@ -508,7 +551,9 @@ void DriveRoboClaw::rotate(int32_t speed)
 	commands[5] = ((char) (speed & 0xFF));
 	commands[6] = checkSUM;
 
-	write(fd, commands, 7);  //Send data
+	//write(fd, commands, 7);  //Send data
+	//boost::asio::write(serial_,boost::asio::buffer(commands,7));
+	serial_->write_some(boost::asio::buffer(commands, 7));
 
 }
 
@@ -526,57 +571,6 @@ int main(int argc, char **argv)
 	while (ros::ok()) {
 		ros::spinOnce();
 		loop_rate.sleep();
-		/*
-		   drive.write_RoboClaw_drive_M1(128, 100);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_drive_M1(128, 50);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_drive_M1(128, 64);
-		   drive.write_RoboClaw_drive_M2(128, 50);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_drive_M1(129, 50);
-		   drive.write_RoboClaw_drive_M2(128, 64);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_drive_M1(129, 64);
-		   ros::Duration(1.0).sleep();
-		 */
-		/*
-		   drive.write_RoboClaw_speed_M1M2(128, 10000, 0);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1M2(128, 0, 10000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1M2(128, 0, 0);
-		   drive.write_RoboClaw_speed_M1M2(129, 10000, 0);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1M2(129, 0, 0);
-		   ros::Duration(1.0).sleep();
-
-		   drive.write_RoboClaw_speed_M1M2(128, -30000, 0);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1M2(128, 0, -30000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1M2(128, 0, 0);
-		   drive.write_RoboClaw_speed_M1M2(129, -30000, 0);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1M2(129, 0, 0);
-		   ros::Duration(1.0).sleep();
-		 */
-		/*
-		   drive.write_RoboClaw_speed_M1(128, 5000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1(128, 10000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1(128, 20000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1(128, 30000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1(128, 40000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1(128, 50000);
-		   ros::Duration(1.0).sleep();
-		   drive.write_RoboClaw_speed_M1(128, 0);
-		   ros::Duration(1.0).sleep();
-		 */
 	}
 
 	ros::Duration(2.0).sleep();
