@@ -110,7 +110,7 @@ void indomptableARM::jointCallback(const dynamixel_msgs::MotorStateList::ConstPt
 
 	joint_state.position[0] = (pose->motor_states[0].position*0.292968 - 150)*3.141592654/180;
 	joint_state.position[1] = (pose->motor_states[1].position*0.292968 - 150)*3.141592654/180;
-	joint_state.position[2] = (pose->motor_states[9].position*0.292968 - 150)*3.141592654/180;
+	joint_state.position[2] = (pose->motor_states[10].position*0.292968 - 150)*3.141592654/180;
 	joint_state.position[3] = (pose->motor_states[2].position*0.292968 - 150)*3.141592654/180;
 	joint_state.position[4] = (pose->motor_states[3].position*0.292968 - 150)*3.141592654/180;
 

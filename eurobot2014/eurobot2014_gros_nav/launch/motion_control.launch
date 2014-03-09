@@ -3,7 +3,7 @@
 <launch>
   <master auto="start"/>
 
-  <node pkg="rosserial_python" type="serial_node.py" respawn="false" name="GROS_rosserial_motion_control" output="screen" args="/dev/ttyACM0">
+  <node pkg="rosserial_python" type="serial_node.py" respawn="false" name="GROS_rosserial_motion_control" output="screen" args="/dev/ttyODOM">
         <remap from="/color" to="/GENERAL/color" />
         <remap from="/alpha_ros" to="/GROS/alpha_ardu" />
         <remap from="/delta_ros" to="/GROS/delta_ardu" />

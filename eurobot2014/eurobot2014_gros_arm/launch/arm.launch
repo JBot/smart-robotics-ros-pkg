@@ -26,4 +26,6 @@
     <remap from="/ROBOT/done" to="/GROS/arm_done" />
   </node>
 
+
+
 </launch>

@@ -6,7 +6,7 @@
             namespace: dxl_manager
             serial_ports:
                 arm_port:
-                    port_name: "/dev/ttyACM0"
+                    port_name: "/dev/ttyAX12"
                     baud_rate: 1000000
                     min_motor_id: 1
                     max_motor_id: 25
@@ -29,7 +29,8 @@
                 Llink2_controller
                 Llink3_controller
                 Llink4_controller
-                Llink5_controller"
+                Llink5_controller
+                fruits_controller"
           output="screen"/>
 
 

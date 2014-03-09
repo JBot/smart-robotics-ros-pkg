@@ -12,7 +12,6 @@
   <depend package="std_msgs"/>
   <depend package="geometry_msgs"/>
   <depend package="nav_msgs"/>
-  <depend package="arm_navigation_msgs"/>
   <depend package="sensor_msgs"/>
 
 </package>

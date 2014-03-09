@@ -129,4 +129,17 @@ Llink5_controller:
         max: 1023
 
 
+fruits_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: fruits_joint
+    joint_speed: 3
+    motor:
+        id: 13
+        init: 512
+        min: 0
+        max: 1023
+
 

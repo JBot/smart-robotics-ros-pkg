@@ -40,9 +40,9 @@ void delay_ms(uint16_t millis)
 /***********/
 #define TICK_PER_MM_LEFT 	(18.6256756)
 #define TICK_PER_MM_RIGHT 	(18.6256756)
-#define TICK_PER_M_LEFT 	(18205.6756)
-#define TICK_PER_M_RIGHT 	(18205.6756)
-#define DIAMETER 	        0.2951 //0.29478 // 0.2973 //    0.2990      //0.2962                      // Distance between the 2 wheels
+#define TICK_PER_M_LEFT 	(18145.6756)//(18205.6756)
+#define TICK_PER_M_RIGHT 	(18145.6756)//(18205.6756)
+#define DIAMETER 	        0.29164 //0.2951                       // Distance between the 2 wheels
 
 #define DISTANCE_REAR_WHEELS    0.120
 
@@ -76,12 +76,12 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         13000//9500//11000//8000 
-#define ALPHA_MAX_ACCEL         800//500//400
-#define ALPHA_MAX_DECEL         1600//1200//1000 
-#define DELTA_MAX_SPEED         23000//18000//20000//16000//12000  
-#define DELTA_MAX_ACCEL         1000//600//400     
-#define DELTA_MAX_DECEL         2200//1700//1500 
+#define ALPHA_MAX_SPEED         3000//13000 
+#define ALPHA_MAX_ACCEL         300//800
+#define ALPHA_MAX_DECEL         500//1600 
+#define DELTA_MAX_SPEED         4000//23000  
+#define DELTA_MAX_ACCEL         300//1000     
+#define DELTA_MAX_DECEL         600//2200 
 
 //#define PATH_FOLLOWING          1
 
