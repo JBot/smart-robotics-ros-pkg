@@ -1,0 +1,56 @@
+GROS_costmap:
+  global_frame: /odom
+  robot_base_frame: /base_link
+  transform_tolerance: 0.6
+  update_frequency: 1.0
+  publish_frequency: 2.0
+  max_obstacle_height: 0.5
+  obstacle_range: 3.0
+  raytrace_range: 3.5
+  #footprint: [[-0.1, -0.1], [-0.1, 0.1], [0.1, 0.1], [0.1, -0.1]]
+  robot_radius: 0.10
+  inflation_radius: 0.11
+  static_map: false
+  resolution: 0.01
+  map_type: costmap
+  rolling_window: false
+  width: 3.5
+  height: 2.5
+  origin_x: -1.5025
+  origin_y: -0.1
+  cost_scaling_factor: 10.0
+
+  observation_sources: GROS_hokuyo_laser pc_map
+  GROS_hokuyo_laser: {sensor_frame: /hokuyo_laser, data_type: LaserScan, topic: /GROS/hokuyo, marking: true, clearing: true, obstacle_range: 1.0}
+  pc_map: {sensor_frame: /world, data_type: PointCloud, topic: /cloud, marking: true, clearing: false}
+  track_unknown_space: false
+
+
+# static_map:
+#   map_topic: /PETIT/map
+#   unknown_cost_value: 50
+#   lethal_cost_threshold: 100
+#
+# obstacles:
+#   observation_sources: PETIT_neato_laser
+#   PETIT_neato_laser: {sensor_frame: /petit_neato_link, data_type: LaserScan, topic: /PETIT/neato, marking: true, clearing: true}
+#   track_unknown_space: false
+#
+# inflater:
+#   inflation_radius: 0.12
+#   cost_scaling_factor: 2.0
+
+# 
+# obstacle_layer:
+#   observation_sources: PETIT_neato_laser
+#   PETIT_neato_laser: {sensor_frame: /petit_neato_link, data_type: LaserScan, topic: /PETIT/neato, marking: true, clearing: true}
+
+
+GROS_planner:
+  allow_unknown: false
+  visualize_potential: true
+  global_frame: /odom
+  robot_base_frame: /base_link
+  map_topic: /GROS/map
+
+

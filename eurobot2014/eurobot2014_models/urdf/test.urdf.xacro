@@ -403,18 +403,19 @@
 
 	<!-- =================== LASER Definitions ==================== -->
 
-        <joint name="base_laser_joint" type="prismatic">
+        <!--<joint name="base_laser_joint" type="prismatic">-->
+	<joint name="base_laser_joint" type="fixed">
         <parent link="base_link" />
         <child link="base_laser" />
         <origin xyz="0.15 0 0.07" rpy="0 0 0" />
-        <limit lower="0.0" upper="0.1" effort="10" velocity="3" />
-        <axis xyz="0 0 1" />
+        <!--<limit lower="0.0" upper="0.1" effort="10" velocity="3" />
+        <axis xyz="0 0 1" />-->
         </joint>
 
         <joint name="laser_joint" type="fixed">
         <parent link="base_laser" />
         <child link="hokuyo_laser" />
-        <origin xyz="0 0 -0.035" rpy="0 0 1.5707963267" />
+        <origin xyz="0 0 -0.035" rpy="3.141592653 0 0" />
         </joint>
 
         <joint name="gros_base_laser_joint" type="fixed">

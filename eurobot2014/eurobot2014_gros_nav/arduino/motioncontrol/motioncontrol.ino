@@ -76,12 +76,12 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         3000//13000 
-#define ALPHA_MAX_ACCEL         300//800
-#define ALPHA_MAX_DECEL         500//1600 
-#define DELTA_MAX_SPEED         4000//23000  
-#define DELTA_MAX_ACCEL         300//1000     
-#define DELTA_MAX_DECEL         600//2200 
+#define ALPHA_MAX_SPEED         13000//3000//13000 
+#define ALPHA_MAX_ACCEL         800//300//800
+#define ALPHA_MAX_DECEL         1600//500//1600 
+#define DELTA_MAX_SPEED         23000//4000//23000  
+#define DELTA_MAX_ACCEL         1000//300//1000     
+#define DELTA_MAX_DECEL         2200//600//2200 
 
 //#define PATH_FOLLOWING          1
 
@@ -692,7 +692,7 @@ void setup()
     
     // auto init
     //color = 1;//-1;
-    /* init_first_position(&maximus); A REMETTRE */
+    init_first_position(&maximus);  
 
     // Disable motion control
     motion_control_ON = 0;
@@ -736,8 +736,8 @@ void setup()
         
     }
 */
-    start_pub.publish(&start_message);
-    start_pub.publish(&start_message);
+//    start_pub.publish(&start_message);
+//    start_pub.publish(&start_message);
     
 }
 
@@ -878,15 +878,16 @@ void init_first_position(struct robot *my_robot)
     // go back to touch the wall
     set_new_command(&bot_command_alpha, 0);
     set_new_command(&bot_command_delta, -1000);
-
+/*
     while ((digitalRead(LEFT_REAR_SENSOR) == 0) || (digitalRead(RIGHT_REAR_SENSOR) == 0)) {
         delay(100);
 
     }
-    delay(300);
+    */
+    delay(2000);
     // Set the Y position and theta
     my_robot->theta = PI / 2;
-    my_robot->pos_Y = DISTANCE_REAR_WHEELS;
+    my_robot->pos_Y = 0.000 + DISTANCE_REAR_WHEELS;
     my_robot->pos_X = 0;
 
     delay(100);
@@ -895,17 +896,18 @@ void init_first_position(struct robot *my_robot)
     set_new_command(&bot_command_delta, 0);
     delay(100);
     // Go forward, turn, and go bachward to touch the other wall
-    set_new_command(&bot_command_delta, 0.140);
-    delay(4000);
+    set_new_command(&bot_command_delta, 0.400);
+    delay(6000);
     set_new_command(&bot_command_alpha, (color * PI / 2 * RAD2DEG));
     delay(5000);
     set_new_command(&bot_command_delta, -1000);
-
+/*
     while ((digitalRead(LEFT_REAR_SENSOR) == 0) || (digitalRead(RIGHT_REAR_SENSOR) == 0)) {
         delay(100);
 
     }
-    delay(300);
+    */
+    delay(4000);
     // Set the X and theta values
     my_robot->pos_X = color * (1.500 - DISTANCE_REAR_WHEELS);
     if (color == 1) {
@@ -922,14 +924,24 @@ void init_first_position(struct robot *my_robot)
 
     delay(500);
     // Go in the middle of the starting area
-    set_new_command(&bot_command_delta, 0.155);
+    set_new_command(&bot_command_delta, 0.060);
 // FOR TEST
 //    set_new_command(&bot_command_delta, 2.5);
 
 //    delay(20000);
 
-
     delay(4000);
+
+    set_new_command(&bot_command_alpha, (color * PI / 2 * RAD2DEG));
+    delay(5000);
+
+    set_new_command(&bot_command_delta, -1.090);
+    delay(12000);
+
+    //set_new_command(&bot_command_alpha, (-color * PI / 8 * RAD2DEG));
+    //delay(3000);
+    
+    //delay(4000);
     // Set the speed to the maximum
     delta_motor.max_speed = DELTA_MAX_SPEED;
     alpha_motor.max_speed = ALPHA_MAX_SPEED;
