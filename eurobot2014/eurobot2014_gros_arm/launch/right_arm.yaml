@@ -143,3 +143,16 @@ fruits_controller:
         max: 1023
 
 
+laser_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: laser_joint
+    joint_speed: 3
+    motor:
+        id: 15
+        init: 512
+        min: 0
+        max: 1023
+

@@ -30,7 +30,8 @@
                 Llink3_controller
                 Llink4_controller
                 Llink5_controller
-                fruits_controller"
+                fruits_controller
+                laser_controller"
           output="screen"/>
 
 
