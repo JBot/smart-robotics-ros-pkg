@@ -21,6 +21,7 @@
   <depend package="common_smart_nav"/>
   <depend package="pcl"/>
   <depend package="laser_geometry"/>
+  <depend package="dynamixel_controllers"/>
 
 </package>
 

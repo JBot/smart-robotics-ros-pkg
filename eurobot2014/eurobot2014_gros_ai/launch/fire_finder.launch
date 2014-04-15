@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <node pkg="eurobot2014_gros_ai" type="fire_finder" respawn="false" name="GROS_fire_finder" output="screen">
+
+        <remap from="/ROBOT/laser_opponent" to="/GROS/hokuyo" />
+        <remap from="/ROBOT/find_fire" to="/GROS/find_fire" />
+        <remap from="/DEBUG/Fire_PointCloud" to="/DEBUG/Fire_PointCloud" />
+        <remap from="/ROBOT/low_PointCloud" to="/GROS/low_PointCloud" />
+        <remap from="/ROBOT/mid_PointCloud" to="/GROS/mid_PointCloud" />
+        <remap from="/ROBOT/hokuyo_opponent" to="/GROS/hokuyo_opponent" />
+
+        <remap from="/hokuyo_link_controller/command" to="/laser_controller/command" />
+
+  </node>
+
+
+
+
+</launch>

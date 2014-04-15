@@ -12,6 +12,7 @@
 #include <tf/transform_listener.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <actionlib/server/simple_action_server.h>
 
 #include "common_smart_nav/GetRobotPose.h"
 #include "common_smart_nav/GetPlan.h"
@@ -24,6 +25,9 @@
 #include <nav_msgs/GetPlan.h>
 #include <navfn/navfn.h>
 #include <navfn/navfn_ros.h>
+
+//#include <move_base_msgs/MoveBase.h>
+#include <move_base_msgs/MoveBaseAction.h>
 
 #include <pluginlib/class_loader.h>
 
@@ -85,6 +89,7 @@ class TrajectoryManager {
 		int cpt_pathimp;
 	private:
 		void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+		void goalActionCallback(void);
 		void pathDoneCallback(const std_msgs::Empty::ConstPtr & pose);
 		void computePathCallback(const std_msgs::Empty::ConstPtr & pose);
 		void pauseCallback(const std_msgs::Empty::ConstPtr & pose);
@@ -122,11 +127,17 @@ class TrajectoryManager {
 
 		std::string map_name;
 
+		actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> as_;
+		move_base_msgs::MoveBaseFeedback action_feedback_;
+
+
 };
 
 TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
+	as_(nh, "test", false),
 	tf_(tf)
 {
+
 
 	std::string costmap_name;
 	std::string planner_name;
@@ -159,6 +170,10 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 	pose_service = nh.advertiseService("/ROBOT/get_robot_pose", &TrajectoryManager::getRobotPose, this);
 	path_service = nh.advertiseService("/ROBOT/get_path", &TrajectoryManager::getPath, this);
 	distance_service = nh.advertiseService("/ROBOT/get_distance", &TrajectoryManager::getDistance, this);
+
+
+	//register the goal and feeback callbacks
+    	as_.registerGoalCallback(boost::bind(&TrajectoryManager::goalActionCallback, this));
 
 
 	//just an arbitrary point in space
@@ -208,7 +223,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 
 	planner_thread_ = new boost::thread(boost::bind(&TrajectoryManager::planThread, this));
 
-
+	as_.start();
 
 
 }
@@ -283,6 +298,8 @@ bool TrajectoryManager::getRobotPose(common_smart_nav::GetRobotPose::Request  &r
 	//res.sum = req.a + req.b;
 	//ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
 	//ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+	action_feedback_.base_position = current_pose;
+	as_.publishFeedback(action_feedback_);
 	return true;
 }
 
@@ -334,6 +351,9 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
 	tmp_path.poses = global_plan;
 
 	res.plan = tmp_path;
+
+	action_feedback_.base_position = current_pose;
+	as_.publishFeedback(action_feedback_);
 
 	sem = 1;
 
@@ -388,6 +408,9 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 
 	res.distance.data = compute_distance(tmp_path);
 
+	action_feedback_.base_position = current_pose;
+	as_.publishFeedback(action_feedback_);
+
 	sem = 1;
 
 	return true;
@@ -433,6 +456,18 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
 
 	status = RUN;
 }
+
+void TrajectoryManager::goalActionCallback(void)
+{
+        final_pose = as_.acceptNewGoal()->target_pose;
+        ROS_ERROR("NEW POSE");
+
+        computePath();
+        publishPath();
+
+        status = RUN;
+}
+
 
 void TrajectoryManager::computePath(void)
 {
@@ -483,6 +518,10 @@ void TrajectoryManager::computePath(void)
 	// lock
 	my_path = tmp_path;
 	// unlock
+
+	action_feedback_.base_position = current_pose;
+	as_.publishFeedback(action_feedback_);
+
 	sem = 1;
 
 }
@@ -548,6 +587,8 @@ void TrajectoryManager::planThread(void)
 
 				//ROS_ERROR("PathPlanner : Compute current pose");
 				current_pose = start;
+				action_feedback_.base_position = current_pose;
+				as_.publishFeedback(action_feedback_);
 
 				break;
 			case RUN:
@@ -556,6 +597,7 @@ void TrajectoryManager::planThread(void)
 					cpt = 0;
 					computePath();
 					publishPath();
+					//planner_costmap_->resetLayers();
 				}
 				else {
 				
