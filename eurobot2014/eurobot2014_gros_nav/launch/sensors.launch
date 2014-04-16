@@ -4,7 +4,7 @@
   <master auto="start"/>
 
   <!-- Static transform from world to the map of the PETIT robot -->
-  <node pkg="tf" type="static_transform_publisher" name="world2gros_broadcaster" args="0 0 0 0 0 0 /world /odom 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="world2gros_broadcaster" args="0 0 0 0 0 0 /world /odom 10"/>
 
   <!-- Map server for PETIT robot -->
   <node pkg="map_server" type="map_server" respawn="false" name="GROS_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">

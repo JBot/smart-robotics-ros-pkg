@@ -120,11 +120,12 @@ void indomptableARM::jointCallback(const dynamixel_msgs::MotorStateList::ConstPt
         joint_state.position[8] = (pose->motor_states[7].position*0.292968 - 150)*3.141592654/180;
         joint_state.position[9] = (pose->motor_states[8].position*0.292968 - 150)*3.141592654/180;
 
-	if(pose->motor_states[10].position < -1.0)
+	//ROS_ERROR("pose : %d", pose->motor_states[10].position);
+	if(pose->motor_states[10].position < 315)
         	joint_state.position[10] = 0.0;
-	if(pose->motor_states[10].position > -1.0 && pose->motor_states[10].position < 0.0)
+	if( (pose->motor_states[10].position > 315) && (pose->motor_states[10].position < 400) )
         	joint_state.position[10] = 0.03;
-	if(pose->motor_states[10].position > 0.0)
+	if(pose->motor_states[10].position > 400)
         	joint_state.position[10] = 0.13;
 }
 
@@ -164,7 +165,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "joint_arm_publisher");
 	indomptableARM indomptablearm;
 	// Refresh rate
-	ros::Rate loop_rate(10);                                // 35 with bluetooth
+	ros::Rate loop_rate(50);                                // 35 with bluetooth
 	while (ros::ok()) {
 		indomptablearm.joint_publish();
 		ros::spinOnce();
