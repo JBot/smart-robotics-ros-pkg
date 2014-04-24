@@ -13,7 +13,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
-#include <common_smart_nav/ArduGoal.h>
+//#include <common_smart_nav/ArduGoal.h>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -70,7 +70,8 @@ class Pathwrapper {
 
 		nav_msgs::Path my_path;
 		geometry_msgs::Pose2D final_pose;
-		common_smart_nav::ArduGoal final_ardugoal;
+		//common_smart_nav::ArduGoal final_ardugoal;
+		geometry_msgs::Pose2D final_ardugoal;
 
 		char cpt_send;
 		char pause;
@@ -95,7 +96,8 @@ Pathwrapper::Pathwrapper()
 
 	pose2D_pub = nh.advertise < geometry_msgs::Pose2D > ("/ROBOT_goal", 1);
 	poseArray_pub = nh.advertise < geometry_msgs::PoseArray > ("/poses", 50);
-	arduGoal_pub = nh.advertise < common_smart_nav::ArduGoal > ("/ROBOT/ardugoal", 1);
+	//arduGoal_pub = nh.advertise < common_smart_nav::ArduGoal > ("/ROBOT/ardugoal", 1);
+	arduGoal_pub = nh.advertise < geometry_msgs::Pose2D > ("/ROBOT/ardugoal", 1);
 
 	pathdone_pub = nh.advertise < std_msgs::Empty > ("/ROBOT/path_done", 50);
 
@@ -121,8 +123,9 @@ Pathwrapper::Pathwrapper()
 	final_ardugoal.x = 0.0;
 	final_ardugoal.y = 0.0;
 	final_ardugoal.theta = 0.0;
-	final_ardugoal.last = 0;
+	//final_ardugoal.last = 0;
 
+	
 
 	cpt_send = 0;
 }
@@ -277,8 +280,9 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 						final_ardugoal.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
 						final_ardugoal.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-						final_ardugoal.theta = getHeadingFromQuat(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.orientation);
-						final_ardugoal.last = 0;
+						//final_ardugoal.theta = getHeadingFromQuat(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.orientation);
+						final_ardugoal.theta = 10000;
+						//final_ardugoal.last = 0;
 
 						arduGoal_pub.publish(final_ardugoal);
 
@@ -298,7 +302,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						final_ardugoal.x = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
 						final_ardugoal.y = my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
 						final_ardugoal.theta = getHeadingFromQuat(my_path.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.orientation);
-						final_ardugoal.last = 1;
+						//final_ardugoal.last = 1;
 
 						arduGoal_pub.publish(final_ardugoal);
 

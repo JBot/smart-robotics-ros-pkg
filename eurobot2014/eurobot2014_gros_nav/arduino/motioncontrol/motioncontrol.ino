@@ -16,7 +16,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 
-#include <common_smart_nav/ArduGoal.h>
+//#include <common_smart_nav/ArduGoal.h>
 
 
 #include <stdio.h>
@@ -302,37 +302,42 @@ ros::Subscriber < geometry_msgs::Pose2D > pose_sub("indomptable_goal",
                                                    &positionCb);
 */
 
-common_smart_nav::ArduGoal ardufeed;
+//common_smart_nav::ArduGoal ardufeed;
+geometry_msgs::Pose2D ardufeed;
 ros::Publisher ack_position("ardugoal_in", &ardufeed);
 
 //////////////////
 // NEW POSITION //
 //////////////////
-void positionCb(const common_smart_nav::ArduGoal & goal_msg)
+//void positionCb(const common_smart_nav::ArduGoal & goal_msg)
+void positionCb(const geometry_msgs::Pose2D & goal_msg)
 {
-
-    
     goal.x = goal_msg.x;
     goal.y = goal_msg.y;
-    desired_last_theta = goal_msg.theta;
-//        maximus.theta += angle_coord(&maximus, goal_msg.x, goal_msg.y);
-
-//        maximus.pos_X = goal_msg.x;
-//        maximus.pos_Y = goal_msg.y;
+    if( goal_msg.theta > 9999 ) {
+    	desired_last_theta = 0;
+        last_goal = 0;
+    }
+    else {
+    	desired_last_theta = goal_msg.theta;
+        last_goal = 1;
+    }
 
     goto_xy(goal_msg.x, goal_msg.y);
-    last_goal = goal_msg.last;
+    //last_goal = goal_msg.last;
     alpha_and_theta = 1;
     
     ardufeed.x = goal_msg.x;
     ardufeed.y = goal_msg.y;
     ardufeed.theta = goal_msg.theta;
-    ardufeed.last = goal_msg.last;
+    //ardufeed.last = goal_msg.last;
     
     ack_position.publish(&ardufeed);
 }
 
-ros::Subscriber < common_smart_nav::ArduGoal > pose_sub("ardugoal_out",
+//ros::Subscriber < common_smart_nav::ArduGoal > pose_sub("ardugoal_out",
+//                                                   &positionCb);
+ros::Subscriber < geometry_msgs::Pose2D > pose_sub("ardugoal_out",
                                                    &positionCb);
 
 
