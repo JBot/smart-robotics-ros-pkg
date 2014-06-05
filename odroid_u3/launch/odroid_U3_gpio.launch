@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <node pkg="rosserial_python" type="serial_node.py" respawn="false" name="odroid_u3_servo" output="screen" args="/dev/ttySAC0">
+        <remap from="/servo1" to="/odroid/servo1" />
+  </node>
+
+  <node pkg="odroid_u3" type="gpio_ctrl" respawn="true" name="odroid_u3_gpio" output="screen">
+        <remap from="/odroid/gpio1" to="/odroid/my_gpio1" />
+  </node>
+
+
+</launch>
