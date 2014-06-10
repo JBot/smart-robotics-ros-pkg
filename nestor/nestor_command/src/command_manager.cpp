@@ -5,7 +5,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <rostweet_msgs/postTweet.h>
+//#include <rostweet_msgs/postTweet.h>
 #include <std_msgs/Int32.h>
 
 /* C includes */
@@ -59,7 +59,7 @@ commandManager::commandManager()
 	map_sub_ = nh.subscribe < sensor_msgs::Image > ("map_image/full", 5, &commandManager::mapCallback, this);
 
 
-	twit_client = nh.serviceClient<rostweet_msgs::postTweet>("/rostweet/postTweet");
+	//twit_client = nh.serviceClient<rostweet_msgs::postTweet>("/rostweet/postTweet");
 
 	mode = 0;
 
@@ -88,7 +88,7 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 
 void commandManager::pictureCallback(const sensor_msgs::Image::ConstPtr & feedback)
 {
-	if(mode == TAKE_PICTURE) {
+/*	if(mode == TAKE_PICTURE) {
 		rostweet_msgs::postTweet srv;
   		srv.request.text = "The requested picture : ";
 		srv.request.picture.push_back(*feedback);
@@ -107,12 +107,12 @@ void commandManager::pictureCallback(const sensor_msgs::Image::ConstPtr & feedba
 
 		mode = 0;
 	}
-
+*/
 }
 
 void commandManager::mapCallback(const sensor_msgs::Image::ConstPtr & feedback)
 {
-        if(mode == SEND_MAP) {
+/*        if(mode == SEND_MAP) {
                 rostweet_msgs::postTweet srv;
                 srv.request.text = "The current map : ";
                 srv.request.picture.push_back(*feedback);
@@ -131,7 +131,7 @@ void commandManager::mapCallback(const sensor_msgs::Image::ConstPtr & feedback)
 
                 mode = 0;
         }
-
+*/
 
 }
 

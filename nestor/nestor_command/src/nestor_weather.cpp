@@ -36,7 +36,7 @@ class nestorWeather {
 /* Constructor */
 nestorWeather::nestorWeather()
 {
-	english_pub = nh.advertise < std_msgs::String > ("nestor/english_voice", 3);
+	english_pub = nh.advertise < std_msgs::String > ("/nestor/english_voice", 3);
 
 	weather_sub_ = nh.subscribe < std_msgs::Empty > ("/nestor/weather", 2, &nestorWeather::weatherCallback, this);
 }

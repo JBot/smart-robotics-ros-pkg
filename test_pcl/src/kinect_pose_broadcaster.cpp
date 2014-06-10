@@ -67,8 +67,8 @@ InitPose::InitPose(tf::TransformListener& tf) :
 	// First guess of the kinect position
 	x = 0.00;
 	y = 0.00;
-	z = 0.50;
-	tx = 0.20;
+	z = 1.30;
+	tx = 0.00;
 	ty = 0.60;
 	tz = 0.00;
 
