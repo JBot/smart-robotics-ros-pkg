@@ -24,6 +24,7 @@
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl/surface/mls.h>
 #include <pcl_ros/transforms.h>
 
 
@@ -102,7 +103,7 @@ void PlaneFinder::pcCallback(const sensor_msgs::PointCloud2::ConstPtr & pc)
   //////////////////
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
   sor.setInputCloud (pcl_pc);
-  sor.setLeafSize (0.01f, 0.01f, 0.01f);
+  sor.setLeafSize (0.003f, 0.003f, 0.003f);
   sor.filter (*cloud_filtered);
 
   // Transformation into ROS type
@@ -216,7 +217,7 @@ void PlaneFinder::pcCallback(const sensor_msgs::PointCloud2::ConstPtr & pc)
   /////////////////////////////////
   pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
   sor.setInputCloud (cloud_filtered2);
-  sor.setMeanK (50);
+  sor.setMeanK (200);
   sor.setStddevMulThresh (1.0);
   sor.filter (*cloud_filtered2);
 
@@ -232,8 +233,8 @@ void PlaneFinder::pcCallback(const sensor_msgs::PointCloud2::ConstPtr & pc)
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   ec.setClusterTolerance (0.02); // 2cm
-  ec.setMinClusterSize (50);
-  ec.setMaxClusterSize (5000);
+  ec.setMinClusterSize (500);
+  ec.setMaxClusterSize (10000);
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_filtered2);
   ec.extract (cluster_indices);
@@ -249,13 +250,37 @@ void PlaneFinder::pcCallback(const sensor_msgs::PointCloud2::ConstPtr & pc)
     cloud_cluster1->is_dense = true;
     cloud_cluster1->header.frame_id = "/map";
 
+
+
+
     if(j == 0) {
+/*
+  // Create a KD-Tree
+  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr treeSM (new pcl::search::KdTree<pcl::PointXYZRGB>);
+
+  // Output has the PointNormal type in order to store the normals calculated by MLS
+  pcl::PointCloud<pcl::PointXYZRGB> mls_pointsSM;
+
+  // Init object (second point type is for the normals, even if unused)
+  pcl::MovingLeastSquares<pcl::PointXYZRGB, pcl::PointXYZRGB> mlsSM;
+ 
+  mlsSM.setComputeNormals (true);
+
+  // Set parameters
+  mlsSM.setInputCloud (cloud_cluster1);
+  mlsSM.setPolynomialFit (true);
+  mlsSM.setSearchMethod (treeSM);
+  mlsSM.setSearchRadius (0.03);
+
+  // Reconstruct
+  mlsSM.process (mls_pointsSM);
+*/
 	// Transformation into ROS type
   	pcl::toPCLPointCloud2(*(cloud_cluster1), *(cloud_out));
+  	//pcl::toPCLPointCloud2(mls_pointsSM, *(cloud_out));
   	pcl_conversions::moveFromPCL(*(cloud_out), pc2);
 
   	debug_pub.publish(pc2);
-
     }
     else {
   	// Transformation into ROS type

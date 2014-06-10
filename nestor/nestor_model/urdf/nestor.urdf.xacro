@@ -232,6 +232,16 @@
 		<xacro:grey2 />
 	</xacro:my_cylinder>
 	
+        <xacro:my_box name="base_laser" lwh="0.05 0.05 0.041" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_box>
+
+        <xacro:my_cylinder name="hokuyo_laser" l="0.029" r="0.021" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+                <xacro:ax12_color />
+        </xacro:my_cylinder>
+
+
+
 	<xacro:my_box name="level1_link" lwh="0.25 0.34 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_box>
@@ -306,7 +316,7 @@
 
 	
  	<!-- ============================   Arms   ============================ -->
-
+<!--
                 <xacro:my_box name="shoulder_yaw_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
                         <xacro:bracket_color />
                 </xacro:my_box>
@@ -334,7 +344,7 @@
                 <xacro:my_box name="claw_link" lwh="0.15 0.15 0.03" xyz="0 0 0" rpy="0 0 0" mass="0.055" material="Gazebo/FlatBlack">
                         <xacro:ax12_color />
                 </xacro:my_box>
-
+-->
 
 
 
@@ -432,6 +442,17 @@
         <axis xyz="1 0 0" />
         </joint>
 
+        <joint name="base_laser_joint" type="fixed">
+        <parent link="plate_link" />
+        <child link="base_laser" />
+        <origin xyz="0.05 0 -0.021" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        </joint>
+        <joint name="laser_joint" type="fixed">
+        <parent link="base_laser" />
+        <child link="hokuyo_laser" />
+        <origin xyz="0 0 -0.035" rpy="3.141592653 0 0" />
+        </joint>
 
 
 
@@ -500,7 +521,7 @@
 
 
 
-
+<!--
         <joint name="shoulder_yaw_joint" type="revolute">
         <parent link="level2_link" />
         <child link="shoulder_yaw_link" />
@@ -561,7 +582,7 @@
         <axis xyz="1 0 0" />
         <dynamics damping="0.0"/>
         </joint>
-
+-->
 <!-- Finger joint -->
 
 
