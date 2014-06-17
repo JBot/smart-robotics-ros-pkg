@@ -129,7 +129,7 @@ int GPIOU3::gpio_set_value(unsigned int gpio, unsigned int value)
 		write(fd, "0", 2);
  
 	close(fd);
-	return 0;
+	return 1;
 }
 
 /****************************************************************
@@ -158,7 +158,7 @@ int GPIOU3::gpio_get_value(unsigned int gpio, unsigned int *value)
 	}
  
 	close(fd);
-	return 0;
+	return 1;
 }
 
 /* Function that read all input IO every X ms */
