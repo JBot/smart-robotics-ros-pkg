@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Static transform from world to the map of the PETIT robot -->
+  <node pkg="tf" type="static_transform_publisher" name="world2petit_broadcaster" args="0 0 0 0 0 0 /world /petit_map 100"/>
+
+  <!-- IMU for PETIT robot -->
+<!--  <node pkg="um6" type="um6_driver" respawn="false" name="PETIT_imu_driver" output="screen">
+        <param name="port" type="str" value="/dev/ttyUM6" />
+  </node>
+-->
+  <!-- Fake odom from IMU -->
+<!--  <node pkg="eurobot2015_petit_nav" type="petit_odom" respawn="false" name="PETIT_fake_odom_IMU" output="screen">
+  </node>
+-->
+  <!-- Map server for PETIT robot -->
+  <node pkg="map_server" type="map_server" respawn="false" name="PETIT_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
+        <param name="frame_id" type="str" value="/petit_map" />
+        <remap from="/map" to="/PETIT/map" />
+  </node>
+
+  <!-- Laser driver => Neato XV11-->
+<!--  <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="false" name="PETIT_neato_laser" output="screen">
+    <param name="firmware_version" value="2" />
+    <param name="port" type="str" value="/dev/ttyNEATO" />
+    <param name="frame_id" type="str" value="petit_neato_link" />
+    
+    <remap from="/scan" to="/PETIT/neato" />
+  </node>
+-->
+  <!-- Low level motor driver => RoboClaw -->
+  <node pkg="eurobot2015_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
+        <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
+  </node>
+
+  <!-- Arduino on the Odroid-U3 -->
+  <node pkg="rosserial_python" type="serial_node.py" respawn="false" name="PETIT_Odruino" output="screen" args="/dev/ttySAC0">
+        <remap from="/servo1" to="/PETIT/servo1" />
+        <remap from="/servo2" to="/PETIT/servo2" />
+        <remap from="/servo3" to="/PETIT/servo3" />
+        <remap from="/servo4" to="/PETIT/servo4" />
+        <remap from="/servo5" to="/PETIT/servo5" />
+        <remap from="/servo6" to="/PETIT/servo6" />
+        <remap from="/servo7" to="/PETIT/servo7" />
+        <remap from="/servo8" to="/PETIT/servo8" />
+        <remap from="/servo9" to="/PETIT/servo9" />
+        <remap from="/servo10" to="/PETIT/servo10" />
+        <remap from="/servo11" to="/PETIT/servo11" />
+        <remap from="/servo12" to="/PETIT/servo12" />
+        <remap from="/servo13" to="/PETIT/servo13" />
+        <remap from="/servo14" to="/PETIT/servo14" />
+        <remap from="/servo15" to="/PETIT/servo15" />
+        <remap from="/servo16" to="/PETIT/servo16" />
+  </node>
+ 
+  <!-- GPIO on the Odroid-U3 -->
+  <node pkg="odroid_u3" type="gpio_ctrl" respawn="false" name="PETIT_OdroIO" output="screen">
+        <remap from="/odroid/gpio1" to="/PETIT/gpio1" />
+        <remap from="/odroid/gpio2" to="/PETIT/gpio2" />
+        <remap from="/odroid/gpio3" to="/PETIT/gpio3" />
+        <remap from="/odroid/gpio4" to="/PETIT/gpio4" />
+        <remap from="/odroid/gpio5" to="/PETIT/gpio5" />
+        <remap from="/odroid/gpio6" to="/PETIT/gpio6" />
+        <remap from="/odroid/gpio7" to="/PETIT/gpio7" />
+        <remap from="/odroid/gpio8" to="/PETIT/gpio8" />
+        <remap from="/odroid/gpio9" to="/PETIT/gpio9" />
+        <remap from="/odroid/gpio10" to="/PETIT/gpio10" />
+        <remap from="/odroid/gpio11" to="/PETIT/gpio11" />
+        <remap from="/odroid/gpio12" to="/PETIT/gpio12" />
+        <remap from="/odroid/gpio13" to="/PETIT/gpio13" />
+        <remap from="/odroid/gpio14" to="/PETIT/gpio14" />
+        <remap from="/odroid/gpio15" to="/PETIT/gpio15" />
+        <remap from="/odroid/gpio16" to="/PETIT/gpio16" />
+  </node>
+
+
+</launch>

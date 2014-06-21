@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Init pose -->
+  <node pkg="eurobot2015_petit_nav" type="petit_init_pose" respawn="false" name="PETIT_initial_pose" output="screen">
+        <param name="color_name" type="str" value="Yellow" />
+
+        <remap from="/ROBOT/init_pose" to="/PETIT/init_pose" />
+        <remap from="/ROBOT/cmd_vel" to="/PETIT/cmd_vel" />
+        <remap from="/ROBOT/resume_pathwrapper" to="/PETIT/resume_pathwrapper" />
+  </node>
+
+  
+</launch>

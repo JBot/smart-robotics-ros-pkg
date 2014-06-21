@@ -1,0 +1,22 @@
+# You can modify it, as long as you keep each rule on a single
+# line, and change only the value of the NAME= key.
+
+# Hokuyo laser range
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{product}=="URG-Series USB Driver", KERNEL=="ttyACM*", SYMLINK+="ttyHOKUYO"
+# USB2AX
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{product}=="USB2AX", ATTRS{serial}=="6403335303135130C0F1", ATTRS{manufacturer}=="Xevelabs", KERNEL=="ttyACM*", SYMLINK+="ttyAX12"
+# Ardupump
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{product}=="Arduino Mega 2560", ATTRS{serial}=="85235333135351A04160", ATTRS{manufacturer}=="Arduino (www.arduino.cc)", KERNEL=="ttyACM*", SYMLINK+="ttyPUMP"
+# ArduOdom
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{product}=="Arduino Mega 2560", ATTRS{serial}=="5533034383135151E1B2", ATTRS{manufacturer}=="Arduino (www.arduino.cc)", KERNEL=="ttyACM*", SYMLINK+="ttyODOM"
+
+# Neato
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{serial}=="0001", ATTRS{idProduct}=="ea60", ATTRS{product}=="CP2102 USB to UART Bridge Controller", KERNEL=="tty*", SYMLINK+="ttyNEATO"
+# RoboClaw
+ATTRS{serial}=="AM01WIRA", ATTRS{product}=="FT232R USB UART", KERNEL=="ttyUSB*", SYMLINK+="ttyROBOCLAW", GROUP="dialout", MODE="0660"
+# UM6
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{serial}=="AD01SSOM", ATTRS{idProduct}=="6001", ATTRS{product}=="FT232R USB UART", KERNEL=="tty*", SYMLINK+="ttyUM6"
+# ArduinoLauncher
+SUBSYSTEM=="tty", DRIVERS=="?*", ATTRS{serial}=="55330343831351615130", ATTRS{idProduct}=="0010", ATTRS{product}=="Arduino Mega 2560", KERNEL=="ttyACM*", SYMLINK+="ttyLAUNCHER"
+
+
