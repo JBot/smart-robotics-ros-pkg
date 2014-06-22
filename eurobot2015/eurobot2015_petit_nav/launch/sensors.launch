@@ -30,6 +30,18 @@
     <remap from="/scan" to="/PETIT/neato" />
   </node>
 -->
+
+  <!-- LASER NODE -->
+  <node pkg="hokuyo_node" type="hokuyo_node" name="PETIT_hokuyo" output="screen">
+    <param name="port" value="/dev/ttyHOKUYO" />
+    <param name="frame_id" value="petit_laser_nav_link" />
+    <param name="min_ang" value="-2.086214" />
+    <param name="max_ang" value="2.092350" />
+
+    <remap from="/scan" to="/PETIT/laser_nav" />
+  </node>
+
+
   <!-- Low level motor driver => RoboClaw -->
   <node pkg="eurobot2015_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />

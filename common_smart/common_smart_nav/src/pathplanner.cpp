@@ -128,14 +128,14 @@ class TrajectoryManager {
 
 		std::string map_name;
 
-		actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> as_;
-		move_base_msgs::MoveBaseFeedback action_feedback_;
+		//actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> as_;
+		//move_base_msgs::MoveBaseFeedback action_feedback_;
 
 
 };
 
 TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
-	as_(nh, "test", false),
+	//as_(nh, "test", false),
 	tf_(tf)
 {
 
@@ -175,7 +175,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 
 
 	//register the goal and feeback callbacks
-    	as_.registerGoalCallback(boost::bind(&TrajectoryManager::goalActionCallback, this));
+    	//as_.registerGoalCallback(boost::bind(&TrajectoryManager::goalActionCallback, this));
 
 
 	//just an arbitrary point in space
@@ -225,7 +225,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 
 	planner_thread_ = new boost::thread(boost::bind(&TrajectoryManager::planThread, this));
 
-	as_.start();
+	//as_.start();
 
 
 }
@@ -300,8 +300,8 @@ bool TrajectoryManager::getRobotPose(common_smart_nav::GetRobotPose::Request  &r
 	//res.sum = req.a + req.b;
 	//ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
 	//ROS_INFO("sending back response: [%ld]", (long int)res.sum);
-	action_feedback_.base_position = current_pose;
-	as_.publishFeedback(action_feedback_);
+	//action_feedback_.base_position = current_pose;
+	//as_.publishFeedback(action_feedback_);
 	return true;
 }
 
@@ -354,8 +354,8 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
 
 	res.plan = tmp_path;
 
-	action_feedback_.base_position = current_pose;
-	as_.publishFeedback(action_feedback_);
+	//action_feedback_.base_position = current_pose;
+	//as_.publishFeedback(action_feedback_);
 
 	sem = 1;
 
@@ -410,8 +410,8 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 
 	res.distance.data = compute_distance(tmp_path);
 
-	action_feedback_.base_position = current_pose;
-	as_.publishFeedback(action_feedback_);
+	//action_feedback_.base_position = current_pose;
+	//as_.publishFeedback(action_feedback_);
 
 	sem = 1;
 
@@ -461,7 +461,7 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
 
 void TrajectoryManager::goalActionCallback(void)
 {
-        final_pose = as_.acceptNewGoal()->target_pose;
+        //final_pose = as_.acceptNewGoal()->target_pose;
         ROS_ERROR("NEW POSE");
 
         computePath();
@@ -521,8 +521,8 @@ void TrajectoryManager::computePath(void)
 	my_path = tmp_path;
 	// unlock
 
-	action_feedback_.base_position = current_pose;
-	as_.publishFeedback(action_feedback_);
+	//action_feedback_.base_position = current_pose;
+	//as_.publishFeedback(action_feedback_);
 
 	sem = 1;
 
@@ -589,8 +589,8 @@ void TrajectoryManager::planThread(void)
 
 				//ROS_ERROR("PathPlanner : Compute current pose");
 				current_pose = start;
-				action_feedback_.base_position = current_pose;
-				as_.publishFeedback(action_feedback_);
+				//action_feedback_.base_position = current_pose;
+				//as_.publishFeedback(action_feedback_);
 				pose_pub.publish(current_pose);
 
 				break;

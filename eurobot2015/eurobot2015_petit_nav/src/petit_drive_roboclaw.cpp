@@ -137,7 +137,7 @@ DriveRoboClaw::DriveRoboClaw()
 	speed_motor2 = 0;
 	speed_motor3 = 0;
 
-	vel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 5, &DriveRoboClaw::velCallback, this);
+	vel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 1, &DriveRoboClaw::velCallback, this);
 
 	//write_RoboClaw_PID_M1(128, 16384, 65536, 32768, 44000);
 	//write_RoboClaw_PID_M2(128, 0x00004000, 0x00010000, 0x00008000, 44000);

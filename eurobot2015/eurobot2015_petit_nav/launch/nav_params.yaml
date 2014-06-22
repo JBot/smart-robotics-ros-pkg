@@ -16,7 +16,7 @@ PETIT_costmap:
   width: 3.5
   height: 2.5
   origin_x: -1.5025
-  origin_y: 0.1
+  origin_y: -0.1
  
 #  static_map:
 #    map_topic: /PETIT/map
@@ -24,8 +24,8 @@ PETIT_costmap:
 #    lethal_cost_threshold: 100
 
   obstacles:
-    observation_sources: PETIT_neato_laser pc_map
-    PETIT_neato_laser: {sensor_frame: /petit_neato_link, data_type: LaserScan, topic: /PETIT/neato, marking: true, clearing: true, obstacle_range: 1.0}
+    observation_sources: PETIT_nav_laser pc_map
+    PETIT_nav_laser: {sensor_frame: /petit_laser_nav_link, data_type: LaserScan, topic: /PETIT/laser_nav2, marking: true, clearing: true, obstacle_range: 1.0}
     pc_map: {sensor_frame: /world, data_type: PointCloud, topic: /cloud, marking: true, clearing: false}
     track_unknown_space: false
 

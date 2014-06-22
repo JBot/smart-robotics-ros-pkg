@@ -39,8 +39,8 @@ class FireFinder {
 
 FireFinder::FireFinder()
 {
-    laser_opponent_sub_ = nh.subscribe < sensor_msgs::LaserScan > ("/PETIT/neato", 1, &FireFinder::laserOppCallback, this);
-    laser_opp_pub = nh.advertise < sensor_msgs::LaserScan > ("/PETIT/neato2", 5);
+    laser_opponent_sub_ = nh.subscribe < sensor_msgs::LaserScan > ("/PETIT/laser_nav", 1, &FireFinder::laserOppCallback, this);
+    laser_opp_pub = nh.advertise < sensor_msgs::LaserScan > ("/PETIT/laser_nav2", 5);
 }
 
 void FireFinder::laserOppCallback(const sensor_msgs::LaserScan::ConstPtr & laser)
@@ -48,7 +48,7 @@ void FireFinder::laserOppCallback(const sensor_msgs::LaserScan::ConstPtr & laser
 	save_opp_laser = *laser;
 	
 	int i = 0;
-	for(i = 336; i < 354; i++) {
+	for(i = 330; i < 354; i++) {
 		save_opp_laser.ranges[i] = 0.001;
 	}
 

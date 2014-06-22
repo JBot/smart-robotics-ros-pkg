@@ -41,8 +41,8 @@
 #define NB_STEP_SKIP	3//8
 #define MAX_DIST_SKIP	0.10//0.14
 
-#define MAX_SPEED_LIN	0.035 // 0.08
-#define MAX_SPEED_ANG	0.13 // 0.15
+#define MAX_SPEED_LIN	0.05//0.035 // 0.08
+#define MAX_SPEED_ANG	0.16//0.13 // 0.15
 
 
 class Pathwrapper {
