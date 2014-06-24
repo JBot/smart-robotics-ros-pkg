@@ -88,7 +88,7 @@ Pathwrapper::Pathwrapper()
 	nhp.getParam("base_name", base_name);
 
 	nhp.param<int>("nb_step_skip", NB_STEP_SKIP, 10);
-        nhp.param<double>("max_dist_skip", NB_DIST_SKIP, 0.20);
+        nhp.param<double>("max_dist_skip", MAX_DIST_SKIP, 0.20);
 
 	// Goal suscriber
 	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_test/goal", 20, &Pathwrapper::goalCallback, this);

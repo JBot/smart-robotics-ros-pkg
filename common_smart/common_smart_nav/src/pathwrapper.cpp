@@ -94,7 +94,7 @@ Pathwrapper::Pathwrapper()
 	nhp.getParam("base_name", base_name);
 	
 	nhp.param<int>("nb_step_skip", NB_STEP_SKIP, 3);
-	nhp.param<double>("max_dist_skip", NB_DIST_SKIP, 0.10);
+	nhp.param<double>("max_dist_skip", MAX_DIST_SKIP, 0.10);
 	nhp.param<double>("max_speed_ang", MAX_SPEED_ANG, 0.05);
 	nhp.param<double>("max_speed_lin", MAX_SPEED_LIN, 0.16);
 
