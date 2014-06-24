@@ -37,9 +37,6 @@
 
 #define BAUDRATE B115200
 
-#define NB_STEP_SKIP	10//8
-#define MAX_DIST_SKIP	0.20//0.14
-
 class Pathwrapper {
 	public:
 		Pathwrapper();
@@ -79,6 +76,8 @@ class Pathwrapper {
 		std::string map_name;
 		std::string base_name;
 
+		int NB_STEP_SKIP;
+                double MAX_DIST_SKIP;
 };
 
 Pathwrapper::Pathwrapper()
@@ -87,6 +86,9 @@ Pathwrapper::Pathwrapper()
 	ros::NodeHandle nhp("~");
 	nhp.getParam("map_name", map_name);
 	nhp.getParam("base_name", base_name);
+
+	nhp.param<int>("nb_step_skip", NB_STEP_SKIP, 10);
+        nhp.param<double>("max_dist_skip", NB_DIST_SKIP, 0.20);
 
 	// Goal suscriber
 	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_test/goal", 20, &Pathwrapper::goalCallback, this);
