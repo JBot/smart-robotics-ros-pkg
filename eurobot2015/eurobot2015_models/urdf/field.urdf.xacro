@@ -1,0 +1,541 @@
+<?xml version="1.0"?>
+
+<!-- XML namespaces -->
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro" 
+	   name="field2013">
+
+	<!--
+	<include filename="$(find pi_robot_description)/urdf/sensors/hokuyo_laser_gazebo.xacro" />
+	-->
+	
+	<xacro:macro name="cyan1">
+		<material name="cyan1">
+			<color rgba="0 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+
+	<xacro:macro name="cyan2">	
+		<material name="cyan2">
+	     <color rgba="0 0.7 0.7 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="cyan3">	
+		<material name="cyan3">
+	     <color rgba="0 0.5 0.5 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black">
+		<material name="black">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="black1">
+		<material name="black1">
+			<color rgba="0.2 0.2 0.2 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="yellow2">
+		<material name="yellow2">
+			<color rgba="0.8 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green1">
+		<material name="green1">
+			<color rgba="0 1 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green2">
+		<material name="green2">
+			<color rgba="0.1 0.8 0 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="green3">
+		<material name="green3">
+			<color rgba="0.1 0.5 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey1">
+		<material name="grey1">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey2">
+		<material name="grey2">
+			<color rgba="0.6 0.6 0.6 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="grey3">
+		<material name="grey3">
+			<color rgba="0.8 0.8 0.8 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="blue1">
+		<material name="blue1">
+			<color rgba="0 0 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12_color">
+		<material name="ax12_color">
+			<color rgba="0.1 0.1 0.1 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="bracket_color">
+		<material name="bracket_color">
+			<color rgba="0.9 0.9 0.9 1.0"/>
+		</material>
+	</xacro:macro>
+	
+	<xacro:macro name="ax12" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.5 0.32 0.38" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.5 0.32 0.38" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.055" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/FlatBlack" />
+	</xacro:macro>
+	
+	<xacro:macro name="bracket1" params="name xyz rpy">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="0.05 0.025 0.038" />
+				</geometry>
+				<material name="black1">
+					<color rgba="0.2 0.2 0.2 1.0"/>
+				</material>
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="0.05 0.025 0.038" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="0.02" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="Gazebo/WhiteEmissive" />
+	</xacro:macro>
+	
+	<xacro:macro name="my_box" params="name lwh xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<box size="${lwh}" />
+				</geometry>
+			    <xacro:insert_block name="rviz_color" />             
+             </visual>
+             <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<box size="${lwh}" />
+					</geometry>
+             </collision>
+             <xacro:default_inertial mass="${mass}" />   
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+	<xacro:macro name="my_cylinder" params="name l r xyz rpy mass material *rviz_color">
+		<link name="${name}">
+			<visual>	
+				<origin xyz="${xyz}" rpy="${rpy}" />
+				<geometry>
+					<cylinder length="${l}" radius="${r}" />
+				</geometry>
+            	<xacro:insert_block name="rviz_color" />
+            </visual>
+            <collision>
+				<origin xyz="${xyz}" rpy="${rpy}" />
+					<geometry>
+						<cylinder length="${l}" radius="${r}" />
+					</geometry>
+            </collision>
+            <xacro:default_inertial mass="${mass}" />
+        </link>
+        <xacro:default_gazebo name="${name}" material="${material}" />
+	</xacro:macro>
+
+    <xacro:macro name="default_inertial" params="mass">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                     iyy="0.001" iyz="0.0"
+                     izz="0.001" />                     
+			</inertial>
+    </xacro:macro>
+    
+    <xacro:macro name="default_gazebo" params="name material">
+ 		<gazebo reference="${name}">
+			<material>${material}</material>
+			<selfCollide>false</selfCollide>
+			<turnGravityOff>true</turnGravityOff>
+		</gazebo>
+    </xacro:macro>
+
+	<link name="world" />
+
+        <!-- ============================   Hearts   ============================ -->
+
+
+    <xacro:my_cylinder name="middle_heart" l="0.03" r="0.15" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="left_heart" l="0.03" r="0.3" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="right_heart" l="0.03" r="0.3" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <!-- ============================   Baskets   ============================ -->
+
+    <xacro:my_box name="RB_basket" lwh="0.700 0.170 0.044" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <xacro:my_box name="LB_basket" lwh="0.700 0.170 0.044" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <xacro:my_box name="RT_basket" lwh="0.700 0.130 0.07" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <xacro:my_box name="LT_basket" lwh="0.700 0.130 0.07" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <!-- ============================   Trees   ============================ -->
+
+    <xacro:my_cylinder name="tree1" l="0.32" r="0.025" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree1_top" l="0.01" r="0.15" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:green3 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree2" l="0.32" r="0.025" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree2_top" l="0.01" r="0.15" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:green3 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree3" l="0.32" r="0.025" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree3_top" l="0.01" r="0.15" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:green3 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree4" l="0.32" r="0.025" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="tree4_top" l="0.01" r="0.15" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:green3 />
+    </xacro:my_cylinder>
+
+
+    <!-- ============================   Interesting points   ============================ -->
+
+    <xacro:my_cylinder name="inter1" l="0.01" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="inter2" l="0.01" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="inter3" l="0.01" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="inter4" l="0.01" r="0.01" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+
+    <!-- ============================   Fruits   ============================ -->
+
+    <xacro:my_cylinder name="fruit1" l="0.044" r="0.012" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="fruit2" l="0.044" r="0.012" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="fruit3" l="0.044" r="0.012" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="fruit4" l="0.044" r="0.012" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="fruit5" l="0.044" r="0.012" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+    <xacro:my_cylinder name="fruit6" l="0.044" r="0.012" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+    <xacro:black1 />
+    </xacro:my_cylinder>
+
+
+
+
+
+    <!-- ============================   Border   ============================ -->
+
+    <xacro:my_box name="up_link" lwh="3.0 0.01 0.07" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <xacro:my_box name="down_link" lwh="3.0 0.01 0.07" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <xacro:my_box name="left_link" lwh="0.01 2.0 0.07" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+    <xacro:my_box name="right_link" lwh="0.01 2.0 0.07" xyz="0 0 0" rpy="0 0 0" mass="0.5" material="Gazebo/FlatBlack">
+    <xacro:grey1 />
+    </xacro:my_box>
+
+
+    <!-- =================== Joint Definitions ==================== -->
+
+    <!--
+    <joint name="base_world_link" type="continuous">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <axis xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <dynamics damping="0.05"/>
+    </joint>
+    -->
+
+    <joint name="middle_heart_joint" type="fixed">
+    <parent link="world" />
+    <child link="middle_heart" />
+    <origin xyz="0.0 0.95 0.015" rpy="0 0 0" />
+    </joint>
+
+    <joint name="right_heart_joint" type="fixed">
+    <parent link="world" />
+    <child link="right_heart" />
+    <origin xyz="1.5 0.0 0.015" rpy="0 0 0" />
+    </joint>
+
+    <joint name="left_heart_joint" type="fixed">
+    <parent link="world" />
+    <child link="left_heart" />
+    <origin xyz="-1.5 0.0 0.015" rpy="0 0 0" />
+    </joint>
+
+
+    <joint name="RB_basket_joint" type="fixed">
+    <parent link="world" />
+    <child link="RB_basket" />
+    <origin xyz="0.750 1.785 0.022" rpy="0 0 0" />
+    </joint>
+
+    <joint name="LB_basket_joint" type="fixed">
+    <parent link="world" />
+    <child link="LB_basket" />
+    <origin xyz="-0.750 1.785 0.022" rpy="0 0 0" />
+    </joint>
+
+    <joint name="RT_basket_joint" type="fixed">
+    <parent link="world" />
+    <child link="RT_basket" />
+    <origin xyz="0.750 1.935 0.035" rpy="0 0 0" />
+    </joint>
+
+    <joint name="LT_basket_joint" type="fixed">
+    <parent link="world" />
+    <child link="LT_basket" />
+    <origin xyz="-0.750 1.935 0.035" rpy="0 0 0" />
+    </joint>
+
+
+    <joint name="tree1_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree1" />
+    <origin xyz="1.5 0.7 0.16" rpy="0 0 0" />
+    </joint>
+    
+    <joint name="tree1_top_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree1_top" />
+    <origin xyz="1.5 0.7 0.325" rpy="0 0 0" />
+    </joint>
+
+    <joint name="tree2_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree2" />
+    <origin xyz="-1.5 0.7 0.16" rpy="0 0 0" />
+    </joint>
+
+    <joint name="tree2_top_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree2_top" />
+    <origin xyz="-1.5 0.7 0.325" rpy="0 0 0" />
+    </joint>
+
+    <joint name="tree3_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree3" />
+    <origin xyz="0.8 0.0 0.16" rpy="0 0 0" />
+    </joint>
+
+    <joint name="tree3_top_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree3_top" />
+    <origin xyz="0.8 0.0 0.325" rpy="0 0 0" />
+    </joint>
+
+    <joint name="tree4_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree4" />
+    <origin xyz="-0.8 0.0 0.16" rpy="0 0 0" />
+    </joint>
+
+    <joint name="tree4_top_joint" type="fixed">
+    <parent link="world" />
+    <child link="tree4_top" />
+    <origin xyz="-0.8 0.0 0.325" rpy="0 0 0" />
+    </joint>
+
+
+    <joint name="inter1_joint" type="fixed">
+    <parent link="world" />
+    <child link="inter1" />
+    <origin xyz="0.6 0.9 0.005" rpy="0 0 0" />
+    </joint>
+
+    <joint name="inter2_joint" type="fixed">
+    <parent link="world" />
+    <child link="inter2" />
+    <origin xyz="-0.6 0.9 0.005" rpy="0 0 0" />
+    </joint>
+
+    <joint name="inter3_joint" type="fixed">
+    <parent link="world" />
+    <child link="inter3" />
+    <origin xyz="1.1 0.9 0.005" rpy="0 0 0" />
+    </joint>
+
+    <joint name="inter4_joint" type="fixed">
+    <parent link="world" />
+    <child link="inter4" />
+    <origin xyz="-1.1 0.9 0.005" rpy="0 0 0" />
+    </joint>
+
+
+    <joint name="fruit1_joint" type="fixed">
+    <parent link="world" />
+    <child link="fruit1" />
+    <origin xyz="-1.5 0.580 0.158" rpy="0 0 0" />
+    </joint>
+
+    <joint name="fruit2_joint" type="fixed">
+    <parent link="world" />
+    <child link="fruit2" />
+    <origin xyz="-1.5 0.820 0.208" rpy="0 0 0" />
+    </joint>
+
+    <joint name="fruit3_joint" type="fixed">
+    <parent link="world" />
+    <child link="fruit3" />
+    <origin xyz="-1.396 0.640 0.208" rpy="0 0 0" />
+    </joint>
+
+    <joint name="fruit4_joint" type="fixed">
+    <parent link="world" />
+    <child link="fruit4" />
+    <origin xyz="-1.396 0.760 0.158" rpy="0 0 0" />
+    </joint>
+
+    <joint name="fruit5_joint" type="fixed">
+    <parent link="world" />
+    <child link="fruit5" />
+    <origin xyz="-1.604 0.640 0.158" rpy="0 0 0" />
+    </joint>
+
+    <joint name="fruit6_joint" type="fixed">
+    <parent link="world" />
+    <child link="fruit6" />
+    <origin xyz="-1.604 0.760 0.208" rpy="0 0 0" />
+    </joint>
+
+
+    <joint name="up_joint" type="fixed">
+    <parent link="world" />
+    <child link="up_link" />
+    <origin xyz="0.0 -0.005 0.035" rpy="0 0 0" />
+    </joint>
+
+    <joint name="down_joint" type="fixed">
+    <parent link="world" />
+    <child link="down_link" />
+    <origin xyz="0.0 2.005 0.035" rpy="0 0 0" />
+    </joint>
+
+    <joint name="left_joint" type="fixed">
+    <parent link="world" />
+    <child link="left_link" />
+    <origin xyz="-1.505 1.0 0.035" rpy="0 0 0" />
+    </joint>
+
+    <joint name="right_joint" type="fixed">
+    <parent link="world" />
+    <child link="right_link" />
+    <origin xyz="1.505 1.0 0.035" rpy="0 0 0" />
+    </joint>
+
+
+
+
+
+    <gazebo reference="field">
+    </gazebo>
+    </robot>
+

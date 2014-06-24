@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find eurobot2015_models)/launch/petit_model.launch">
+  </include>
+
+  <include file="$(find eurobot2015_models)/launch/field.launch">
+  </include>
+
+  <include file="$(find eurobot2015_petit_nav)/launch/sensors.launch">
+  </include>
+
+  <include file="$(find eurobot2015_petit_nav)/launch/hector.launch">
+  </include>
+
+
+
+
+
+
+</launch>
+

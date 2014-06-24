@@ -41,6 +41,9 @@
     <remap from="/scan" to="/PETIT/laser_nav" />
   </node>
 
+  <!-- FILTER LASER NODE -->
+  <node pkg="test_pcl" type="laser_test" name="Filter_laser" output="screen">
+  </node>
 
   <!-- Low level motor driver => RoboClaw -->
   <node pkg="eurobot2015_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">

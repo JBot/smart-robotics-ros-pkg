@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!-- Load the URDF/Xacro model of our robot -->
+    <param name="field_description" command="$(find xacro)/xacro.py '$(find eurobot2014_models)/urdf/field.urdf.xacro'" />
+
+    <!-- Publish the robot state -->
+    <node name="field_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <param name="publish_frequency" value="20.0"/>
+	<remap from="robot_description" to="field_description" />
+    </node>
+<!--
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find eurobot2014_models)/map2014.yaml">
+    </node>
+-->
+</launch>
+

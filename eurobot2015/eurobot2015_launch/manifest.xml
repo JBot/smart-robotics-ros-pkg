@@ -1,0 +1,15 @@
+<package>
+  <description brief="eurobot2015_launch">
+
+     eurobot2015_launch
+
+  </description>
+  <author>odroid</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/eurobot2015_launch</url>
+  <depend package="roscpp"/>
+
+</package>
+
+
