@@ -41,53 +41,73 @@ Servo servo14;
 Servo servo15;
 Servo servo16;
 
+int des_pos[16];
+int cur_pos[16];
+int max_speed[16];
+
 void servo1_cb( const std_msgs::UInt16& cmd_msg){
-  servo1.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[0] = cmd_msg.data;
+  //servo1.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo2_cb( const std_msgs::UInt16& cmd_msg){
-  servo2.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[1] = cmd_msg.data;
+  //servo2.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo3_cb( const std_msgs::UInt16& cmd_msg){
-  servo3.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[2] = cmd_msg.data;
+  //servo3.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo4_cb( const std_msgs::UInt16& cmd_msg){
-  servo4.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[3] = cmd_msg.data;
+  //servo4.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo5_cb( const std_msgs::UInt16& cmd_msg){
-  servo5.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[4] = cmd_msg.data;
+  //servo5.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo6_cb( const std_msgs::UInt16& cmd_msg){
-  servo6.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[5] = cmd_msg.data;
+  //servo6.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo7_cb( const std_msgs::UInt16& cmd_msg){
-  servo7.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[6] = cmd_msg.data;
+  //servo7.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo8_cb( const std_msgs::UInt16& cmd_msg){
-  servo8.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[7] = cmd_msg.data;
+  //servo8.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo9_cb( const std_msgs::UInt16& cmd_msg){
-  servo9.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[8] = cmd_msg.data;
+  //servo9.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo10_cb( const std_msgs::UInt16& cmd_msg){
-  servo10.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[9] = cmd_msg.data;
+  //servo10.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo11_cb( const std_msgs::UInt16& cmd_msg){
-  servo11.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[10] = cmd_msg.data;
+  //servo11.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo12_cb( const std_msgs::UInt16& cmd_msg){
-  servo12.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[11] = cmd_msg.data;
+  //servo12.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo13_cb( const std_msgs::UInt16& cmd_msg){
-  servo13.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[12] = cmd_msg.data;
+  //servo13.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo14_cb( const std_msgs::UInt16& cmd_msg){
-  servo14.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[13] = cmd_msg.data;
+  //servo14.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo15_cb( const std_msgs::UInt16& cmd_msg){
-  servo15.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[14] = cmd_msg.data;
+  //servo15.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 void servo16_cb( const std_msgs::UInt16& cmd_msg){
-  servo16.write(cmd_msg.data); //set servo angle, should be from 0-180  
+  des_pos[15] = cmd_msg.data;
+  //servo16.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 
 
@@ -108,7 +128,85 @@ ros::Subscriber<std_msgs::UInt16> sub14("servo14", servo14_cb);
 ros::Subscriber<std_msgs::UInt16> sub15("servo15", servo15_cb);
 ros::Subscriber<std_msgs::UInt16> sub16("servo16", servo16_cb);
 
+void servo_write(int servo, int value) {
+ switch(servo) {
+   case 0:
+     servo1.write(value);
+     break;
+   case 1:
+     servo2.write(value);
+     break; 
+   case 2:
+     servo3.write(value);
+     break; 
+   case 3:
+     servo4.write(value);
+     break; 
+   case 4:
+     servo5.write(value);
+     break; 
+   case 6:
+     servo7.write(value);
+     break; 
+   case 7:
+     servo8.write(value);
+     break; 
+   case 8:
+     servo9.write(value);
+     break; 
+   case 9:
+     servo10.write(value);
+     break; 
+   case 10:
+     servo11.write(value);
+     break; 
+   case 11:
+     servo12.write(value);
+     break; 
+   case 12:
+     servo13.write(value);
+     break; 
+   case 13:
+     servo14.write(value);
+     break; 
+   case 14:
+     servo15.write(value);
+     break; 
+   case 15:
+     servo16.write(value);
+     break; 
+ }
+}
+
+void update_servo(void) {
+  int i = 0;
+  for(i = 0;i<16;i++){
+    if(des_pos[i] != cur_pos[i]) {
+      if(cur_pos[i] < des_pos[i]) {
+        if( (des_pos[i]-cur_pos[i]) > max_speed[i])
+          cur_pos[i] = cur_pos[i] + max_speed[i];
+        else
+          cur_pos[i] = des_pos[i];
+      }
+      else {
+        if( (cur_pos[i]-des_pos[i]) > max_speed[i])
+          cur_pos[i] = cur_pos[i] - max_speed[i];
+        else
+          cur_pos[i] = des_pos[i];
+      }
+      servo_write(i, cur_pos[i]);
+    } 
+  } 
+}
+
 void setup(){
+  int i = 0;
+  for(i = 0;i<16;i++){
+    des_pos[i] = 90;
+    cur_pos[i] = 90;
+    max_speed[i] = 1;
+  }
+
   nh.initNode();
   nh.subscribe(sub1);
   nh.subscribe(sub2);
@@ -147,5 +245,6 @@ void setup(){
 
 void loop(){
   nh.spinOnce();
-  delay(1);
+  delay(20);
+  update_servo();
 }
