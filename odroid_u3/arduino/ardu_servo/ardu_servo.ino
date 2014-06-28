@@ -110,6 +110,12 @@ void servo16_cb( const std_msgs::UInt16& cmd_msg){
   //servo16.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
 
+void servospeed_cb( const std_msgs::UInt16& cmd_msg){
+  int i = 0;
+  for(i = 0;i<16;i++){
+    max_speed[i] = cmd_msg.data;
+  }
+}
 
 ros::Subscriber<std_msgs::UInt16> sub1("servo1", servo1_cb);
 ros::Subscriber<std_msgs::UInt16> sub2("servo2", servo2_cb);
@@ -127,6 +133,8 @@ ros::Subscriber<std_msgs::UInt16> sub13("servo13", servo13_cb);
 ros::Subscriber<std_msgs::UInt16> sub14("servo14", servo14_cb);
 ros::Subscriber<std_msgs::UInt16> sub15("servo15", servo15_cb);
 ros::Subscriber<std_msgs::UInt16> sub16("servo16", servo16_cb);
+
+ros::Subscriber<std_msgs::UInt16> subspeed("servo_speed", servospeed_cb);
 
 void servo_write(int servo, int value) {
  switch(servo) {
@@ -225,6 +233,8 @@ void setup(){
   nh.subscribe(sub15);
   nh.subscribe(sub16);
   
+  nh.subscribe(subspeed);
+  
   servo1.attach(2);
   servo2.attach(3);
   servo3.attach(4);
@@ -245,6 +255,6 @@ void setup(){
 
 void loop(){
   nh.spinOnce();
-  delay(20);
+  delay(30);
   update_servo();
 }
