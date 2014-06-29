@@ -1,11 +1,3 @@
 ROS packages repository of the association SMART (autonomouS Multi Application Robot Team) 
 
-rosmake maximus_position maximus_setup_tf neato_xv11_lds maximus_goals eurobot_obstacles
-
-roslaunch maximus_nav maximus_2dnav_neato.launch
-roslaunch maximus_nav move_base_map.launch
-
-roslaunch maximus_nav maximus_2dnav_neato_nomap.launch
-roslaunch maximus_nav mapping_maximus.launch
-roslaunch maximus_nav move_base_map_onlylds.launch
 
