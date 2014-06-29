@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="TEST_standard_servo" output="screen">
+    <param name="inverted" type="int" value="1" />
+    <param name="offset" type="int" value="-10" />
+
+        <remap from="/servo_in" to="/SeRvO_In" />
+        <remap from="/servo_out" to="/sErVo_OuT" />
+  </node>
+  
+</launch>

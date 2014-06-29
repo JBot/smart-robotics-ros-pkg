@@ -1,0 +1,23 @@
+<package>
+  <description brief="common_smart_drivers">
+
+     common_smart_drivers
+
+  </description>
+  <author>viki</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/common_smart_drivers</url>
+  <depend package="roscpp"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="actionlib"/>
+  <depend package="move_base"/>
+  <depend package="move_base_msgs"/>
+  <depend package="nav_msgs"/>
+
+</package>
+
+
