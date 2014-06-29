@@ -90,5 +90,56 @@
         <remap from="/odroid/gpio16" to="/PETIT/gpio16" />
   </node>
 
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="standard_servo1" output="screen">
+    	<param name="inverted" type="int" value="0" />
+    	<param name="offset" type="int" value="0" />
+
+        <remap from="/servo_in" to="/PETIT/ARM/servo1" />
+        <remap from="/servo_out" to="/PETIT/servo1" />
+  </node>
+
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="standard_servo2" output="screen">
+    	<param name="inverted" type="int" value="0" />
+    	<param name="offset" type="int" value="0" />
+
+        <remap from="/servo_in" to="/PETIT/ARM/servo2" />
+        <remap from="/servo_out" to="/PETIT/servo2" />
+  </node>
+
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="standard_servo3" output="screen">
+    	<param name="inverted" type="int" value="0" />
+    	<param name="offset" type="int" value="0" />
+
+        <remap from="/servo_in" to="/PETIT/ARM/servo3" />
+        <remap from="/servo_out" to="/PETIT/servo3" />
+  </node>
+
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="standard_servo4" output="screen">
+    	<param name="inverted" type="int" value="0" />
+    	<param name="offset" type="int" value="0" />
+
+        <remap from="/servo_in" to="/PETIT/ARM/servo4" />
+        <remap from="/servo_out" to="/PETIT/servo4" />
+  </node>
+
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="standard_servo5" output="screen">
+    	<param name="inverted" type="int" value="0" />
+    	<param name="offset" type="int" value="0" />
+
+        <remap from="/servo_in" to="/PETIT/ARM/servo5" />
+        <remap from="/servo_out" to="/PETIT/servo5" />
+  </node>
+
+  <node pkg="common_smart_drivers" type="standard_servo" respawn="false" name="standard_servo6" output="screen">
+    	<param name="inverted" type="int" value="0" />
+    	<param name="offset" type="int" value="0" />
+
+        <remap from="/servo_in" to="/PETIT/ARM/servo6" />
+        <remap from="/servo_out" to="/PETIT/servo6" />
+  </node>
+
+
+
+
 
 </launch>
