@@ -15,10 +15,8 @@
 
 #include "common_smart_nav/GetRobotPose.h"
 
-/* TO MODIFY */
-#include "ROBOT_ai/GetObjective.h"
-#include "ROBOT_ai/UpdatePriority.h"
-/*****END*****/
+#include "common_smart_ai/GetObjective.h"
+#include "common_smart_ai/UpdatePriority.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -66,10 +64,8 @@ class ObjectiveManager {
 
     private:
         double compute_distance(nav_msgs::Path path_to_compute);
-/* TO MODIFY */
-        bool getObjective(ROBOT_ai::GetObjective::Request  &req, ROBOT_ai::GetObjective::Response &res );
-        bool updateObjective(ROBOT_ai::UpdatePriority::Request  &req, ROBOT_ai::UpdatePriority::Response &res );
-/*****END*****/
+        bool getObjective(common_smart_ai::GetObjective::Request  &req, common_smart_ai::GetObjective::Response &res );
+        bool updateObjective(common_smart_ai::UpdatePriority::Request  &req, common_smart_ai::UpdatePriority::Response &res );
         void deletCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
         void fill_trees(void);
         void colorCallback(const std_msgs::Int32::ConstPtr & my_int);
@@ -175,11 +171,9 @@ void ObjectiveManager::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
 
 
 
-/* TO MODIFY */
-bool ObjectiveManager::getObjective(ROBOT_ai::GetObjective::Request  &req,
-        ROBOT_ai::GetObjective::Response &res )
+bool ObjectiveManager::getObjective(common_smart_ai::GetObjective::Request  &req,
+        common_smart_ai::GetObjective::Response &res )
 {
-/*****END*****/
     res.goal = best_objective;
     //res.sum = req.a + req.b;
     //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
@@ -187,10 +181,8 @@ bool ObjectiveManager::getObjective(ROBOT_ai::GetObjective::Request  &req,
     return true;
 }
 
-/* TO MODIFY */
-bool ObjectiveManager::updateObjective(ROBOT_ai::UpdatePriority::Request  &req, ROBOT_ai::UpdatePriority::Response &res )
+bool ObjectiveManager::updateObjective(common_smart_ai::UpdatePriority::Request  &req, common_smart_ai::UpdatePriority::Response &res )
 {
-/*****END*****/
 
     list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list;
     list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list2;

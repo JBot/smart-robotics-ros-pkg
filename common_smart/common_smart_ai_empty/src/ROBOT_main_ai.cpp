@@ -18,11 +18,9 @@
 
 #include "common_smart_nav/GetRobotPose.h"
 
-/* TO MODIFY */
-#include "ROBOT_ai/GetObjective.h"
-#include "ROBOT_ai/UpdatePriority.h"
+#include "common_smart_ai/GetObjective.h"
+#include "common_smart_ai/UpdatePriority.h"
 //#include "indomptable_vision/ImageResult.h"
-/*****END*****/
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -149,9 +147,9 @@ MainAI::MainAI()
 
     get_pose = nh.serviceClient<common_smart_nav::GetRobotPose>("/ROBOT/get_robot_pose");
 
-    get_objective = nh.serviceClient<ROBOT_ai::GetObjective>("/ROBOT/get_objective");
+    get_objective = nh.serviceClient<common_smart_ai::GetObjective>("/ROBOT/get_objective");
 
-    update_objective = nh.serviceClient<ROBOT_ai::UpdatePriority>("/ROBOT/update_priority");
+    update_objective = nh.serviceClient<common_smart_ai::UpdatePriority>("/ROBOT/update_priority");
 
     delet_pub = nh.advertise < geometry_msgs::PoseStamped > ("/ROBOT/delet_objective", 5);
 
@@ -278,11 +276,10 @@ void MainAI::main_loop(void)
     std_msgs::Int32 tmpaction;
     std_msgs::Empty tmprelease;
     common_smart_nav::GetRobotPose tmp_pose;
-/* TO MODIFY */
-    ROBOT_ai::GetObjective tmp_obj;
-    ROBOT_ai::UpdatePriority update_prio;
+
+    common_smart_ai::GetObjective tmp_obj;
+    common_smart_ai::UpdatePriority update_prio;
     //indomptable_vision::ImageResult tmp_img_res;
-/* TO MODIFY */
     
     tmppose.pose.position.x = 0;
     tmppose.pose.position.y = 0;

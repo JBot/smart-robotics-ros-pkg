@@ -1,0 +1,21 @@
+<package>
+  <description brief="common_smart_simulators">
+
+     common_smart_simulators
+
+  </description>
+  <author>viki</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/common_smart_simulators</url>
+  <depend package="roscpp"/>
+  <depend package="move_base"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+
+</package>
+
+
