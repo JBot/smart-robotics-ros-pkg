@@ -1,0 +1,22 @@
+<package>
+  <description brief="eurobot2015_petit_ai">
+
+     eurobot2015_petit_ai
+
+  </description>
+  <author>viki</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/eurobot2015_petit_ai</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="tf"/>
+  <depend package="nav_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="common_smart_ai"/>
+  <depend package="common_smart_nav"/>
+
+</package>
+
+
