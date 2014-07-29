@@ -110,21 +110,19 @@ void PoseSimulator::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & po
 	temp_pose.pose.orientation.y = pose->pose.orientation.y;
 	temp_pose.pose.orientation.z = pose->pose.orientation.z;
 	temp_pose.pose.orientation.w = pose->pose.orientation.w;
-	/*
-	   transform.setOrigin(tf::Vector3(pose->pose.position.x, pose->pose.position.y, 0.0));
-	   transform.setRotation(tf::Quaternion(pose->pose.orientation.x, pose->pose.orientation.y, pose->pose.orientation.z, pose->pose.orientation.w));
-	   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "/fake_map", "/petit_base_link"));
-	 */
 
+	// TO VERIFY
+	double tmp1 = 2.0*pose->pose.orientation.z*pose->pose.orientation.w;
+	double tmp2 = 2.0*pose->pose.orientation.x*pose->pose.orientation.z;
+	double tmp3 = 2.0*pose->pose.orientation.y*pose->pose.orientation.y;
+	double tmp4 = 2.0*pose->pose.orientation.z*pose->pose.orientation.z;
+
+	temp_heading = atan2(tmp1 - tmp2, 1.0 - tmp3 - tmp4);
 }
 
 void PoseSimulator::velCallback(const geometry_msgs::Twist::ConstPtr & pose)
 {
 	temp_twist = *pose;
-	/*
-	   temp_pose.pose.position.x = temp_pose.pose.position.x + pose->linear.x / 20;
-	   temp_pose.pose.position.y = temp_pose.pose.position.y + pose->linear.y / 20;
-	 */
 }
 
 
