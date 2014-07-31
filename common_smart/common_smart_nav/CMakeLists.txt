@@ -9,6 +9,10 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
+rosbuild_find_ros_package(actionlib_msgs)
+include(${actionlib_msgs_PACKAGE_PATH}/cmake/actionbuild.cmake)
+genaction()
+
 rosbuild_init()
 
 #set the default path for built executables to the "bin" directory
@@ -33,3 +37,5 @@ rosbuild_add_executable(pathwrapper src/pathwrapper.cpp)
 rosbuild_add_executable(arduino_pathwrapper src/arduino_pathwrapper.cpp)
 #rosbuild_add_executable(trajectory_wrapper src/trajectory_wrapper.cpp)
 rosbuild_add_executable(pathplanner src/pathplanner.cpp)
+
+rosbuild_add_executable(test_action_client src/test_action_client.cpp)

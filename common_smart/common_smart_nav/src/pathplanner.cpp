@@ -17,6 +17,7 @@
 #include "common_smart_nav/GetRobotPose.h"
 #include "common_smart_nav/GetPlan.h"
 #include "common_smart_nav/GetDistance.h"
+#include "common_smart_nav/move_robotAction.h"
 
 //#include <move_base/move_base.h>
 #include <nav_core/base_global_planner.h>
@@ -67,7 +68,7 @@
 
 class TrajectoryManager {
 	public:
-		TrajectoryManager(tf::TransformListener& tf);
+		TrajectoryManager(tf::TransformListener& tf, std::string name);
 		~TrajectoryManager();
 		void rotate(double heading, double attitude, double bank, geometry_msgs::PoseStamped * pose);
 		void recompute_path(void);
@@ -91,6 +92,7 @@ class TrajectoryManager {
 	private:
 		void goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
 		void goalActionCallback(void);
+		//void goalActionCallback(const common_smart_nav::move_robotGoalConstPtr &goal);
 		void pathDoneCallback(const std_msgs::Empty::ConstPtr & pose);
 		void computePathCallback(const std_msgs::Empty::ConstPtr & pose);
 		void pauseCallback(const std_msgs::Empty::ConstPtr & pose);
@@ -131,11 +133,17 @@ class TrajectoryManager {
 		//actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> as_;
 		//move_base_msgs::MoveBaseFeedback action_feedback_;
 
+		actionlib::SimpleActionServer<common_smart_nav::move_robotAction> as_;
+		common_smart_nav::move_robotFeedback action_feedback_;
+		common_smart_nav::move_robotResult action_result_;
+		int action_goal;
 
 };
 
-TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
-	//as_(nh, "test", false),
+TrajectoryManager::TrajectoryManager(tf::TransformListener& tf, std::string name):
+	//as_(nh, name, false),
+	//as_(nh, name, boost::bind(&TrajectoryManager::goalActionCallback, this, _1), false),
+	as_(nh, name, false),
 	tf_(tf)
 {
 
@@ -175,8 +183,18 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 
 
 	//register the goal and feeback callbacks
-    	//as_.registerGoalCallback(boost::bind(&TrajectoryManager::goalActionCallback, this));
+    	as_.registerGoalCallback(boost::bind(&TrajectoryManager::goalActionCallback, this));
 
+	action_goal = 0;
+	action_result_.result.header.frame_id = map_name;
+	action_result_.result.header.stamp = ros::Time();
+	action_result_.result.pose.position.x = 0.0;
+	action_result_.result.pose.position.y = 0.0;
+	action_result_.result.pose.position.z = 0.0;
+	action_result_.result.pose.orientation.x = 0.0;
+	action_result_.result.pose.orientation.y = 0.0;
+	action_result_.result.pose.orientation.z = 0.0;
+	action_result_.result.pose.orientation.w = 1.0;
 
 	//just an arbitrary point in space
 	current_pose.header.frame_id = map_name;
@@ -225,7 +243,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf):
 
 	planner_thread_ = new boost::thread(boost::bind(&TrajectoryManager::planThread, this));
 
-	//as_.start();
+	as_.start();
 
 
 }
@@ -354,7 +372,7 @@ bool TrajectoryManager::getPath(common_smart_nav::GetPlan::Request  &req,
 
 	res.plan = tmp_path;
 
-	//action_feedback_.base_position = current_pose;
+	//action_feedback_.feedback = current_pose;
 	//as_.publishFeedback(action_feedback_);
 
 	sem = 1;
@@ -422,6 +440,14 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 
 void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
 {
+
+	if( action_goal == 1 ) {
+		action_result_.result = current_pose;
+		as_.setSucceeded(action_result_);
+		action_goal = 0;
+        	ROS_INFO("END POSE (ACTION)");
+	}
+
 	//planner_costmap_->resetMaps();
 	//planner_costmap_->resetLayers();
 	//planner_costmap_->resetMapOutsideWindow(0.001, 0.001);
@@ -451,7 +477,7 @@ void TrajectoryManager::computePathCallback(const std_msgs::Empty::ConstPtr & po
 void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr & pose)
 {
 	final_pose = *pose;
-	ROS_ERROR("NEW POSE");
+	ROS_INFO("NEW POSE");
 
 	computePath();
 	publishPath();
@@ -459,10 +485,13 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
 	status = RUN;
 }
 
+//void TrajectoryManager::goalActionCallback(const common_smart_nav::move_robotGoalConstPtr &goal)
 void TrajectoryManager::goalActionCallback(void)
 {
-        //final_pose = as_.acceptNewGoal()->target_pose;
-        ROS_ERROR("NEW POSE");
+        final_pose = as_.acceptNewGoal()->goal;
+	//final_pose = goal->goal;
+	action_goal = 1;
+        ROS_INFO("NEW POSE (ACTION)");
 
         computePath();
         publishPath();
@@ -521,8 +550,10 @@ void TrajectoryManager::computePath(void)
 	my_path = tmp_path;
 	// unlock
 
-	//action_feedback_.base_position = current_pose;
-	//as_.publishFeedback(action_feedback_);
+	if( action_goal == 1 ) {
+		action_feedback_.feedback = current_pose;
+		as_.publishFeedback(action_feedback_);
+	}
 
 	sem = 1;
 
@@ -634,7 +665,7 @@ int main(int argc, char **argv)
 	 */
 	ros::init(argc, argv, "Trajectory_Manager");
 	tf::TransformListener listener(ros::Duration(10));
-	TrajectoryManager trajectorymanager(listener);
+	TrajectoryManager trajectorymanager(listener, ros::this_node::getName());
 
 	ros::spin();
 

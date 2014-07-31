@@ -262,7 +262,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 	if(pause == 0) {
-		ROS_ERROR("PAS EN PAUSE");
+		//ROS_ERROR("PAS EN PAUSE");
 
 		geometry_msgs::PoseStamped odom_pose;
 		odom_pose.header.frame_id = base_name;
