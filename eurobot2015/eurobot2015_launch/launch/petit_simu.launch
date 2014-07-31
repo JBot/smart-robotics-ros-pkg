@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- LASER NODE -->
+  <node pkg="common_smart_simulators" type="robot_pose_simulator" name="PETIT_simulator" output="screen">
+    <param name="map_name" value="/petit_map" />
+    <param name="base_name" value="/petit_base_link" />
+
+    <remap from="/ROBOT/pose" to="/PETIT/pose" />
+    <remap from="/ROBOT/cmd_vel" to="/PETIT/cmd_vel" />
+  </node>
+
+</launch>
