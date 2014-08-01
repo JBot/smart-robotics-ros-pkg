@@ -3,6 +3,24 @@
 <launch>
   <master auto="start"/>
 
+  <include file="$(find eurobot2015_models)/launch/petit_model.launch">
+  </include>
+
+  <include file="$(find eurobot2015_models)/launch/field.launch">
+  </include>
+
+  <include file="$(find eurobot2015_petit_nav)/launch/move_base.launch">
+  </include>
+
+  <!-- Static transform from world to the map of the PETIT robot -->
+  <node pkg="tf" type="static_transform_publisher" name="world2petit_broadcaster" args="0 0 0 0 0 0 /world /petit_map 100"/>
+
+  <!-- Map server for PETIT robot -->
+  <node pkg="map_server" type="map_server" respawn="false" name="PETIT_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
+        <param name="frame_id" type="str" value="/petit_map" />
+        <remap from="/map" to="/PETIT/map" />
+  </node>
+
   <!-- LASER NODE -->
   <node pkg="common_smart_simulators" type="robot_pose_simulator" name="PETIT_simulator" output="screen">
     <param name="map_name" value="/petit_map" />
