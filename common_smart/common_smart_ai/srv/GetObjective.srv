@@ -3,4 +3,5 @@
 ---
 
 geometry_msgs/PoseStamped goal
+std_msgs/Int32 type
 
