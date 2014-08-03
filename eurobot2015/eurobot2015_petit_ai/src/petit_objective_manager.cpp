@@ -64,7 +64,6 @@ class ObjectiveManager {
 
 
     private:
-        double compute_distance(nav_msgs::Path path_to_compute);
         bool getObjective(common_smart_ai::GetObjective::Request  &req, common_smart_ai::GetObjective::Response &res );
         bool updateObjective(common_smart_ai::UpdatePriority::Request  &req, common_smart_ai::UpdatePriority::Response &res );
         void deletCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
@@ -74,18 +73,23 @@ class ObjectiveManager {
         ros::NodeHandle nh;
 
         nav_msgs::Path my_path;
-        geometry_msgs::Pose2D final_pose;
 
-        geometry_msgs::PoseStamped best_objective;
+        pair<geometry_msgs::PoseStamped, uint32_t> best_objective; // First = goal position / Second = goal type
 
         //map<geometry_msgs::Pose2D, uint32_t> objectives;
-        list< pair<geometry_msgs::PoseStamped, uint32_t> > objectives;
+        list< pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t> > objectives;
 
         int color;
+	std::string map_name;
+
 };
 
 ObjectiveManager::ObjectiveManager()
 {
+    ros::NodeHandle nhp("~");
+
+    nhp.param<std::string>("map_name", map_name, "/map");
+
     color = 1;
 
 /* TO MODIFY */
@@ -112,48 +116,44 @@ ObjectiveManager::ObjectiveManager()
         my_path.poses.std::vector < geometry_msgs::PoseStamped >::pop_back();
     }
 
-    final_pose.x = 0.0;
-    final_pose.y = 0.14;
-    final_pose.theta = 0.0;
-
-    best_objective.header.frame_id = "/map";
-    best_objective.pose.position.x = 0.0;
-    best_objective.pose.position.y = 0.0;
-    best_objective.pose.position.z = 0.0;
-
-
-
-
-
+    best_objective.first.header.frame_id = map_name;
+    best_objective.first.pose.position.x = 0.0;
+    best_objective.first.pose.position.y = 0.0;
+    best_objective.first.pose.position.z = 0.0;
 
 }
 
 void ObjectiveManager::fill_trees(void)
 {   
 
-    geometry_msgs::PoseStamped tmp_obj;
-    tmp_obj.header.frame_id = "/map";
-    tmp_obj.pose.position.z = 0;
+    pair<geometry_msgs::PoseStamped, uint32_t> tmp_obj;
+    tmp_obj.first.header.frame_id = map_name;
+    tmp_obj.first.pose.position.z = 0;
+    tmp_obj.second = 1;
 
-    tmp_obj.pose.position.x = color*(1.500 - 0.600); // totem self
-    tmp_obj.pose.position.y = 1.000; 
-   // Priority : 20
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 60) );
+    tmp_obj.first.pose.position.x = color*(1.500 - 0.600); //
+    tmp_obj.first.pose.position.y = 1.000; 
+    tmp_obj.second = 1;
+   // Priority : 
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
 
-    tmp_obj.pose.position.x = color*(1.500 - 0.250); // release
-    tmp_obj.pose.position.y = 0.800;
-    // Priority : 1
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 30) ); // TO CHANGE
+    tmp_obj.first.pose.position.x = color*(1.500 - 0.250); //
+    tmp_obj.first.pose.position.y = 0.800;
+    tmp_obj.second = 2;
+    // Priority : 
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
 
-    tmp_obj.pose.position.x = color*(-1.500 + 0.640 + 0.477); // bottle
-    tmp_obj.pose.position.y = 1.700;
-    // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 25) );
+    tmp_obj.first.pose.position.x = color*(-1.500 + 0.640 + 0.477); // 
+    tmp_obj.first.pose.position.y = 1.700;
+    tmp_obj.second = 3;
+    // Priority : 
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
 
-    tmp_obj.pose.position.x = color*(0); // end
-    tmp_obj.pose.position.y = 1.700;
-    // Priority : 8
-    objectives.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_obj, 1) );
+    tmp_obj.first.pose.position.x = color*(0); // end
+    tmp_obj.first.pose.position.y = 1.700;
+    tmp_obj.second = 4;
+    // Priority : 
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
 
 
 }
@@ -175,26 +175,25 @@ void ObjectiveManager::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
 bool ObjectiveManager::getObjective(common_smart_ai::GetObjective::Request  &req,
         common_smart_ai::GetObjective::Response &res )
 {
-    res.goal = best_objective;
-    //res.sum = req.a + req.b;
-    //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-    //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+    std_msgs::Int32 tmp;
+    tmp.data = best_objective.second;
+    res.goal = best_objective.first;
+    res.type = tmp;
     return true;
 }
 
 bool ObjectiveManager::updateObjective(common_smart_ai::UpdatePriority::Request  &req, common_smart_ai::UpdatePriority::Response &res )
 {
-
-    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list;
-    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list2;
+    list< pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t> > tmp_list;
+    list< pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t> > tmp_list2;
 
     tmp_list = objectives;
 
     while (!tmp_list.empty()) {
 
-        if( (tmp_list.back().first.pose.position.x == req.goal.pose.position.x) && (tmp_list.back().first.pose.position.y == req.goal.pose.position.y) ) {
+        if( (tmp_list.back().first.first.pose.position.x == req.goal.pose.position.x) && (tmp_list.back().first.first.pose.position.y == req.goal.pose.position.y) ) {
 
-            tmp_list2.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_list.back().first, tmp_list.back().second + req.prio.data) );
+            tmp_list2.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_list.back().first, tmp_list.back().second + req.prio.data) );
         }
         else {
             tmp_list2.push_back(tmp_list.back());
@@ -204,23 +203,21 @@ bool ObjectiveManager::updateObjective(common_smart_ai::UpdatePriority::Request 
     }
 
     objectives = tmp_list2;
-
 }
 
 void ObjectiveManager::deletCallback(const geometry_msgs::PoseStamped::ConstPtr & pose) 
 {
-
-    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list;
-    list< pair<geometry_msgs::PoseStamped, uint32_t> > tmp_list2;
+    list< pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t> > tmp_list;
+    list< pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t> > tmp_list2;
 
     tmp_list = objectives;
 
     while (!tmp_list.empty()) {
 
-        if( (tmp_list.back().first.pose.position.x == pose->pose.position.x) && (tmp_list.back().first.pose.position.y == pose->pose.position.y) ) {
+        if( (tmp_list.back().first.first.pose.position.x == pose->pose.position.x) && (tmp_list.back().first.first.pose.position.y == pose->pose.position.y) ) {
 
-	        if( (tmp_list.back().first.pose.position.x == (color*(1.500 - 0.250)) ) && (tmp_list.back().first.pose.position.y == 0.800) ) {
-			tmp_list2.push_back( pair<geometry_msgs::PoseStamped, uint32_t>(tmp_list.back().first, 0) );
+	        if( (tmp_list.back().first.first.pose.position.x == (color*(1.500 - 0.250)) ) && (tmp_list.back().first.first.pose.position.y == 0.800) ) {
+			tmp_list2.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_list.back().first, 0) );
 		}
 
         }
@@ -234,7 +231,6 @@ void ObjectiveManager::deletCallback(const geometry_msgs::PoseStamped::ConstPtr 
     objectives = tmp_list2;
 
     ObjectiveManager::loop();
-
 }
 
 
@@ -257,35 +253,8 @@ void ObjectiveManager::rotate(double heading, double attitude, double bank, geom
     pose->pose.orientation.z = c1 * s2 * c3 - s1 * c2 * s3;
 }
 
-double ObjectiveManager::compute_distance(nav_msgs::Path path_to_compute) 
-{
-    double distance = 0;
-    geometry_msgs::Pose2D current_pose;
-
-    if ( !(path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ) {
-        current_pose.x = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-        current_pose.y = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-        path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::erase (path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-
-        while ( !(path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ) {
-            distance += sqrt( pow(current_pose.x - path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x, 2) + pow(current_pose.y - path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y, 2) );
-
-            current_pose.x = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.x;
-            current_pose.y = path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::front().pose.position.y;
-            path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::erase (path_to_compute.poses.std::vector<geometry_msgs::PoseStamped >::begin());
-
-        }
-
-    }
-    //ROS_ERROR("Distance : %f", distance);
-
-    return distance;
-
-}
-
 void ObjectiveManager::loop(void) 
 {
-
     double best_prio = 0;
     double current_prio = 0;
 
@@ -295,10 +264,10 @@ void ObjectiveManager::loop(void)
     common_smart_nav::GetDistance tmp_distance;
 
     //loop
-    for( list< pair<geometry_msgs::PoseStamped, uint32_t> >::iterator iter = objectives.begin(); iter != objectives.end(); iter++ ) {
+    for( list< pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t> >::iterator iter = objectives.begin(); iter != objectives.end(); iter++ ) {
         current_prio = 0;
 
-        tmp_distance.request.goal = iter->first;
+        tmp_distance.request.goal = iter->first.first;
         if (get_distance.call(tmp_distance))
         {
             current_prio = (3.0) / ((tmp_distance.response.distance.data));
@@ -321,63 +290,20 @@ void ObjectiveManager::loop(void)
 		ROS_ERROR("Failed to call service GetDistance");
 	}
 
-/*        if (get_pose.call(tmp_pose))
-        {  
-            //ROS_INFO("Sum: %ld", get_path.response.plan);
-            tmp_plan.request.start = tmp_pose.response.pose;
-        }
-        else
-        {
-            ROS_ERROR("Failed to call service GetRobotPose");
-        }
-
-
-        //ROS_ERROR("Prio : %d", iter->second);
-        //tmp_plan.request.start = 90;
-        tmp_plan.request.goal = iter->first;
-        tmp_plan.request.tolerance = 0.01;
-        if (get_path.call(tmp_plan))
-        {  
-            //ROS_INFO("Sum: %ld", get_path.response.plan);
-            //path_debug.publish(tmp_plan.response.plan);
-
-            // compute distance to goal 
-            current_prio = (3.0) / (ObjectiveManager::compute_distance(tmp_plan.response.plan));
-            if(current_prio < 10000000.0) {
-                // add it to the base priority
-		if((double)iter->second > 0.0)
-                	current_prio = current_prio + (double)iter->second;
-		else 
-			current_prio = 0.0;
-                //ROS_ERROR("Prio tot : %f", current_prio);
-                if(current_prio > best_prio) {
-                    best_prio = current_prio;
-                    best_objective = iter->first;
-                }
-            }
-
-        }
-        else
-        {
-            ROS_ERROR("Failed to call service GetPlan");
-        }
-*/
-
         //usleep(200000); // For debug purpose
     }
     // end loop
 
     // if no objective available, make random movements
     if(best_prio > 10000000.0) {
-        best_objective.pose.position.x = 0;
-        best_objective.pose.position.y = 0;
+        best_objective.first.pose.position.x = 0;
+        best_objective.first.pose.position.y = 0;
     }
 
     // For debug purpose
-    goal_debug.publish(best_objective);
+    goal_debug.publish(best_objective.first);
 
     //ROS_INFO("Trajectory manager : Goal sent.");
-
 
 }
 

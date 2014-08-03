@@ -14,6 +14,8 @@
   <depend package="tf"/>
   <depend package="nav_msgs"/>
   <depend package="geometry_msgs"/>
+  <depend package="smach"/>
+  <depend package="smach_ros"/>
   <depend package="common_smart_ai"/>
   <depend package="common_smart_nav"/>
 

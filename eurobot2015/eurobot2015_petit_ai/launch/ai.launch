@@ -5,6 +5,8 @@
 
   <!--  -->
   <node pkg="eurobot2015_petit_ai" type="petit_objective_manager" respawn="false" name="petit_objective_manager" output="screen">
+	<param name="map_name" type="str" value="/petit_map" />
+
         <remap from="/ROBOT/best_objective" to="/DEBUG/best_objective" />
         <remap from="/ROBOT/debug_path" to="/DEBUG/debug_path" />
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
