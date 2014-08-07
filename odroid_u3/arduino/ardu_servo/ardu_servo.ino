@@ -21,6 +21,7 @@
 #include <Servo.h> 
 #include <ros.h>
 #include <std_msgs/UInt16.h>
+#include <std_msgs/Float32.h>
 
 ros::NodeHandle  nh;
 
@@ -38,12 +39,13 @@ Servo servo11;
 Servo servo12;
 Servo servo13;
 Servo servo14;
-Servo servo15;
-Servo servo16;
 
-int des_pos[16];
-int cur_pos[16];
-int max_speed[16];
+int adc_value;
+int cpt_adc;
+
+int des_pos[14];
+int cur_pos[14];
+int max_speed[14];
 
 void servo1_cb( const std_msgs::UInt16& cmd_msg){
   des_pos[0] = cmd_msg.data;
@@ -101,18 +103,11 @@ void servo14_cb( const std_msgs::UInt16& cmd_msg){
   des_pos[13] = cmd_msg.data;
   //servo14.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
-void servo15_cb( const std_msgs::UInt16& cmd_msg){
-  des_pos[14] = cmd_msg.data;
-  //servo15.write(cmd_msg.data); //set servo angle, should be from 0-180  
-}
-void servo16_cb( const std_msgs::UInt16& cmd_msg){
-  des_pos[15] = cmd_msg.data;
-  //servo16.write(cmd_msg.data); //set servo angle, should be from 0-180  
-}
+
 
 void servospeed_cb( const std_msgs::UInt16& cmd_msg){
   int i = 0;
-  for(i = 0;i<16;i++){
+  for(i = 0;i<14;i++){
     max_speed[i] = cmd_msg.data;
   }
 }
@@ -131,10 +126,12 @@ ros::Subscriber<std_msgs::UInt16> sub11("servo11", servo11_cb);
 ros::Subscriber<std_msgs::UInt16> sub12("servo12", servo12_cb);
 ros::Subscriber<std_msgs::UInt16> sub13("servo13", servo13_cb);
 ros::Subscriber<std_msgs::UInt16> sub14("servo14", servo14_cb);
-ros::Subscriber<std_msgs::UInt16> sub15("servo15", servo15_cb);
-ros::Subscriber<std_msgs::UInt16> sub16("servo16", servo16_cb);
 
 ros::Subscriber<std_msgs::UInt16> subspeed("servo_speed", servospeed_cb);
+
+std_msgs::UInt16 adc_msg;
+ros::Publisher adc1("adc1", &adc_msg);
+ros::Publisher adc2("adc2", &adc_msg);
 
 void servo_write(int servo, int value) {
  switch(servo) {
@@ -177,18 +174,12 @@ void servo_write(int servo, int value) {
    case 13:
      servo14.write(value);
      break; 
-   case 14:
-     servo15.write(value);
-     break; 
-   case 15:
-     servo16.write(value);
-     break; 
  }
 }
 
 void update_servo(void) {
   int i = 0;
-  for(i = 0;i<16;i++){
+  for(i = 0;i<14;i++){
     if(des_pos[i] != cur_pos[i]) {
       if(cur_pos[i] < des_pos[i]) {
         if( (des_pos[i]-cur_pos[i]) > max_speed[i])
@@ -209,7 +200,7 @@ void update_servo(void) {
 
 void setup(){
   int i = 0;
-  for(i = 0;i<16;i++){
+  for(i = 0;i<14;i++){
     des_pos[i] = 90;
     cur_pos[i] = 90;
     max_speed[i] = 1;
@@ -230,10 +221,11 @@ void setup(){
   nh.subscribe(sub12);
   nh.subscribe(sub13);
   nh.subscribe(sub14);
-  nh.subscribe(sub15);
-  nh.subscribe(sub16);
   
   nh.subscribe(subspeed);
+  
+  nh.advertise(adc1);
+  nh.advertise(adc2);
   
   servo1.attach(2);
   servo2.attach(3);
@@ -249,12 +241,30 @@ void setup(){
   servo12.attach(13);
   servo13.attach(14);
   servo14.attach(15);
-  servo15.attach(16);
-  servo16.attach(17);
+  
+  cpt_adc = 0;
 }
 
 void loop(){
   nh.spinOnce();
   delay(30);
   update_servo();
+ 
+ if(cpt_adc > 30) {
+    adc_value = averageAnalog(4);
+    adc_msg.data = map(adc_value, 0, 1023, 0, 500);
+    adc1.publish(&adc_msg);
+    adc_value = averageAnalog(5);
+    adc_msg.data = map(adc_value, 0, 1023, 0, 500);
+    adc2.publish(&adc_msg);
+    cpt_adc = 0;
+ }
+ cpt_adc++;
+}
+
+//We average the analog reading to elminate some of the noise
+int averageAnalog(int pin){
+  int v=0;
+  for(int i=0; i<4; i++) v+= analogRead(pin);
+  return v/4;
 }
