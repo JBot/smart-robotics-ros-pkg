@@ -17,5 +17,12 @@
         <remap from="/GENERAL/color" to="/GENERAL/color" />
   </node>
 
+  <!--  -->
+  <node pkg="common_smart_ai" type="eurobot_timer_manager" respawn="false" name="petit_timer_manager" output="screen">
+        <remap from="/remain" to="/GENERAL/remain" />
+        <remap from="/start_match" to="/GENERAL/start" />
+        <remap from="/stop_match" to="/GENERAL/stop_match" />
+        <remap from="/pause_nav" to="/PETIT/pause_nav" />
+  </node>
   
 </launch>
