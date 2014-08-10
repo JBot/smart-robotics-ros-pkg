@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
-#include <common_smart_nav/move_robotAction.h>
+#include <move_base_msgs/MoveBaseAction.h>
 
 int main (int argc, char **argv)
 {
@@ -9,7 +9,7 @@ int main (int argc, char **argv)
 
   // create the action client
   // true causes the client to spin its own thread
-  actionlib::SimpleActionClient<common_smart_nav::move_robotAction> ac("PETIT_pathplanner", true);
+  actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> ac("PETIT_pathplanner", true);
 
   ROS_INFO("Waiting for action server to start.");
   // wait for the action server to start
@@ -17,16 +17,16 @@ int main (int argc, char **argv)
 
   ROS_INFO("Action server started, sending goal.");
   // send a goal to the action
-  common_smart_nav::move_robotGoal goal;
-  goal.goal.header.frame_id = "/petit_map"; 
-  goal.goal.header.stamp = ros::Time::now();
-  goal.goal.pose.position.x = 1.0;
-  goal.goal.pose.position.y = 1.0;
-  goal.goal.pose.position.z = 0.0;
-  goal.goal.pose.orientation.x = 0.0;
-  goal.goal.pose.orientation.y = 0.0;
-  goal.goal.pose.orientation.z = 0.0;
-  goal.goal.pose.orientation.w = 1.0;
+  move_base_msgs::MoveBaseGoal goal;
+  goal.target_pose.header.frame_id = "/petit_map"; 
+  goal.target_pose.header.stamp = ros::Time::now();
+  goal.target_pose.pose.position.x = 1.0;
+  goal.target_pose.pose.position.y = 1.0;
+  goal.target_pose.pose.position.z = 0.0;
+  goal.target_pose.pose.orientation.x = 0.0;
+  goal.target_pose.pose.orientation.y = 0.0;
+  goal.target_pose.pose.orientation.z = 0.0;
+  goal.target_pose.pose.orientation.w = 1.0;
   ac.sendGoal(goal);
 
   //wait for the action to return
