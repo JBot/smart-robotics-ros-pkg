@@ -133,9 +133,9 @@ class TrajectoryManager {
 		//actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> as_;
 		//move_base_msgs::MoveBaseFeedback action_feedback_;
 
-		actionlib::SimpleActionServer<common_smart_nav::move_robotAction> as_;
-		common_smart_nav::move_robotFeedback action_feedback_;
-		common_smart_nav::move_robotResult action_result_;
+		actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> as_;
+		move_base_msgs::MoveBaseFeedback action_feedback_;
+		move_base_msgs::MoveBaseResult action_result_;
 		int action_goal;
 
 };
@@ -168,7 +168,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf, std::string name
 
 	path_pub = nh.advertise < nav_msgs::Path > ("/ROBOT/plan", 5);
 
-	pathdone_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/path_done", 2, &TrajectoryManager::pathDoneCallback, this);
+	pathdone_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/path_done", 1, &TrajectoryManager::pathDoneCallback, this);
 	computepath_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/compute_path", 2, &TrajectoryManager::computePathCallback, this);
 	pause_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/pause", 2, &TrajectoryManager::pauseCallback, this);
 	resume_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/resume", 2, &TrajectoryManager::resumeCallback, this);
@@ -186,7 +186,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf, std::string name
     	as_.registerGoalCallback(boost::bind(&TrajectoryManager::goalActionCallback, this));
 
 	action_goal = 0;
-	action_result_.result.header.frame_id = map_name;
+	/*action_result_.result.header.frame_id = map_name;
 	action_result_.result.header.stamp = ros::Time();
 	action_result_.result.pose.position.x = 0.0;
 	action_result_.result.pose.position.y = 0.0;
@@ -195,7 +195,7 @@ TrajectoryManager::TrajectoryManager(tf::TransformListener& tf, std::string name
 	action_result_.result.pose.orientation.y = 0.0;
 	action_result_.result.pose.orientation.z = 0.0;
 	action_result_.result.pose.orientation.w = 1.0;
-
+*/
 	//just an arbitrary point in space
 	current_pose.header.frame_id = map_name;
 	current_pose.header.stamp = ros::Time();
@@ -440,9 +440,10 @@ bool TrajectoryManager::getDistance(common_smart_nav::GetDistance::Request  &req
 
 void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
 {
+	status = PAUSE;
 
 	if( action_goal == 1 ) {
-		action_result_.result = current_pose;
+		//action_result_.result = current_pose;
 		as_.setSucceeded(action_result_);
 		action_goal = 0;
         	ROS_INFO("END POSE (ACTION)");
@@ -451,7 +452,6 @@ void TrajectoryManager::pathDoneCallback(const std_msgs::Empty::ConstPtr & pose)
 	//planner_costmap_->resetMaps();
 	//planner_costmap_->resetLayers();
 	//planner_costmap_->resetMapOutsideWindow(0.001, 0.001);
-	status = PAUSE;
 }
 
 void TrajectoryManager::pauseCallback(const std_msgs::Empty::ConstPtr & pose)
@@ -488,7 +488,7 @@ void TrajectoryManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr 
 //void TrajectoryManager::goalActionCallback(const common_smart_nav::move_robotGoalConstPtr &goal)
 void TrajectoryManager::goalActionCallback(void)
 {
-        final_pose = as_.acceptNewGoal()->goal;
+        final_pose = as_.acceptNewGoal()->target_pose;
 	//final_pose = goal->goal;
 	action_goal = 1;
         ROS_INFO("NEW POSE (ACTION)");
@@ -551,7 +551,7 @@ void TrajectoryManager::computePath(void)
 	// unlock
 
 	if( action_goal == 1 ) {
-		action_feedback_.feedback = current_pose;
+		action_feedback_.base_position = current_pose;
 		as_.publishFeedback(action_feedback_);
 	}
 

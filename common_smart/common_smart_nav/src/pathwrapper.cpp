@@ -56,6 +56,7 @@ class Pathwrapper {
 		ros::Publisher cmd_vel_pub;
 
 		ros::Publisher pathdone_pub;
+		ros::Publisher pause_planner_pub;
 
 		ros::Subscriber pause_sub_;
 		ros::Subscriber resume_sub_;
@@ -109,6 +110,7 @@ Pathwrapper::Pathwrapper()
 
 
 	pathdone_pub = nh.advertise < std_msgs::Empty > ("/path_done", 5);
+	pause_planner_pub = nh.advertise < std_msgs::Empty > ("/pause_planner", 5);
 
 
 	pause_sub_ = nh.subscribe < std_msgs::Empty > ("/pause_nav", 2, &Pathwrapper::pauseCallback, this);
@@ -372,6 +374,10 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					}
 
 					if( (my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
+						
+						std_msgs::Empty empty_msg;
+						Pathwrapper::pause_planner_pub.publish(empty_msg);
+
 						usleep(100000);
 						int i = 0;
 						// Test if path is finished (i.e. robot is at his final pose)
