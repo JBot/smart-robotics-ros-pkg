@@ -141,10 +141,10 @@ DriveRoboClaw::DriveRoboClaw()
 
 	//write_RoboClaw_PID_M1(128, 16384, 65536, 32768, 44000);
 	//write_RoboClaw_PID_M2(128, 0x00004000, 0x00010000, 0x00008000, 44000);
-	write_RoboClaw_PID_M1(128, 70384, 170536, 100768, 120000); // 94000
-	write_RoboClaw_PID_M2(128, 70384, 170536, 100768, 120000);
+	write_RoboClaw_PID_M1(128, 90384, 170536, 100768, 80000); // 94000 // 120000
+	write_RoboClaw_PID_M2(128, 90384, 170536, 100768, 80000);
 
-	write_RoboClaw_PID_M1(129, 70384, 170536, 100768, 120000);
+	write_RoboClaw_PID_M1(129, 90384, 170536, 100768, 80000);
 
 }
 
@@ -197,8 +197,8 @@ void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 	   write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2/ratio * 12.85) ));
 	 */
 
-	write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 5000.0), -int32_t(speed_motor2 * 5000.0));
-	write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 5000.0));  
+	write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 3200.0), -int32_t(speed_motor2 * 3200.0));
+	write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 3200.0));  
 
 
 }

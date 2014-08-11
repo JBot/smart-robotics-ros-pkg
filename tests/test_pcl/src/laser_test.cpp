@@ -34,27 +34,36 @@ class FireFinder {
         ros::NodeHandle nh;
 
 	sensor_msgs::LaserScan save_opp_laser;
-
+	int cpt;
 };
 
 FireFinder::FireFinder()
 {
     laser_opponent_sub_ = nh.subscribe < sensor_msgs::LaserScan > ("/PETIT/laser_nav", 1, &FireFinder::laserOppCallback, this);
     laser_opp_pub = nh.advertise < sensor_msgs::LaserScan > ("/PETIT/laser_nav2", 5);
+
+    cpt = 0;
 }
 
 void FireFinder::laserOppCallback(const sensor_msgs::LaserScan::ConstPtr & laser)
 {
-	save_opp_laser = *laser;
-	
-	int i = 0;
-	for(i = 330; i < 354; i++) {
-		save_opp_laser.ranges[i] = 0.001;
+	if(cpt == 3) {
+		cpt = 0;
 	}
-
-	//std::cout << (save_opp_laser.ranges).size() << std::endl;
+	else {
+		save_opp_laser = *laser;
 	
-	laser_opp_pub.publish(save_opp_laser);
+		int i = 0;
+		for(i = 330/2; i < 354/2; i++) {
+			save_opp_laser.ranges[i] = 0.001;
+		}
+
+		//std::cout << (save_opp_laser.ranges).size() << std::endl;
+	
+		laser_opp_pub.publish(save_opp_laser);
+		
+		//cpt++;
+	}
 }
 
 

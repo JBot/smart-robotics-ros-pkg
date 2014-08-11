@@ -28,10 +28,10 @@
     <param name="map_name" type="str" value="petit_map" />
     <param name="base_name" type="str" value="petit_base_link" /> 
 
-    <param name="nb_step_skip" type="int" value="3" />
-    <param name="max_dist_skip" type="double" value="0.1" />
-    <param name="max_speed_ang" type="double" value="0.18" />
-    <param name="max_speed_lin" type="double" value="0.07" />
+    <param name="nb_step_skip" type="int" value="4" />
+    <param name="max_dist_skip" type="double" value="0.13" />
+    <param name="max_speed_ang" type="double" value="0.25" />
+    <param name="max_speed_lin" type="double" value="0.13" />
 
        <remap from="/ROBOT/plan" to="/PETIT/plan" />
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
