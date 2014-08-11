@@ -15,6 +15,11 @@
   <include file="$(find eurobot2015_petit_nav)/launch/hector.launch">
   </include>
 
+  <include file="$(find eurobot2015_petit_nav)/launch/move_base.launch">
+  </include>
+
+  <include file="$(find eurobot2015_petit_ai)/launch/ai.launch">
+  </include>
 
 
 

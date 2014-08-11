@@ -9,6 +9,12 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/eurobot2015_launch</url>
   <depend package="roscpp"/>
+  <depend package="common_smart_simulators"/>
+  <depend package="common_smart_drivers"/>
+  <depend package="eurobot_obstacles"/>
+  <depend package="odroid_u3"/>
+  <depend package="eurobot2015_petit_nav"/>
+  <depend package="eurobot2015_petit_ai"/>
 
 </package>
 
