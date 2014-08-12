@@ -569,33 +569,6 @@ void TrajectoryManager::planThread(void)
 	ros::Rate r(20);
 	while(nh.ok()) {
 
-
-		//boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
-		//boost::unique_lock< boost::shared_mutex > unlock(*(planner_costmap_->getCostmap()->getLock()));
-		//make sure we have a costmap for our planner
-/*		
-		costmap_2d::Costmap2D* pCostmap = planner_costmap_->getCostmap();
-		boost::unique_lock< boost::shared_mutex > lock(*(pCostmap->getLock()));
-		if(planner_costmap_ == NULL){
-			ROS_ERROR("move_base cannot make a plan for you because it doesn't have a costmap");
-			//return false;
-		}
-
-		tf::Stamped<tf::Pose> global_pose;
-		if(!planner_costmap_->getRobotPose(global_pose)){
-			ROS_ERROR("move_base cannot make a plan for you because it could not get the start pose of the robot");
-			//return false;
-		}
-
-		geometry_msgs::PoseStamped start;
-		//if the user does not specify a start pose, identified by an empty frame id, then use the robot's pose
-		//if(req.start.header.frame_id == "")
-		tf::poseStampedTFToMsg(global_pose, start);
-
-		//ROS_ERROR("PathPlanner : Compute current pose");
-		current_pose = start;
-*/
-
 		tf::Stamped<tf::Pose> global_pose;
 		geometry_msgs::PoseStamped start;
 		switch(status) {
@@ -631,10 +604,12 @@ void TrajectoryManager::planThread(void)
 					cpt = 0;
 					computePath();
 					publishPath();
-					//planner_costmap_->resetLayers();
 				}
-				else {
-				
+				if(cpt == 10) {
+					ROS_INFO("Trying to reset layers");
+					//planner_costmap_->resetLayers();
+					//planner_costmap_->getCostmap()->resetMaps();
+					planner_costmap_->getCostmap()->resetMap(0,0,200,200);
 				}
 				break;	
 			default:
