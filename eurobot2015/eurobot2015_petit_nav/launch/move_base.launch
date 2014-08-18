@@ -37,7 +37,7 @@
         <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
         <remap from="/resume_nav" to="/PETIT/resume_pathwrapper" />
-        <remap from="/pause_nav" to="/GLOBAL/stop" />
+        <remap from="/pause_nav" to="/PETIT/pause_pathwrapper" />
         <remap from="/path_done" to="/PETIT/path_done" />
         <remap from="/pause_planner" to="/PETIT/pause_planner" />
   </node>

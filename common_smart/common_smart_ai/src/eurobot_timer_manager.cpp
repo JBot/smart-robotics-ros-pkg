@@ -80,7 +80,7 @@ void TimerManager::main_loop(void)
             ROS_ERROR("Stop!");
         }
 
-	remain.data = 90 - (current_date.toSec() - starting_date.toSec());
+	remain.data = 20 - (current_date.toSec() - starting_date.toSec());
 	remain_pub.publish(remain);
 	
     }

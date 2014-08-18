@@ -129,6 +129,10 @@ void ObjectiveManager::fill_trees(void)
     pair<geometry_msgs::PoseStamped, uint32_t> tmp_obj;
     tmp_obj.first.header.frame_id = map_name;
     tmp_obj.first.pose.position.z = 0;
+    tmp_obj.first.pose.orientation.x = 0;
+    tmp_obj.first.pose.orientation.y = 0;
+    tmp_obj.first.pose.orientation.z = 0;
+    tmp_obj.first.pose.orientation.w = 1;
     tmp_obj.second = 1;
 
     tmp_obj.first.pose.position.x = color*(1.500 - 0.600); //
