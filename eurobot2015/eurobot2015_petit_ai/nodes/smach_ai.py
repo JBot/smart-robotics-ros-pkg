@@ -47,6 +47,17 @@ class Stop(State):
         rospy.loginfo("Shutting down the state machine")
         return 'succeeded'
 
+class Pause(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['succeeded','aborted','preempted'])
+        pass
+
+    def execute(self, userdata):
+        rospy.loginfo("Thinking...")
+        rospy.sleep(0.5)   
+        return 'succeeded'
+
+
 class PickWaypoint(State):
     def __init__(self):
         State.__init__(self, outcomes=['succeeded','aborted','preempted','action1','action2','action3','action4','action5','action6'], input_keys=['waypoints'], output_keys=['waypoint_out'])
@@ -109,6 +120,8 @@ class RemoveObjective(State):
 	waypoint = PoseStamped()
 	waypoint = userdata.waypoint_in
 	self.remove_objective.publish(waypoint)
+        rospy.loginfo("Thinking...")
+        rospy.sleep(0.5)   
 
 	return 'succeeded'
         
@@ -163,7 +176,7 @@ class Nav2Waypoint(State):
 
 class MoveForward(State):
     def __init__(self):
-        State.__init__(self, outcomes=['succeeded','aborted','preempted'])
+        State.__init__(self, outcomes=['succeeded','aborted','preempted'], input_keys=['speed','distance'])
 
         self.cmd_vel_pub = rospy.Publisher('/PETIT/cmd_vel', Twist)
         self.pause_pub = rospy.Publisher('/PETIT/pause_pathwrapper', Empty)
@@ -173,10 +186,37 @@ class MoveForward(State):
     def execute(self, userdata):
         rospy.loginfo("moving forward")
         self.pause_pub.publish(Empty())
+        rospy.sleep(0.1)   
 	tmp_twist = Twist()
-	tmp_twist.linear.x = 0.1
+	tmp_twist.linear.x = userdata.speed
         self.cmd_vel_pub.publish(tmp_twist)
-        rospy.sleep(1)   
+	tmp_time = abs(userdata.distance / userdata.speed)
+        rospy.sleep(tmp_time)
+	self.cmd_vel_pub.publish(Twist())   
+        rospy.sleep(0.1)   
+        self.resume_pub.publish(Empty())
+        return 'succeeded'
+
+class MoveSide(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['succeeded','aborted','preempted'], input_keys=['speed','distance'])
+
+        self.cmd_vel_pub = rospy.Publisher('/PETIT/cmd_vel', Twist)
+        self.pause_pub = rospy.Publisher('/PETIT/pause_pathwrapper', Empty)
+        self.resume_pub = rospy.Publisher('/PETIT/resume_pathwrapper', Empty)
+        pass
+
+    def execute(self, userdata):
+        rospy.loginfo("moving side")
+        self.pause_pub.publish(Empty())
+        rospy.sleep(0.1)
+        tmp_twist = Twist()
+        tmp_twist.linear.y = userdata.speed
+        self.cmd_vel_pub.publish(tmp_twist)
+        tmp_time = abs(userdata.distance / userdata.speed)
+        rospy.sleep(tmp_time)
+        self.cmd_vel_pub.publish(Twist())
+        rospy.sleep(0.1)
         self.resume_pub.publish(Empty())
         return 'succeeded'
 
@@ -227,19 +267,31 @@ class SMACHAI():
 
 	# State machine for Action1
         self.sm_action1 = StateMachine(outcomes=['succeeded','aborted','preempted'], input_keys=['waypoint_in'], output_keys=['waypoint_out'])
+	self.sm_action1.userdata.speed = 0.1;
+	self.sm_action1.userdata.distance = 1.0;
 
         with self.sm_action1:            
             StateMachine.add('NAV_WAYPOINT', Nav2Waypoint(),
+                             transitions={'succeeded':'FORWARD',
+                                          'aborted':'aborted'})
+            StateMachine.add('FORWARD', MoveForward(),
                              transitions={'succeeded':'succeeded',
                                           'aborted':'aborted'})
             
+            
 	# State machine for Action2
         self.sm_action2 = StateMachine(outcomes=['succeeded','aborted','preempted'], input_keys=['waypoint_in'], output_keys=['waypoint_out'])
+	self.sm_action2.userdata.speed = -0.1;
+	self.sm_action2.userdata.distance = 0.5;
 
         with self.sm_action2:
             StateMachine.add('NAV_WAYPOINT', Nav2Waypoint(),
+                             transitions={'succeeded':'SIDE',
+                                          'aborted':'aborted'})
+            StateMachine.add('SIDE', MoveSide(),
                              transitions={'succeeded':'succeeded',
                                           'aborted':'aborted'})
+            
 
 	# State machine for Action3
         self.sm_action3 = StateMachine(outcomes=['succeeded','aborted','preempted'], input_keys=['waypoint_in'], output_keys=['waypoint_out'])
