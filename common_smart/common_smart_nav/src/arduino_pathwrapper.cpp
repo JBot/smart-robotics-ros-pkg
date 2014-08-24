@@ -54,6 +54,7 @@ class Pathwrapper {
 		ros::Publisher arduGoal_pub;
 
 		ros::Publisher pathdone_pub;
+		ros::Publisher pause_planner_pub;
 
 		ros::Subscriber pause_sub_;
 		ros::Subscriber resume_sub_;
@@ -102,7 +103,7 @@ Pathwrapper::Pathwrapper()
 	arduGoal_pub = nh.advertise < geometry_msgs::Pose2D > ("/ROBOT/ardugoal", 1);
 
 	pathdone_pub = nh.advertise < std_msgs::Empty > ("/ROBOT/path_done", 50);
-
+	pause_planner_pub = nh.advertise < std_msgs::Empty > ("/pause_planner", 5);
 
 	pause_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/pause_nav", 20, &Pathwrapper::pauseCallback, this);
 	resume_sub_ = nh.subscribe < std_msgs::Empty > ("/ROBOT/resume_nav", 20, &Pathwrapper::resumeCallback, this);
@@ -313,6 +314,9 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 					}
 
 					if( (my_path.poses.std::vector<geometry_msgs::PoseStamped >::empty()) ){
+						std_msgs::Empty empty_msg;
+                                                Pathwrapper::pause_planner_pub.publish(empty_msg);
+
 						usleep(100000);
 						int i = 0;
 						double test = sqrt( pow(final_pose.x - base_pose.pose.position.x, 2) + pow(final_pose.y - base_pose.pose.position.y, 2));
