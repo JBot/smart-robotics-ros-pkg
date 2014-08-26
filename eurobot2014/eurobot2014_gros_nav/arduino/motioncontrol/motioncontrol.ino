@@ -76,10 +76,10 @@ void delay_ms(uint16_t millis)
 #define WAITING_BEGIN 		2
 #define ERROR 			3
 
-#define ALPHA_MAX_SPEED         13000//3000//13000 
+#define ALPHA_MAX_SPEED         8000//13000//3000//13000 
 #define ALPHA_MAX_ACCEL         800//300//800
 #define ALPHA_MAX_DECEL         1600//500//1600 
-#define DELTA_MAX_SPEED         23000//4000//23000  
+#define DELTA_MAX_SPEED         16000//23000//4000//23000  
 #define DELTA_MAX_ACCEL         1000//300//1000     
 #define DELTA_MAX_DECEL         2200//600//2200 
 
@@ -265,11 +265,6 @@ ros::NodeHandle nh;
 geometry_msgs::TransformStamped t;
 tf::TransformBroadcaster broadcaster;
 
-std_msgs::Float32 xspeed;
-std_msgs::Float32 tspeed;
-ros::Publisher pub_xspeed("/xspeed", &xspeed);
-ros::Publisher pub_tspeed("/tspeed", &tspeed);
-
 geometry_msgs::Pose2D goal;
 int goals_index = 0;
 
@@ -302,9 +297,6 @@ ros::Subscriber < geometry_msgs::Pose2D > pose_sub("indomptable_goal",
                                                    &positionCb);
 */
 
-//common_smart_nav::ArduGoal ardufeed;
-geometry_msgs::Pose2D ardufeed;
-ros::Publisher ack_position("ardugoal_in", &ardufeed);
 
 //////////////////
 // NEW POSITION //
@@ -326,13 +318,6 @@ void positionCb(const geometry_msgs::Pose2D & goal_msg)
     goto_xy(goal_msg.x, goal_msg.y);
     //last_goal = goal_msg.last;
     alpha_and_theta = 1;
-    
-    ardufeed.x = goal_msg.x;
-    ardufeed.y = goal_msg.y;
-    ardufeed.theta = goal_msg.theta;
-    //ardufeed.last = goal_msg.last;
-    
-    ack_position.publish(&ardufeed);
 }
 
 //ros::Subscriber < common_smart_nav::ArduGoal > pose_sub("ardugoal_out",
@@ -355,10 +340,6 @@ void messageCbSpeed(const geometry_msgs::Twist& msg) {
 ros::Subscriber<geometry_msgs::Twist> subspeed("cmd_vel", &messageCbSpeed);
 */
 
-std_msgs::Int32 val;
-ros::Publisher ack_a("alpha_feedback", &val);
-ros::Publisher ack_d("delta_feedback", &val);
-
 void messageCbalpha_ros(const std_msgs::Int32 & msg)
 {
 
@@ -376,8 +357,6 @@ void messageCbalpha_ros(const std_msgs::Int32 & msg)
     set_new_command(&bot_command_alpha, angletodo * RAD2DEG );
     //set_new_command(&bot_command_alpha, msg.data / 1000);
     //set_new_command(&bot_command_delta, 0);    
-    val.data = msg.data;
-    ack_a.publish(&val);
 
 }
 
@@ -395,18 +374,11 @@ void messageCbdelta_ros(const std_msgs::Int32 & msg)
     set_new_command(&bot_command_delta, dist );
     //set_new_command(&bot_command_alpha, msg.data / 1000);
     //set_new_command(&bot_command_delta, 0);    
-    if(fabs(dist) > 0.005) {
-      val.data = msg.data;
-      ack_d.publish(&val);
-    }
 
 }
 
 ros::Subscriber < std_msgs::Int32 > delta_ros("delta_ros", &messageCbdelta_ros);
 
-
-std_msgs::Int32 color_feedback;
-ros::Publisher ack_color("color_feedback", &color_feedback);
 
 void colorCb(const std_msgs::Int32 & msg)
 {
@@ -416,9 +388,6 @@ void colorCb(const std_msgs::Int32 & msg)
   else {
     color = -1;
   }
-  
-  color_feedback.data = msg.data;
-  ack_color.publish(&color_feedback);
 
 }
 
@@ -653,16 +622,12 @@ void setup()
     nh.initNode();
     broadcaster.init(nh);
 
-    nh.advertise(ack_position);
     nh.subscribe(pose_sub);
 //    nh.subscribe(subspeed);
     nh.subscribe(alpha_ros);
     nh.subscribe(delta_ros);
-    nh.advertise(ack_a);
-    nh.advertise(ack_d);
     
     nh.subscribe(ros_color);
-    nh.advertise(ack_color);
     
     nh.advertise(start_pub);
     
