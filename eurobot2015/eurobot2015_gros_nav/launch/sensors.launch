@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Static transform from world to the map of the PETIT robot -->
+  <node pkg="tf" type="static_transform_publisher" name="world2gros_broadcaster" args="0 0 0 0 0 0 /world /odom 10"/>
+
+  <!-- Map server for PETIT robot -->
+  <node pkg="map_server" type="map_server" respawn="false" name="GROS_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
+        <param name="frame_id" type="str" value="/odom" />
+        <remap from="/map" to="/GROS/map" />
+  </node>
+
+  <!-- Laser driver => Hokuyo -->
+<!--  <node pkg="hokuyo_node" type="hokuyo_node" name="GROS_laser_publisher" output="screen">
+    <param name="frame_id" value="nav_laser" />
+    <param name="min_ang" value="-2.086214" /> 
+    <param name="max_ang" value="2.092350" /> 
+
+    <remap from="/scan" to="/GROS/laser_nav" />
+  </node>
+ -->
+  <!-- Motion control arduino -->
+  <include file="$(find eurobot2015_gros_nav)/launch/motion_control.launch">
+  </include>
+ 
+  <!-- Pump and grip arduino -->
+<!--  <node pkg="rosserial_python" type="serial_node.py" respawn="false" name="GROS_rosserial_pump" output="screen" args="/dev/ttyPUMP">
+  </node>
+-->
+  <!-- Fixed obstacles -->
+  <node pkg="eurobot_obstacles" type="pc_eurobot2014_obstacles" respawn="false" name="eurobot2014_obstacles" output="screen">
+  </node>
+  
+</launch>

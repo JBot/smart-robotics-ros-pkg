@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Path planner / Costmap -->
+  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="GROS_pathplanner" output="screen">
+    <param name="costmap_name" type="str" value="GROS_costmap" />
+    <param name="planner_name" type="str" value="GROS_planner" />
+    <param name="map_name" type="str" value="odom" />
+
+    <rosparam file="$(find eurobot2015_gros_nav)/launch/nav_params.yaml" command="load" />
+
+        <remap from="/ROBOT/goal" to="/GROS/goal" />
+        <remap from="/ROBOT/plan" to="/GROS/plan" />
+        <remap from="/ROBOT/path_done" to="/GROS/path_done" />
+        <remap from="/ROBOT/compute_path" to="/GROS/compute_path" />
+        <remap from="/ROBOT/pause" to="/GROS/stop_planner" />
+        <remap from="/ROBOT/resume" to="/GROS/pause_planner" />
+
+        <remap from="/ROBOT/get_robot_pose" to="/GROS/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/GROS/get_distance" />
+        <remap from="/ROBOT/get_path" to="/GROS/get_path" />
+  </node>
+
+  <!-- Path wrapper = Path follower -->
+  <node pkg="common_smart_nav" type="arduino_pathwrapper" respawn="false" name="GROS_pathwrapper" output="screen">
+    <param name="map_name" type="str" value="odom" />
+    <param name="base_name" type="str" value="base_link" /> 
+
+    <param name="nb_step_skip" type="int" value="10" />
+    <param name="max_dist_skip" type="double" value="0.20" />
+
+       <remap from="/ROBOT/plan" to="/GROS/plan" />
+        <remap from="/ROBOT/get_robot_pose" to="/GROS/get_robot_pose" />
+        <remap from="/ROBOT/ardugoal" to="/GROS/ardugoal" />
+        <remap from="/ROBOT/resume_nav" to="/GROS/resume_pathwrapper" />
+        <remap from="/ROBOT/pause_nav" to="/GROS/pause_pathwrapper" />
+        <remap from="/ROBOT/path_done" to="/GROS/path_done" />
+        <remap from="/pause_planner" to="/GROS/pause_planner" />
+  </node>
+
+  
+</launch>
