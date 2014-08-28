@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "geometry_msgs/Pose.h"
+#include "geometry_msgs/Pose2D.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "nav_msgs/Path.h"
 #include <tf/transform_broadcaster.h>
@@ -33,12 +34,14 @@ class PoseSimulator {
 
 		// Set the position of the robot
 		ros::Subscriber pose_in_map_sub_;
+		ros::Subscriber pose_sub_;
 		// Set the position of the robot (velocity)
 		ros::Subscriber vel_sub_;
 
 
 	private:
 		void poseCallback(const geometry_msgs::PoseStamped::ConstPtr & pose);
+		void pose2DCallback(const geometry_msgs::Pose2D::ConstPtr & pose);
 		void velCallback(const geometry_msgs::Twist::ConstPtr & pose);
 		ros::NodeHandle nh;
 
@@ -62,7 +65,8 @@ PoseSimulator::PoseSimulator()
         //nhp.getParam("map_name", map_name);
 
 	// Set the position of the robot
-	pose_in_map_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/pose", 20, &PoseSimulator::poseCallback, this);
+	pose_in_map_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/ROBOT/startpose", 20, &PoseSimulator::poseCallback, this);
+	pose_sub_ = nh.subscribe < geometry_msgs::Pose2D > ("/ROBOT/pose", 20, &PoseSimulator::pose2DCallback, this);
 	// Set the position of the robot (velocity)
 	vel_sub_ = nh.subscribe < geometry_msgs::Twist > ("/ROBOT/cmd_vel", 20, &PoseSimulator::velCallback, this);
 
@@ -79,6 +83,7 @@ PoseSimulator::PoseSimulator()
 	temp_pose.pose.orientation.w = 1;
 
 	temp_heading = 0.0;
+
 
 }
 
@@ -119,6 +124,30 @@ void PoseSimulator::poseCallback(const geometry_msgs::PoseStamped::ConstPtr & po
 
 	temp_heading = atan2(tmp1 - tmp2, 1.0 - tmp3 - tmp4);
 }
+
+void PoseSimulator::pose2DCallback(const geometry_msgs::Pose2D::ConstPtr & pose)
+{
+
+
+        temp_pose.pose.position.x = pose->x;
+        temp_pose.pose.position.y = pose->y;
+
+	if(pose->theta > 9999) {
+	}
+	else {
+		rotate(0.0, pose->theta, 0.0, &temp_pose);
+
+        	temp_heading = pose->theta;
+	}
+
+	int i = 0;
+	while(i < 10) {
+		//ros::spinOnce();
+		usleep(50000);
+		i++;
+	}
+}
+
 
 void PoseSimulator::velCallback(const geometry_msgs::Twist::ConstPtr & pose)
 {
