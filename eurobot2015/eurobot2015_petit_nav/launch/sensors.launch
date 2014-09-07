@@ -13,6 +13,7 @@
 
   <!-- Fake odom from IMU -->
   <node pkg="eurobot2015_petit_nav" type="petit_odom" respawn="false" name="PETIT_fake_odom_IMU" output="screen">
+	<param name="use_imu" type="bool" value="true" />
   </node>
 
   <!-- Map server for PETIT robot -->
