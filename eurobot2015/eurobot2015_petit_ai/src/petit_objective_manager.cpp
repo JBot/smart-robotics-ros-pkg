@@ -129,35 +129,56 @@ void ObjectiveManager::fill_trees(void)
     pair<geometry_msgs::PoseStamped, uint32_t> tmp_obj;
     tmp_obj.first.header.frame_id = map_name;
     tmp_obj.first.pose.position.z = 0;
-    tmp_obj.first.pose.orientation.x = 0;
-    tmp_obj.first.pose.orientation.y = 0;
-    tmp_obj.first.pose.orientation.z = 0;
-    tmp_obj.first.pose.orientation.w = 1;
-    tmp_obj.second = 1;
+    tmp_obj.first.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+    tmp_obj.second = 1; // type of objective (1-6)
 
     tmp_obj.first.pose.position.x = color*(1.500 - 0.600); //
     tmp_obj.first.pose.position.y = 1.000; 
+    tmp_obj.first.pose.orientation = tf::createQuaternionMsgFromYaw(1.57);
     tmp_obj.second = 1;
    // Priority : 
     objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
 
     tmp_obj.first.pose.position.x = color*(1.500 - 0.250); //
     tmp_obj.first.pose.position.y = 0.800;
+    tmp_obj.first.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     tmp_obj.second = 2;
     // Priority : 
-    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 40) );
 
-    tmp_obj.first.pose.position.x = color*(-1.500 + 0.640 + 0.477); // 
-    tmp_obj.first.pose.position.y = 1.700;
+    tmp_obj.first.pose.position.x = color*(1.500 - 0.400); //
+    tmp_obj.first.pose.position.y = 0.400;
+    tmp_obj.first.pose.orientation = tf::createQuaternionMsgFromYaw(1.0);
     tmp_obj.second = 3;
     // Priority : 
-    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 40) );
+
+    tmp_obj.first.pose.position.x = color*(1.500 - 1.250); //
+    tmp_obj.first.pose.position.y = 1.300;
+    tmp_obj.first.pose.orientation = tf::createQuaternionMsgFromYaw(-1.0);
+    tmp_obj.second = 4;
+    // Priority : 
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 40) );
+
+
+
+    tmp_obj.first.pose.position.x = color*(-1.500 + 0.250); // 
+    tmp_obj.first.pose.position.y = 0.500;
+    tmp_obj.first.pose.orientation = tf::createQuaternionMsgFromYaw(-1.57);
+    tmp_obj.second = 3;
+    // Priority : 
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 20) );
+
+
+
+
+
 
     tmp_obj.first.pose.position.x = color*(0); // end
     tmp_obj.first.pose.position.y = 1.700;
-    tmp_obj.second = 4;
+    tmp_obj.second = 6;
     // Priority : 
-    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 60) );
+    objectives.push_back( pair<pair<geometry_msgs::PoseStamped, uint32_t>, uint32_t>(tmp_obj, 1) );
 
 
 }
