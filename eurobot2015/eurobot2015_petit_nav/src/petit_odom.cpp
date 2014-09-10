@@ -39,6 +39,7 @@ class OdomPose {
 
 		ros::Subscriber imu_sub;
 		ros::Subscriber cmd_vel_sub;
+		ros::Publisher odom_pub;
 
 		void broadcast(void);
 
@@ -47,6 +48,8 @@ class OdomPose {
 		void velCallback(const geometry_msgs::Twist::ConstPtr& vel);
 
 		ros::NodeHandle nh;
+
+		nav_msgs::Odometry my_odom;
 
 		tf::StampedTransform t;
 		tf::TransformBroadcaster broadcaster;
@@ -67,11 +70,32 @@ OdomPose::OdomPose()
 
 	ros::NodeHandle nhp("~");
 
-        nhp.param<bool>("use_imu", use_imu, false);
+	nhp.param<bool>("use_imu", use_imu, false);
 
 
 	imu_sub = nh.subscribe<geometry_msgs::Vector3Stamped>("imu/rpy", 5, &OdomPose::imuCallback, this);
 	cmd_vel_sub = nh.subscribe<geometry_msgs::Twist>("/PETIT/cmd_vel", 5, &OdomPose::velCallback, this);
+
+	odom_pub = nh.advertise < nav_msgs::Odometry > ("/PETIT/odom", 50);
+
+	my_odom.header.frame_id = "/petit_odom_link";
+	my_odom.child_frame_id = "/petit_base_link";
+	my_odom.header.stamp = ros::Time::now();
+
+	my_odom.pose.pose.position.x = 0;
+	my_odom.pose.pose.position.y = 0;
+	my_odom.pose.pose.position.z = 0;
+	my_odom.pose.pose.orientation.x = 0;
+	my_odom.pose.pose.orientation.y = 0;
+	my_odom.pose.pose.orientation.z = 0;
+	my_odom.pose.pose.orientation.w = 0;
+
+	my_odom.twist.twist.linear.x = 0;
+	my_odom.twist.twist.linear.y = 0;
+	my_odom.twist.twist.linear.z = 0;
+	my_odom.twist.twist.angular.x = 0;
+	my_odom.twist.twist.angular.y = 0;
+	my_odom.twist.twist.angular.z = 0;
 
 	usleep(5);
 	last_time = ros::Time::now();
@@ -80,6 +104,8 @@ OdomPose::OdomPose()
 	th = 0.0;
 	vth = 0.0;
 	yaw = 0.0;
+
+
 
 }
 
@@ -91,38 +117,38 @@ void OdomPose::imuCallback(const geometry_msgs::Vector3Stamped::ConstPtr& imu)
 		yaw = imu->vector.z;
 	}
 	/*t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(yaw), tf::Vector3(x, y, z)),
-			ros::Time::now(), "/petit_odom_link", "/petit_base_link");
+	  ros::Time::now(), "/petit_odom_link", "/petit_base_link");
 
-	t.stamp_ = ros::Time::now();
-	broadcaster.sendTransform(t);
-*/
+	  t.stamp_ = ros::Time::now();
+	  broadcaster.sendTransform(t);
+	 */
 }
 
 void OdomPose::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 {
 	current_time = ros::Time::now();
-//	double dt = (current_time - last_time).toSec();
+	//	double dt = (current_time - last_time).toSec();
 
 	vx = vel->linear.x;
 	vy = vel->linear.y;
 	vth = vel->angular.z;
-/*
-	double delta_x = (vel->linear.x * cos(yaw) - vel->linear.y * sin(yaw)) * dt;
-	double delta_y = (vel->linear.x * sin(yaw) + vel->linear.y * cos(yaw)) * dt;
-	double delta_th = vel->angular.z * dt;
+	/*
+	   double delta_x = (vel->linear.x * cos(yaw) - vel->linear.y * sin(yaw)) * dt;
+	   double delta_y = (vel->linear.x * sin(yaw) + vel->linear.y * cos(yaw)) * dt;
+	   double delta_th = vel->angular.z * dt;
 
-	x += delta_x;
-	y += delta_y;
-	th += delta_th;
+	   x += delta_x;
+	   y += delta_y;
+	   th += delta_th;
 
-	t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(yaw), tf::Vector3(x, y, z)),
-			ros::Time::now(), "/petit_odom_link", "/petit_base_link");
+	   t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(yaw), tf::Vector3(x, y, z)),
+	   ros::Time::now(), "/petit_odom_link", "/petit_base_link");
 
-	t.stamp_ = ros::Time::now();
-	broadcaster.sendTransform(t);
+	   t.stamp_ = ros::Time::now();
+	   broadcaster.sendTransform(t);
 
-	last_time = current_time;
-*/
+	   last_time = current_time;
+	 */
 }
 
 void OdomPose::broadcast(void)
@@ -138,7 +164,9 @@ void OdomPose::broadcast(void)
 		double delta_th = vth * dt;
 
 		if( use_imu ) {
-
+			vth = 0.0;
+			vth = (yaw - th) / dt;
+			th = yaw;
 		} 
 		else {
 			th += delta_th;
@@ -146,6 +174,23 @@ void OdomPose::broadcast(void)
 		}
 		x += delta_x;
 		y += delta_y;
+
+
+		my_odom.header.stamp = current_time;
+                my_odom.pose.pose.position.x = x;
+                my_odom.pose.pose.position.y = y;
+                my_odom.pose.pose.position.z = 0.0;
+                my_odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
+
+                my_odom.twist.twist.linear.x = vx;
+                my_odom.twist.twist.linear.y = vy;
+                my_odom.twist.twist.linear.z = 0.0;
+                my_odom.twist.twist.angular.x = 0.0;
+                my_odom.twist.twist.angular.y = 0.0;
+                my_odom.twist.twist.angular.z = vth;
+
+                odom_pub.publish(my_odom);
+
 
 		t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(yaw), tf::Vector3(x, y, z)),
 				ros::Time::now(), "/petit_odom_link", "/petit_base_link");
