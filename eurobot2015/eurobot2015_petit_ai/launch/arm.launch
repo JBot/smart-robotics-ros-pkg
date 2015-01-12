@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!--  -->
+  <node pkg="eurobot2015_petit_ai" type="petit_arm_manager" respawn="false" name="petit_arm_manager" output="screen">
+        <remap from="/ROBOT/ARM/servo1" to="/PETIT/ARM/servo1" />
+        <remap from="/ROBOT/ARM/servo2" to="/PETIT/ARM/servo2" />
+        <remap from="/ROBOT/ARM/servo3" to="/PETIT/ARM/servo3" />
+        <remap from="/ROBOT/ARM/servo4" to="/PETIT/ARM/servo4" />
+        <remap from="/ROBOT/ARM/servo5" to="/PETIT/ARM/servo5" />
+        <remap from="/ROBOT/ARM/servo6" to="/PETIT/ARM/servo6" />
+        <remap from="/ROBOT/ARM/servo7" to="/PETIT/ARM/servo8" />
+        <remap from="/ROBOT/ARM/servo8" to="/PETIT/ARM/servo9" />
+
+        <remap from="/ROBOT/ARM/servo_speed" to="/PETIT/ARM/servo_speed" />
+        <remap from="/ROBOT/ARM/enable_servo" to="/PETIT/ARM/enable_arm" />
+
+        <remap from="/ROBOT/ARM/set_side" to="/PETIT/ARM/set_side" />
+        <remap from="/ROBOT/ARM/grab" to="/PETIT/ARM/grab" />
+        <remap from="/ROBOT/ARM/release" to="/PETIT/ARM/release" />
+        <remap from="/ROBOT/ARM/collect" to="/PETIT/ARM/collect" />
+        <remap from="/ROBOT/ARM/climb" to="/PETIT/ARM/climb" />
+
+        <remap from="/GENERAL/color" to="/GENERAL/color" />
+        <remap from="/GENERAL/start" to="/GENERAL/start" />
+  </node>
+
+
+</launch>

@@ -21,6 +21,7 @@
 #include <Servo.h> 
 #include <ros.h>
 #include <std_msgs/UInt16.h>
+#include <std_msgs/Empty.h>
 #include <std_msgs/Float32.h>
 
 ros::NodeHandle  nh;
@@ -37,11 +38,11 @@ Servo servo9;
 Servo servo10;
 Servo servo11;
 Servo servo12;
-Servo servo13;
-Servo servo14;
 
 int adc_value;
 int cpt_adc;
+
+int servo_enabled;
 
 int des_pos[14];
 int cur_pos[14];
@@ -95,14 +96,6 @@ void servo12_cb( const std_msgs::UInt16& cmd_msg){
   des_pos[11] = cmd_msg.data;
   //servo12.write(cmd_msg.data); //set servo angle, should be from 0-180  
 }
-void servo13_cb( const std_msgs::UInt16& cmd_msg){
-  des_pos[12] = cmd_msg.data;
-  //servo13.write(cmd_msg.data); //set servo angle, should be from 0-180  
-}
-void servo14_cb( const std_msgs::UInt16& cmd_msg){
-  des_pos[13] = cmd_msg.data;
-  //servo14.write(cmd_msg.data); //set servo angle, should be from 0-180  
-}
 
 
 void servospeed_cb( const std_msgs::UInt16& cmd_msg){
@@ -110,6 +103,36 @@ void servospeed_cb( const std_msgs::UInt16& cmd_msg){
   for(i = 0;i<14;i++){
     max_speed[i] = cmd_msg.data;
   }
+}
+
+void enableservo_cb( const std_msgs::Empty& msg)
+{    
+  servo1.attach(2);
+  servo1.write(cur_pos[0]);
+  servo2.attach(3);
+  servo2.write(cur_pos[1]);
+  servo3.attach(4);
+  servo3.write(cur_pos[2]);
+  servo4.attach(5);
+  servo4.write(cur_pos[3]);
+  servo5.attach(6);
+  servo5.write(cur_pos[4]);
+  servo6.attach(7);
+  servo6.write(cur_pos[5]);
+  servo7.attach(8);
+  servo7.write(cur_pos[6]);
+  servo8.attach(9);
+  servo8.write(cur_pos[7]);
+  servo9.attach(10);
+  servo9.write(cur_pos[8]);
+  servo10.attach(11);
+  servo10.write(cur_pos[9]);
+  servo11.attach(12);
+  servo11.write(cur_pos[10]);
+  servo12.attach(13);
+  servo12.write(cur_pos[11]);
+  
+  servo_enabled = 1;
 }
 
 ros::Subscriber<std_msgs::UInt16> sub1("servo1", servo1_cb);
@@ -124,10 +147,10 @@ ros::Subscriber<std_msgs::UInt16> sub9("servo9", servo9_cb);
 ros::Subscriber<std_msgs::UInt16> sub10("servo10", servo10_cb);
 ros::Subscriber<std_msgs::UInt16> sub11("servo11", servo11_cb);
 ros::Subscriber<std_msgs::UInt16> sub12("servo12", servo12_cb);
-ros::Subscriber<std_msgs::UInt16> sub13("servo13", servo13_cb);
-ros::Subscriber<std_msgs::UInt16> sub14("servo14", servo14_cb);
 
 ros::Subscriber<std_msgs::UInt16> subspeed("servo_speed", servospeed_cb);
+
+ros::Subscriber<std_msgs::Empty> subenable("enable_servo", enableservo_cb);
 
 std_msgs::UInt16 adc_msg;
 ros::Publisher adc1("adc1", &adc_msg);
@@ -149,7 +172,10 @@ void servo_write(int servo, int value) {
      break; 
    case 4:
      servo5.write(value);
-     break; 
+     break;
+   case 5:
+     servo6.write(value);
+     break;  
    case 6:
      servo7.write(value);
      break; 
@@ -169,10 +195,10 @@ void servo_write(int servo, int value) {
      servo12.write(value);
      break; 
    case 12:
-     servo13.write(value);
+     //servo13.write(value);
      break; 
    case 13:
-     servo14.write(value);
+     //servo14.write(value);
      break; 
  }
 }
@@ -193,7 +219,10 @@ void update_servo(void) {
         else
           cur_pos[i] = des_pos[i];
       }
-      servo_write(i, cur_pos[i]);
+      if(servo_enabled == 1)
+      {
+        servo_write(i, cur_pos[i]);
+      }
     } 
   } 
 }
@@ -205,6 +234,8 @@ void setup(){
     cur_pos[i] = 90;
     max_speed[i] = 1;
   }
+
+  servo_enabled = 0;
 
   nh.initNode();
   nh.subscribe(sub1);
@@ -219,29 +250,14 @@ void setup(){
   nh.subscribe(sub10);
   nh.subscribe(sub11);
   nh.subscribe(sub12);
-  nh.subscribe(sub13);
-  nh.subscribe(sub14);
   
   nh.subscribe(subspeed);
+
+  nh.subscribe(subenable);
   
   nh.advertise(adc1);
   nh.advertise(adc2);
-  
-  servo1.attach(2);
-  servo2.attach(3);
-  servo3.attach(4);
-  servo4.attach(5);
-  servo5.attach(6);
-  servo6.attach(7);
-  servo7.attach(8);
-  servo8.attach(9);
-  servo9.attach(10);
-  servo10.attach(11);
-  servo11.attach(12);
-  servo12.attach(13);
-  servo13.attach(14);
-  servo14.attach(15);
-  
+
   cpt_adc = 0;
 }
 
@@ -249,7 +265,8 @@ void loop(){
   nh.spinOnce();
   delay(30);
   update_servo();
- 
+  
+  
  if(cpt_adc > 30) {
     adc_value = averageAnalog(4);
     adc_msg.data = map(adc_value, 0, 1023, 0, 500);

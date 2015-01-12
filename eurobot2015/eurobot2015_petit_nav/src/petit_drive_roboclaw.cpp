@@ -58,6 +58,10 @@ class DriveRoboClaw {
 		void write_RoboClaw_speed_M1M2(char addr, int32_t speedM1, int32_t speedM2);
 		void write_RoboClaw_speed_dist_M1M2(char addr, int32_t speedM1, int32_t distanceM1, int32_t speedM2, int32_t distanceM2);
 
+		double speed_motor1;
+		double speed_motor2;
+		double speed_motor3;
+		double speed_motor4;
 	private:
 		void velCallback(const geometry_msgs::Twist::ConstPtr& vel);
 		void compute_motor_speed(double x, double y, double z);
@@ -78,9 +82,6 @@ class DriveRoboClaw {
                 struct termios port_settings;      // structure to store the port settings in
 #endif
 
-		double speed_motor1;
-		double speed_motor2;
-		double speed_motor3;
 
 };
 
@@ -89,7 +90,7 @@ DriveRoboClaw::DriveRoboClaw()
 
 #ifdef USE_BOOST
 	port_="/dev/ttyUSB0";
-	baud_rate_=115200;
+	baud_rate_=38400;
 
     	try {
         	//boost::asio::serial_port serial_(io, port_);
@@ -136,6 +137,7 @@ DriveRoboClaw::DriveRoboClaw()
 	speed_motor1 = 0;
 	speed_motor2 = 0;
 	speed_motor3 = 0;
+	speed_motor4 = 0;
 
 	vel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 1, &DriveRoboClaw::velCallback, this);
 
@@ -145,73 +147,30 @@ DriveRoboClaw::DriveRoboClaw()
 	write_RoboClaw_PID_M2(128, 90384, 170536, 100768, 80000);
 
 	write_RoboClaw_PID_M1(129, 90384, 170536, 100768, 80000);
+	write_RoboClaw_PID_M2(129, 90384, 170536, 100768, 80000);
 
 }
 
 
 void DriveRoboClaw::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 {
-	compute_motor_speed(-vel->linear.x, vel->linear.y, vel->angular.z);
-	/*
-	   write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 20000), int32_t(speed_motor2 * 20000));
-	   write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 20000));  
-	 */
-
-	// TODO : brider la vitesse des moteurs
-	// TODO : SI un moteur va trop vite, prendre son ratio par rapport a vitesse max et l'appliquer aux autres moteurs
-
-	double ratio = 1.0;
-	/*
-	   if( fabs(speed_motor1) > fabs(speed_motor2) )
-	   {
-	   if( fabs(speed_motor1) > fabs(speed_motor3) )
-	   { // speed_motor1 is the biggest
-	   if( fabs(speed_motor1) > 63.0 )
-	   ratio = fabs(speed_motor1) / 63.0;
-	   }
-	   else // speed_motor3 is the biggest
-	   {
-	   if( fabs(speed_motor3) > 63.0 )
-	   ratio = fabs(speed_motor3) / 63.0;
-	   }
-	   }
-	   else
-	   {
-	   if( fabs(speed_motor2) > fabs(speed_motor3) )
-	   { // speed_motor2 is the biggest
-	   if( fabs(speed_motor2) > 63.0 )
-	   ratio = fabs(speed_motor2) / 63.0;
-
-	   }
-	   else // speed_motor3 is the biggest
-	   {
-	   if( fabs(speed_motor3) > 63.0 )
-	   ratio = fabs(speed_motor3) / 63.0;
-
-	   }
-	   }
-
-
-	   write_RoboClaw_drive_M1(128, int32_t( 64 + (-speed_motor1/ratio * 12.85) ));
-	   write_RoboClaw_drive_M2(128, int32_t( 64 + (-speed_motor3/ratio * 12.85) ));
-	   write_RoboClaw_drive_M1(129, int32_t( 64 + (-speed_motor2/ratio * 12.85) ));
-	 */
+	compute_motor_speed(vel->linear.x, vel->linear.y, vel->angular.z);
 
 	write_RoboClaw_speed_M1M2(128, int32_t(speed_motor1 * 3200.0), -int32_t(speed_motor2 * 3200.0));
-	write_RoboClaw_speed_M1(129, int32_t(speed_motor3 * 3200.0));  
-
-
+	write_RoboClaw_speed_M1M2(129, -int32_t(speed_motor3 * 3200.0), int32_t(speed_motor4 * 3200.0));
+	//write_RoboClaw_speed_M1M2(129, -int32_t(speed_motor3 * 3200.0), int32_t(speed_motor4 * 3200.0));
 }
 
 void DriveRoboClaw::compute_motor_speed(double x, double y, double z)
 {
+	//speed_motor1 = x * 6 - z * 3;
+	//speed_motor2 = x * 6 + z * 3;
+	speed_motor1 = x * 6 - y * 6 + z * 3;
+	speed_motor2 = x * 6 + y * 6 + z * 3;
+	speed_motor3 = x * 6 - y * 6 - z * 3;
+	speed_motor4 = x * 6 + y * 6 - z * 3;
 
-	speed_motor1 = (-sin(theta1) * x + cos(theta1) * y + R * z) / RAYON;
-	speed_motor2 = (-sin(theta2) * x + cos(theta2) * y + R * z) / RAYON;
-	speed_motor3 = (-sin(theta3) * x + cos(theta3) * y + R * z) / RAYON;
-
-	printf("speed_motor1 : %f speed_motor2 : %f speed_motor3 : %f \n", speed_motor1, speed_motor2, speed_motor3);
-
+	printf("speed_motor1 : %f speed_motor2 : %f speed_motor3 : %f speed_motor4 : %f \n", speed_motor1, speed_motor2, speed_motor3, speed_motor4);
 }
 
 /***********************/
