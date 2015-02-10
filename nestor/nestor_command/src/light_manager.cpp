@@ -126,12 +126,11 @@ int main(int argc, char **argv)
          * You must call one of the versions of ros::init() before using any other
          * part of the ROS system.
          */
-        ros::init(argc, argv, "Command_Manager");
-        commandManager command_manager;
+        ros::init(argc, argv, "Light_Manager");
+        lightManager light_manager;
         // Refresh rate
         ros::Rate loop_rate(20); /* 5 min */
         while (ros::ok()) {
-                //calendarcheck.check_calendar();
                 ros::spinOnce();
                 loop_rate.sleep();
         }
