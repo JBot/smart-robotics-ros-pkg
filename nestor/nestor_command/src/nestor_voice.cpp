@@ -55,7 +55,8 @@ void nestorVoice::frenchCallback(const std_msgs::String::ConstPtr & feedback)
 	//std::cout << feedback->data << std::endl;
 	//buff << feedback->data << std::endl;
         //sprintf(my_buff, "espeak -g 1 -v fr-mbrola-1 \" %s \"", buff);
-        sprintf(my_buff, "espeak -g 1 -v mb/mb-fr1 \" %s \"", buff);
+        //sprintf(my_buff, "espeak -g 1 -v mb/mb-fr1 \" %s \"", buff);
+        sprintf(my_buff, "pico2wave -l fr-FR -w a.wav \" %s \" && aplay a.wav", buff);
         std::cout << my_buff << std::endl;
         system(my_buff);
 
@@ -73,7 +74,8 @@ void nestorVoice::englishCallback(const std_msgs::String::ConstPtr & feedback)
 	//std::cout << feedback->data << std::endl;
         //buff << feedback->data << std::endl;
         //sprintf(my_buff, "espeak -g 1 -v us-mbrola-1 \" %s \"", buff);
-        sprintf(my_buff, "espeak -g 1 -v mb/mb-us2 \" %s \"", buff);
+        //sprintf(my_buff, "espeak -g 1 -v mb/mb-us2 \" %s \"", buff);
+        sprintf(my_buff, "pico2wave -l en-US -w a.wav \" %s \" && aplay a.wav", buff);
         std::cout << my_buff << std::endl;
         system(my_buff);
 

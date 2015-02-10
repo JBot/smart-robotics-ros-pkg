@@ -21,6 +21,7 @@ class nestorCalendar {
 		nestorCalendar();
 
 		ros::Publisher english_pub;
+		ros::Publisher french_pub;
 		ros::Publisher command_pub;
 
 		void check(void);
@@ -34,6 +35,7 @@ class nestorCalendar {
 nestorCalendar::nestorCalendar()
 {
 	english_pub = nh.advertise < std_msgs::String > ("/nestor/english_voice", 3);
+	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
 	command_pub = nh.advertise < std_msgs::Int32 > ("/nestor/command", 3);
 }
 
@@ -112,6 +114,7 @@ void nestorCalendar::check(void)
 							break;
 						default:
 							std::cout << "default" << std::endl;
+							command_pub.publish(command_tosend);
 							break;
 					}
 
@@ -123,7 +126,7 @@ void nestorCalendar::check(void)
 					std::cout << "" << str3 << std::endl;
 					// say something
 					to_send.data = str3;
-					english_pub.publish(to_send);
+					french_pub.publish(to_send);
 				}
 
 			}

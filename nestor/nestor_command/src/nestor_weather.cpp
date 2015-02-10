@@ -21,6 +21,7 @@ class nestorWeather {
         nestorWeather();
 
 	ros::Publisher english_pub;
+	ros::Publisher french_pub;
 
         ros::Subscriber weather_sub_;
 
@@ -37,6 +38,7 @@ class nestorWeather {
 nestorWeather::nestorWeather()
 {
 	english_pub = nh.advertise < std_msgs::String > ("/nestor/english_voice", 3);
+	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
 
 	weather_sub_ = nh.subscribe < std_msgs::Empty > ("/nestor/weather", 2, &nestorWeather::weatherCallback, this);
 }
@@ -76,14 +78,14 @@ void nestorWeather::weatherCallback(const std_msgs::Empty::ConstPtr & feedback)
 		std::cout << str1 << std::endl;
 		std::cout << str3 << std::endl;
 */
-		to_send.data = "Currently it is. ";
+		to_send.data = "En ce moment, le temps ai. ";
 		to_send.data += str1;
-		to_send.data += ". The temperature is around. ";
+		to_send.data += ". La température est d'environ. ";
 		to_send.data += str3;
-		to_send.data += ". degrees.";
+		to_send.data += ". degrés.";
 
 
-		english_pub.publish(to_send);
+		french_pub.publish(to_send);
   	}
 
   	/* close */
@@ -125,13 +127,16 @@ void nestorWeather::weatherCallback(const std_msgs::Empty::ConstPtr & feedback)
 			to_send.data += str1;
 			to_send.data += ". The temperature will be between. ";
 			to_send.data += str2;
-			to_send.data += " and. ";
+			to_send.data += ". and. ";
 			to_send.data += str3;
 			to_send.data += " degrees. ";
 			i++;
+			usleep(6000000);
+			english_pub.publish(to_send);
 		}
 		else { /* Tomorrow */
 
+			to_send.data = "";
                         to_send.data += "Tomorrow it is going to be. ";
                         std::string my_string = path;
 
@@ -148,16 +153,18 @@ void nestorWeather::weatherCallback(const std_msgs::Empty::ConstPtr & feedback)
                         to_send.data += str1;
                         to_send.data += ". The temperature will be between. ";
                         to_send.data += str2;
-                        to_send.data += " and. ";
+                        to_send.data += ". and. ";
                         to_send.data += str3;
                         to_send.data += " degrees. ";
 
+			usleep(6000000);
+			english_pub.publish(to_send);
 
 		}
         }
 
 	usleep(5000000);
-	english_pub.publish(to_send);
+	//english_pub.publish(to_send);
 
 
         /* close */

@@ -31,9 +31,9 @@
   </node>
 
   <!-- Low level motor driver => RoboClaw -->
-  <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
+<!--  <node pkg="eurobot2014_petit_nav" type="petit_drive_roboclaw" respawn="false" name="PETIT_RoboClawDriver" output="screen">
         <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
   </node>
-
+-->
   
 </launch>

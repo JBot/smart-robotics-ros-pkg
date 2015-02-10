@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="nestor_voice" respawn="false" name="NESTOR_voice" output="screen">
+  </node>
+
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="nestor_weather" respawn="false" name="NESTOR_weather" output="screen">
+  </node>
+  
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="nestor_radio" respawn="false" name="NESTOR_radio" output="screen">
+  </node>
+  
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="nestor_calendar" respawn="true" name="NESTOR_calendar" output="screen">
+  </node>
+
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="command_manager" respawn="false" name="NESTOR_command_manager" output="screen">
+  </node>
+
+
+
+</launch>

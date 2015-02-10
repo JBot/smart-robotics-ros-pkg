@@ -7,6 +7,8 @@
 #include <opencv2/highgui/highgui.hpp>
 //#include <rostweet_msgs/postTweet.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/String.h>
+#include <std_msgs/Empty.h>
 
 /* C includes */
 #include <stdio.h>
@@ -20,9 +22,14 @@
 #include <string>
 #include <list>
 
-#define STOP		0
-#define TAKE_PICTURE 	1
-#define SEND_MAP 	2
+#define STOP		10
+#define TAKE_PICTURE 	11
+#define SEND_MAP 	21
+
+#define WAKE_TIME 	0
+#define BED_TIME 	1
+#define WEATHER 	2
+#define LUNCH_TIME 	5
 
 
 
@@ -34,6 +41,9 @@ class commandManager {
         ros::Subscriber picture_sub_;
         ros::Subscriber map_sub_;
         //ros::Publisher command_pub;
+        
+	ros::Publisher french_pub;
+	ros::Publisher weather_pub;
 
 	ros::ServiceClient twit_client;
 
@@ -58,6 +68,8 @@ commandManager::commandManager()
 	picture_sub_ = nh.subscribe < sensor_msgs::Image > ("camera/rgb/image_rect_color", 5, &commandManager::pictureCallback, this);
 	map_sub_ = nh.subscribe < sensor_msgs::Image > ("map_image/full", 5, &commandManager::mapCallback, this);
 
+    	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
+    	weather_pub = nh.advertise < std_msgs::Empty > ("/nestor/weather", 3);
 
 	//twit_client = nh.serviceClient<rostweet_msgs::postTweet>("/rostweet/postTweet");
 
@@ -69,6 +81,8 @@ commandManager::commandManager()
 
 void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 {
+	std_msgs::String to_send;
+	std_msgs::Empty empty_to_send;
 	switch(feedback->data) {
 		case TAKE_PICTURE :
 			mode = TAKE_PICTURE;	
@@ -77,6 +91,30 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 		case SEND_MAP :
 			mode = SEND_MAP;	
 			ROS_INFO("Send map command.");		
+			break;
+		case WAKE_TIME :
+			mode = WAKE_TIME;	
+			system("/home/jbot/milight_sources/test.sh &");
+			to_send.data = "Il est l'heure de se lever. Debout les feignants.";
+                        french_pub.publish(to_send);
+			ROS_INFO("Send wake command.");		
+			break;
+		case BED_TIME :
+			mode = BED_TIME;	
+			to_send.data = "Il est l'heure d'aller dormir";
+                        french_pub.publish(to_send);
+			ROS_INFO("Send sleep command.");		
+			break;
+		case WEATHER :
+			mode = WEATHER;	
+                        weather_pub.publish(empty_to_send);
+			ROS_INFO("Send weather command.");		
+			break;
+		case LUNCH_TIME :
+			mode = LUNCH_TIME;	
+			to_send.data = "Il est l'heure de se mettre à table";
+                        french_pub.publish(to_send);
+			ROS_INFO("Send lunch command.");		
 			break;
 		default:
 			ROS_INFO("Unknown command.");
