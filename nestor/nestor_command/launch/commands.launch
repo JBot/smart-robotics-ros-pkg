@@ -23,6 +23,9 @@
   <node pkg="nestor_command" type="command_manager" respawn="false" name="NESTOR_command_manager" output="screen">
   </node>
 
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="light_manager" respawn="false" name="NESTOR_light_manager" output="screen">
+  </node>
 
 
 </launch>

@@ -26,6 +26,7 @@
 #define TAKE_PICTURE 	11
 #define SEND_MAP 	21
 
+#define NOTHING 	99
 #define WAKE_TIME 	0
 #define BED_TIME 	1
 #define WEATHER 	2
@@ -44,8 +45,18 @@ class commandManager {
         
 	ros::Publisher french_pub;
 	ros::Publisher weather_pub;
+	ros::Publisher light1ON_pub;
+	ros::Publisher light2ON_pub;
+	ros::Publisher light3ON_pub;
+	ros::Publisher light4ON_pub;
+	ros::Publisher light1OFF_pub;
+	ros::Publisher light2OFF_pub;
+	ros::Publisher light3OFF_pub;
+	ros::Publisher light4OFF_pub;
 
 	ros::ServiceClient twit_client;
+
+	void loop(void);
 
     private:
 	void commandCallback(const std_msgs::Int32::ConstPtr & feedback);
@@ -54,6 +65,8 @@ class commandManager {
         ros::NodeHandle nh;
 
 	int mode;
+
+	ros::Time starting_time;
 };
 
 
@@ -70,12 +83,20 @@ commandManager::commandManager()
 
     	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
     	weather_pub = nh.advertise < std_msgs::Empty > ("/nestor/weather", 3);
+    	light1ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light1ON", 3);
+    	light2ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light2ON", 3);
+    	light3ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light3ON", 3);
+    	light4ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light4ON", 3);
+    	light1OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light1OFF", 3);
+    	light2OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light2OFF", 3);
+    	light3OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light3OFF", 3);
+    	light4OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light4OFF", 3);
 
 	//twit_client = nh.serviceClient<rostweet_msgs::postTweet>("/rostweet/postTweet");
 
 	mode = 0;
 
-
+	starting_time = ros::Time::now();
 
 }
 
@@ -85,33 +106,35 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 	std_msgs::Empty empty_to_send;
 	switch(feedback->data) {
 		case TAKE_PICTURE :
-			mode = TAKE_PICTURE;	
+			//mode = TAKE_PICTURE;	
 			ROS_INFO("Take picture command.");		
 			break;
 		case SEND_MAP :
-			mode = SEND_MAP;	
+			//mode = SEND_MAP;	
 			ROS_INFO("Send map command.");		
 			break;
 		case WAKE_TIME :
+			starting_time = ros::Time::now();
 			mode = WAKE_TIME;	
 			system("/home/jbot/milight_sources/test.sh &");
-			to_send.data = "Il est l'heure de se lever. Debout les feignants.";
-                        french_pub.publish(to_send);
 			ROS_INFO("Send wake command.");		
 			break;
 		case BED_TIME :
+			starting_time = ros::Time::now();
 			mode = BED_TIME;	
 			to_send.data = "Il est l'heure d'aller dormir";
                         french_pub.publish(to_send);
+			light1ON_pub.publish(empty_to_send);
+			light3ON_pub.publish(empty_to_send);
 			ROS_INFO("Send sleep command.");		
 			break;
 		case WEATHER :
-			mode = WEATHER;	
+			//mode = WEATHER;	
                         weather_pub.publish(empty_to_send);
 			ROS_INFO("Send weather command.");		
 			break;
 		case LUNCH_TIME :
-			mode = LUNCH_TIME;	
+			//mode = LUNCH_TIME;	
 			to_send.data = "Il est l'heure de se mettre à table";
                         french_pub.publish(to_send);
 			ROS_INFO("Send lunch command.");		
@@ -123,6 +146,54 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 
 
 }
+
+void commandManager::loop(void)
+{
+
+	std_msgs::String to_send;
+	std_msgs::Empty empty_to_send;
+
+	switch(mode) {
+                case TAKE_PICTURE :
+                        break;
+                case SEND_MAP :
+                        break;
+                case WAKE_TIME :
+			if( (ros::Time::now() - starting_time).toSec() < 120)
+			{
+			}
+			else
+			{
+				light2ON_pub.publish(empty_to_send);
+                        	to_send.data = "Il est l'heure de se lever. Debout les feignants.";
+                        	french_pub.publish(to_send);
+				mode = NOTHING;
+			}
+                        break;
+                case BED_TIME :
+			if( (ros::Time::now() - starting_time).toSec() < (60*30))
+                        {
+                        } 
+                        else
+                        {	
+				light1OFF_pub.publish(empty_to_send);
+				light2OFF_pub.publish(empty_to_send);
+				light3OFF_pub.publish(empty_to_send);
+				light4OFF_pub.publish(empty_to_send);
+				mode = NOTHING;
+			}
+                        break;
+                case WEATHER :
+                        break;
+                case LUNCH_TIME :
+                        break;
+                default:
+                        break;
+        }
+
+
+}
+
 
 void commandManager::pictureCallback(const sensor_msgs::Image::ConstPtr & feedback)
 {
@@ -190,8 +261,9 @@ int main(int argc, char **argv)
         commandManager command_manager;
         // Refresh rate
         ros::Rate loop_rate(20); /* 5 min */
-        while (ros::ok()) {
-                //calendarcheck.check_calendar();
+        while (ros::ok()) 
+	{
+                command_manager.loop();
                 ros::spinOnce();
                 loop_rate.sleep();
         }
