@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find nestor_models)/launch/nestor_model.launch">
+  </include>
+
+  <include file="$(find nestor_navigation)/launch/nestor_nav_sensors.launch">
+  </include>
+
+  <include file="$(find nestor_navigation)/launch/nestor_move_base.launch">
+  </include>
+
+  <include file="$(find nestor_command)/launch/commands.launch">
+  </include>
+
+
+
+
+
+</launch>
+

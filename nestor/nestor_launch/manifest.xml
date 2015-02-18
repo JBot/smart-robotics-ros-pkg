@@ -1,0 +1,19 @@
+<package>
+  <description brief="nestor_launch">
+
+     nestor_launch
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nestor_launch</url>
+  <depend package="roscpp"/>
+  <depend package="nestor_arm"/>
+  <depend package="nestor_command"/>
+  <depend package="nestor_model"/>
+  <depend package="nestor_navigation"/>
+
+</package>
+
+

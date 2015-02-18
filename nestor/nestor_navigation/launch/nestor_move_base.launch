@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Path planner / Costmap -->
+  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="NESTOR_pathplanner" output="screen">
+    <param name="costmap_name" type="str" value="NESTOR_costmap" />
+    <param name="planner_name" type="str" value="NESTOR_planner" />
+    <param name="map_name" type="str" value="map" />
+
+    <rosparam file="$(find nestor_navigation)/launch/nav_params.yaml" command="load" />
+
+        <remap from="/ROBOT/goal" to="/NESTOR/goal" />
+        <remap from="/ROBOT/plan" to="/NESTOR/plan" />
+        <remap from="/ROBOT/path_done" to="/NESTOR/path_done" />
+        <remap from="/ROBOT/compute_path" to="/NESTOR/compute_path" />
+        <remap from="/ROBOT/pause" to="/NESTOR/stop_planner" />
+        <remap from="/ROBOT/resume" to="/NESTOR/pause_planner" />
+
+        <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/NESTOR/get_distance" />
+        <remap from="/ROBOT/get_path" to="/NESTOR/get_path" />
+  </node>
+
+  <!-- Path wrapper = Path follower -->
+  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="NESTOR_pathwrapper" output="screen">
+    <param name="map_name" type="str" value="map" />
+    <param name="base_name" type="str" value="odom" /> 
+
+    <param name="nb_step_skip" type="int" value="4" />
+    <param name="max_dist_skip" type="double" value="0.13" />
+    <param name="max_speed_ang" type="double" value="0.25" />
+    <param name="max_speed_lin" type="double" value="0.13" />
+
+       <remap from="/ROBOT/plan" to="/NESTOR/plan" />
+        <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
+        <remap from="/cmd_vel" to="/NESTOR/cmd_vel" />
+        <remap from="/resume_nav" to="/NESTOR/resume_pathwrapper" />
+        <remap from="/pause_nav" to="/NESTOR/pause_pathwrapper" />
+        <remap from="/path_done" to="/NESTOR/path_done" />
+        <remap from="/pause_planner" to="/NESTOR/pause_planner" />
+  </node>
+
+  
+</launch>

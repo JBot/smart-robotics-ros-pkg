@@ -94,7 +94,7 @@ commandManager::commandManager()
 
 	//twit_client = nh.serviceClient<rostweet_msgs::postTweet>("/rostweet/postTweet");
 
-	mode = 0;
+	mode = NOTHING;
 
 	starting_time = ros::Time::now();
 
@@ -114,19 +114,31 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 			ROS_INFO("Send map command.");		
 			break;
 		case WAKE_TIME :
-			starting_time = ros::Time::now();
-			mode = WAKE_TIME;	
-			system("/home/jbot/milight_sources/test.sh &");
-			ROS_INFO("Send wake command.");		
+			if(mode == WAKE_TIME)
+			{
+			}
+			else
+			{
+				starting_time = ros::Time::now();
+				mode = WAKE_TIME;	
+				system("/home/jbot/milight_sources/test.sh &");
+				ROS_INFO("Send wake command.");	
+			}
 			break;
 		case BED_TIME :
-			starting_time = ros::Time::now();
-			mode = BED_TIME;	
-			to_send.data = "Il est l'heure d'aller dormir";
-                        french_pub.publish(to_send);
-			light1ON_pub.publish(empty_to_send);
-			light3ON_pub.publish(empty_to_send);
-			ROS_INFO("Send sleep command.");		
+			if(mode == BED_TIME)
+			{
+			}
+			else 
+			{
+				starting_time = ros::Time::now();
+				mode = BED_TIME;	
+				to_send.data = "Il est l'heure d'aller dormir";
+                        	french_pub.publish(to_send);
+				light1ON_pub.publish(empty_to_send);
+				light3ON_pub.publish(empty_to_send);
+				ROS_INFO("Send sleep command.");
+			}
 			break;
 		case WEATHER :
 			//mode = WEATHER;	
