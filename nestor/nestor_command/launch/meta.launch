@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="metawatch.py" respawn="true" name="NESTOR_metawatch" output="screen">
+	<remap from="/METAWATCH/button1" to="/milight/light3ON" />
+	<remap from="/METAWATCH/button2" to="/milight/light1OFF" />
+	<remap from="/METAWATCH/button3" to="/milight/light3OFF" />
+  </node>
+
+
+</launch>
