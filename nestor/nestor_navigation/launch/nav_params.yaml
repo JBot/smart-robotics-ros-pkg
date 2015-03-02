@@ -24,9 +24,8 @@ NESTOR_costmap:
 #    lethal_cost_threshold: 100
 
   obstacles:
-    observation_sources: NESTOR_nav_laser pc_map
+    observation_sources: NESTOR_nav_laser
     NESTOR_nav_laser: {sensor_frame: /hokuyo_laser, data_type: LaserScan, topic: /NESTOR/hokuyo, marking: true, clearing: true, obstacle_range: 1.0}
-    pc_map: {sensor_frame: /world, data_type: PointCloud, topic: /cloud, marking: true, clearing: false}
     track_unknown_space: false
 
   inflater:

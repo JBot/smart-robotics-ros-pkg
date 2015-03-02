@@ -121,7 +121,7 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 			{
 				starting_time = ros::Time::now();
 				mode = WAKE_TIME;	
-				system("/home/jbot/milight_sources/test.sh &");
+				system("/home/jbot/ROS/smart-robotics-ros-pkg/nestor/nestor_command/light_wakeup.sh &");
 				ROS_INFO("Send wake command.");	
 			}
 			break;
@@ -136,6 +136,7 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 				to_send.data = "Il est l'heure d'aller dormir";
                         	french_pub.publish(to_send);
 				light1ON_pub.publish(empty_to_send);
+				usleep(50000);
 				light3ON_pub.publish(empty_to_send);
 				ROS_INFO("Send sleep command.");
 			}
