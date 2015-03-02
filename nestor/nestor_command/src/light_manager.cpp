@@ -86,30 +86,30 @@ lightManager::lightManager()
         std::string name;
         ///nh.param("calendar_name", name, std::string(""));
 
-	light1ON_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light1ON", 5, &lightManager::light1ONCallback, this);
-	light2ON_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light2ON", 5, &lightManager::light2ONCallback, this);
-	light3ON_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light3ON", 5, &lightManager::light3ONCallback, this);
-	light4ON_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light4ON", 5, &lightManager::light4ONCallback, this);
+	light1ON_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light1ON", 5, &lightManager::light1ONCallback, this);
+	light2ON_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light2ON", 5, &lightManager::light2ONCallback, this);
+	light3ON_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light3ON", 5, &lightManager::light3ONCallback, this);
+	light4ON_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light4ON", 5, &lightManager::light4ONCallback, this);
 
-	light1OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light1OFF", 5, &lightManager::light1OFFCallback, this);
-	light2OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light2OFF", 5, &lightManager::light2OFFCallback, this);
-	light3OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light3OFF", 5, &lightManager::light3OFFCallback, this);
-	light4OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light4OFF", 5, &lightManager::light4OFFCallback, this);
+	light1OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light1OFF", 5, &lightManager::light1OFFCallback, this);
+	light2OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light2OFF", 5, &lightManager::light2OFFCallback, this);
+	light3OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light3OFF", 5, &lightManager::light3OFFCallback, this);
+	light4OFF_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light4OFF", 5, &lightManager::light4OFFCallback, this);
 
-	light1Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light1Color", 5, &lightManager::light1ColorCallback, this);
-	light2Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light2Color", 5, &lightManager::light2ColorCallback, this);
-	light3Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light3Color", 5, &lightManager::light3ColorCallback, this);
-	light4Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light4Color", 5, &lightManager::light4ColorCallback, this);
+	light1Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light1Color", 5, &lightManager::light1ColorCallback, this);
+	light2Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light2Color", 5, &lightManager::light2ColorCallback, this);
+	light3Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light3Color", 5, &lightManager::light3ColorCallback, this);
+	light4Color_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light4Color", 5, &lightManager::light4ColorCallback, this);
 
-	light1Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light1Brightness", 5, &lightManager::light1BrightnessCallback, this);
-	light2Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light2Brightness", 5, &lightManager::light2BrightnessCallback, this);
-	light3Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light3Brightness", 5, &lightManager::light3BrightnessCallback, this);
-	light4Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/milight/light4Brightness", 5, &lightManager::light4BrightnessCallback, this);
+	light1Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light1Brightness", 5, &lightManager::light1BrightnessCallback, this);
+	light2Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light2Brightness", 5, &lightManager::light2BrightnessCallback, this);
+	light3Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light3Brightness", 5, &lightManager::light3BrightnessCallback, this);
+	light4Brightness_sub_ = nh.subscribe < std_msgs::Int32 > ("/MILIGHT/light4Brightness", 5, &lightManager::light4BrightnessCallback, this);
 
-	light1White_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light1White", 5, &lightManager::light1WhiteCallback, this);
-	light2White_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light2White", 5, &lightManager::light2WhiteCallback, this);
-	light3White_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light3White", 5, &lightManager::light3WhiteCallback, this);
-	light4White_sub_ = nh.subscribe < std_msgs::Empty > ("/milight/light4White", 5, &lightManager::light4WhiteCallback, this);
+	light1White_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light1White", 5, &lightManager::light1WhiteCallback, this);
+	light2White_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light2White", 5, &lightManager::light2WhiteCallback, this);
+	light3White_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light3White", 5, &lightManager::light3WhiteCallback, this);
+	light4White_sub_ = nh.subscribe < std_msgs::Empty > ("/MILIGHT/light4White", 5, &lightManager::light4WhiteCallback, this);
 }
 
 void lightManager::light1ONCallback(const std_msgs::Empty::ConstPtr &empty)

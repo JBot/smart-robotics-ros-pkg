@@ -54,6 +54,13 @@ class commandManager {
 	ros::Publisher light3OFF_pub;
 	ros::Publisher light4OFF_pub;
 
+	ros::Publisher shower_pub;
+        ros::Publisher leaving_pub;
+        ros::Publisher sleep_pub;
+        ros::Publisher eat_pub;
+        ros::Publisher wake_pub;
+
+
 	ros::ServiceClient twit_client;
 
 	void loop(void);
@@ -91,6 +98,12 @@ commandManager::commandManager()
     	light2OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light2OFF", 3);
     	light3OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light3OFF", 3);
     	light4OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light4OFF", 3);
+
+	shower_pub = nh.advertise < std_msgs::Empty > ("/HOME/go_shower", 3);
+        leaving_pub = nh.advertise < std_msgs::Empty > ("/HOME/leaving_home", 3);
+        sleep_pub = nh.advertise < std_msgs::Empty > ("/HOME/go_sleep", 3);
+        eat_pub = nh.advertise < std_msgs::Empty > ("/HOME/go_eat", 3);
+        wake_pub = nh.advertise < std_msgs::Empty > ("/HOME/wake_up", 3);
 
 	//twit_client = nh.serviceClient<rostweet_msgs::postTweet>("/rostweet/postTweet");
 

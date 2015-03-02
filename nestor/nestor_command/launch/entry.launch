@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="light_detector" respawn="true" name="HOME_entry_detection" output="screen">
+	<remap from="/milight/light3ON" to="/HOME/entry_move" />
+	<remap from="/milight/light3OFF" to="/HOME/entry_noOne" />
+  </node>
+
+
+</launch>
