@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="entry_link_broadcaster" args="4.16 3.14 1.0 0 0 0 map entry_laser_base 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="entry_link2_broadcaster" args="0 0 0 3.14159 0 0 entry_laser_base entry_laser 100"/>
+
+  <!-- Entry presence detection -->
+  <node pkg="xv_11_laser_driver" type="neato_laser_publisher" respawn="true" name="HOME_entry_laser">
+	<param name="port" value="/dev/ttyUSB0" />
+	<param name="firmware_version" value="2" />
+	<param name="frame_id" value="entry_laser" />
+	<remap from="/scan" to="/HOME/entry_scan" />
+  </node>
+
+  <!-- Entry presence detection -->
+  <node pkg="nestor_command" type="light_detector" respawn="true" name="HOME_entry_detection" output="screen">
+        <remap from="/milight/light3ON" to="/HOME/entry_move" />
+        <remap from="/milight/light3OFF" to="/HOME/entry_noOne" />
+	<remap from="/scan" to="/HOME/entry_scan" />
+  </node>
+
+</launch>

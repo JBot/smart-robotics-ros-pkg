@@ -610,7 +610,7 @@ void TrajectoryManager::planThread(void)
 					//planner_costmap_->resetLayers();
 					//planner_costmap_->getCostmap()->resetMaps();
 					//boost::unique_lock< boost::shared_mutex > lock(*(planner_costmap_->getCostmap()->getLock()));
-					planner_costmap_->getCostmap()->resetMap(0,0,200,200);
+					//planner_costmap_->getCostmap()->resetMap(0,0,200,200);
 				}
 				break;	
 			default:

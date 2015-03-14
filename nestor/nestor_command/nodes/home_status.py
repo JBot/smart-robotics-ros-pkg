@@ -57,7 +57,7 @@ class PreparingShower(State):
 class GoShower(State):
     def __init__(self):
         State.__init__(self, outcomes=['succeeded','aborted','preempted'])
-        self.french_pub = rospy.Publisher('/nestor/french_voice', String)
+        self.french_pub = rospy.Publisher('/nestor/french_voice', String, 1)
         pass
 
     def execute(self, userdata):
@@ -133,14 +133,147 @@ class WakingUp(State):
     def __init__(self):
         State.__init__(self, outcomes=['succeeded'])
         self.ON_pub = rospy.Publisher('/MILIGHT/light3ON', Empty)
+        self.ON2_pub = rospy.Publisher('/MILIGHT/light2ON', Empty)
+	self.heatON_pub = rospy.Publisher('/HOME/showerHeatON', Empty)
+        self.heatOFF_pub = rospy.Publisher('/HOME/showerHeatOFF', Empty)
+        self.weather_pub = rospy.Publisher('/NESTOR/weather', Empty)
+        self.french_pub = rospy.Publisher('/NESTOR/french_voice', String)
+	self.music_pub = rospy.Publisher('/NESTOR/radio_jap', Empty)
 
     def execute(self, userdata):
 
-        self.ON_pub.publish(Empty())
+        #self.ON_pub.publish(Empty())
+        rospy.sleep(120)
+
+	my_string=String()
+	my_string.data="Il est l'heure de se lever. Debout les feignants."
+	self.french_pub.publish(my_string)
+
+        rospy.sleep(180)
+	self.ON2_pub.publish(Empty())
+
+        rospy.sleep(120)
+	my_string.data="Chauffage de la salle de bain en cours."
+	self.french_pub.publish(my_string)
+        rospy.sleep(0.01)
+	self.heatON_pub.publish(Empty())
+        rospy.sleep(0.01)
+	self.music_pub.publish(Empty())
+
+        rospy.sleep(60)
+	self.weather_pub.publish(Empty())
+
+        rospy.sleep(240)
+	self.heatOFF_pub.publish(Empty())
+
+        return 'succeeded'
+
+
+class GoingSleep(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['succeeded'])
+        self.ON1_pub = rospy.Publisher('/MILIGHT/light1ON', Empty)
+	self.color1_pub = rospy.Publisher('/MILIGHT/light1Color', Int32)
+        self.brightness1_pub = rospy.Publisher('/MILIGHT/light1Brightness', Int32)
+        self.ON2_pub = rospy.Publisher('/MILIGHT/light2ON', Empty)
+	self.color2_pub = rospy.Publisher('/MILIGHT/light2Color', Int32)
+        self.brightness2_pub = rospy.Publisher('/MILIGHT/light2Brightness', Int32)
+        self.ON3_pub = rospy.Publisher('/MILIGHT/light3ON', Empty)
+	self.color3_pub = rospy.Publisher('/MILIGHT/light3Color', Int32)
+        self.brightness3_pub = rospy.Publisher('/MILIGHT/light3Brightness', Int32)
+	self.french_pub = rospy.Publisher('/NESTOR/french_voice', String)
+
+    def execute(self, userdata):
+
+	tosay = String()
+	myint = Int32()
+	tosay.data = "Il est l'heure d'aller dormir."
+	self.french_pub.publish(tosay)
+        rospy.sleep(0.01)
+        self.ON3_pub.publish(Empty())
+        rospy.sleep(0.01)
+        self.ON2_pub.publish(Empty())
+        rospy.sleep(0.01)
+        self.ON1_pub.publish(Empty())
+        rospy.sleep(0.01)
+	myint.data = 175
+	self.color1_pub.publish(myint)
+        rospy.sleep(0.01)
+	self.color3_pub.publish(myint)
+        rospy.sleep(0.01)
+	myint.data = 2
+	self.brightness1_pub.publish(myint)
+        rospy.sleep(0.01)
+	myint.data = 10
+	self.brightness2_pub.publish(myint)
+        rospy.sleep(0.01)
+	myint.data = 9
+	self.brightness3_pub.publish(myint)
         rospy.sleep(0.01)
 
         return 'succeeded'
 
+class InBed(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['succeeded'])
+        self.OFF1_pub = rospy.Publisher('/MILIGHT/light1OFF', Empty)
+        self.brightness1_pub = rospy.Publisher('/MILIGHT/light1Brightness', Int32)
+        self.OFF2_pub = rospy.Publisher('/MILIGHT/light2OFF', Empty)
+        self.brightness2_pub = rospy.Publisher('/MILIGHT/light2Brightness', Int32)
+        self.OFF3_pub = rospy.Publisher('/MILIGHT/light3OFF', Empty)
+        self.brightness3_pub = rospy.Publisher('/MILIGHT/light3Brightness', Int32)
+        self.heatOFF_pub = rospy.Publisher('/HOME/showerHeatOFF', Empty)
+	self.french_pub = rospy.Publisher('/NESTOR/french_voice', String)
+
+    def execute(self, userdata):
+
+        tosay = String()
+        myint = Int32()
+        tosay.data = "Bonne nuit."
+        self.french_pub.publish(tosay)
+        rospy.sleep(0.01)
+
+	myint.data = 1
+        self.brightness1_pub.publish(myint)
+        rospy.sleep(0.01)
+        myint.data = 6
+        self.brightness2_pub.publish(myint)
+        rospy.sleep(0.01)
+        myint.data = 6
+        self.brightness3_pub.publish(myint)
+        rospy.sleep(0.3)
+
+	# Shutdown everything
+        self.OFF3_pub.publish(Empty())
+        rospy.sleep(0.01)
+        self.OFF2_pub.publish(Empty())
+        rospy.sleep(0.01)
+        self.OFF1_pub.publish(Empty())
+        rospy.sleep(0.01)
+	self.heatOFF_pub.publish(Empty())
+        rospy.sleep(0.01)
+
+        return 'succeeded'
+
+class TimeoutToBed(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['succeeded','aborted','preempted'],input_keys=[],output_keys=[])
+        self.stop=0
+	pass
+
+    def execute(self, userdata):
+	for bla in range(1,1800):
+        	rospy.sleep(1) #30min
+		if self.stop == 1:
+			break
+	self.stop=0
+        return 'succeeded'
+
+    def request_preempt(self):
+        """Overload the preempt request method just to spew an error."""
+	self.stop=1
+        State.request_preempt(self)
+        rospy.logwarn("Preempted!")
 
 
 
@@ -252,9 +385,29 @@ class SMACHAI():
         self.sm_going_sleep = StateMachine(outcomes=['succeeded','aborted','preempted'])
 
         with self.sm_going_sleep:
-            StateMachine.add('GOING_SLE', Pause(),
-                             transitions={'succeeded':'succeeded',
-                                          'aborted':'aborted'})
+            StateMachine.add('GOING_SLEEP', GoingSleep(),
+                             transitions={'succeeded':'succeeded'})
+
+
+	# State machine for day mode
+        self.sm_wait_bed = Concurrence(outcomes=['succeeded','aborted','preempted'],
+                                        default_outcome='succeeded',
+                                        child_termination_cb=self.useless_child_termination_cb,
+                                        outcome_cb=self.useless_outcome_cb)
+
+        with self.sm_wait_bed:
+            Concurrence.add('LOOK_INBED', MonitorState("/METAWATCH/button2", Empty, self.empty_cb))
+            Concurrence.add('TIMEOUT', TimeoutToBed())
+
+
+	# State machine for in bed
+        self.sm_in_bed = StateMachine(outcomes=['succeeded','aborted','preempted'])
+
+        with self.sm_in_bed:
+            StateMachine.add('IN_BED', InBed(),
+                             transitions={'succeeded':'succeeded'})
+
+
 
 	# State machine for light entry 
         self.sm_lightn_entry = StateMachine(outcomes=['succeeded','aborted','preempted'])
@@ -296,8 +449,7 @@ class SMACHAI():
 
         with self.sm_waking_up:
             StateMachine.add('WAKING_UP', WakingUp(),
-                             transitions={'succeeded':'succeeded',
-                                          'aborted':'aborted'})
+                             transitions={'succeeded':'succeeded'})
 
 	# State machine for waking up 
         self.sm_going_eat = StateMachine(outcomes=['succeeded','aborted','preempted'])
@@ -336,6 +488,13 @@ class SMACHAI():
                              transitions={'succeeded':'going_out',
                                           'aborted':'aborted'})
             StateMachine.add('GOING_SLEEP', self.sm_going_sleep,
+                             transitions={'succeeded':'WAIT_TO_BED',
+                                          'aborted':'aborted'})
+	    StateMachine.add('WAIT_TO_BED', self.sm_wait_bed,
+                             transitions={'succeeded':'IN_BED',
+					  'preempted':'IN_BED',
+                                          'aborted':'aborted'})
+            StateMachine.add('IN_BED', self.sm_in_bed,
                              transitions={'succeeded':'NIGHT_MODE',
                                           'aborted':'aborted'})
             StateMachine.add('NIGHT_MODE', self.sm_night_mode,
@@ -426,6 +585,16 @@ class SMACHAI():
 	#rospy.loginfo("Empty message received.")
         return False
 
+    # Gets called when ANY child state terminates
+    def useless_child_termination_cb(self, outcome_map):
+	rospy.loginfo("useless_child_termination_cb.")
+        return True
+
+
+    # Gets called when ALL child states are terminated
+    def useless_outcome_cb(self, outcome_map):
+        rospy.loginfo("useless_outcome_cb.")
+        return 'succeeded'
 
 
     # Gets called when ANY child state terminates

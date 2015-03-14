@@ -5,18 +5,18 @@ NESTOR_costmap:
   update_frequency: 1.0
   publish_frequency: 2.0
   max_obstacle_height: 1.0
-  obstacle_range: 3.0
-  raytrace_range: 3.5
+  obstacle_range: 4.0
+  raytrace_range: 4.5
   #footprint: [[-0.1, -0.1], [-0.1, 0.1], [0.1, 0.1], [0.1, -0.1]]
-  robot_radius: 0.30
+  robot_radius: 0.31
   static_map: false
   resolution: 0.01
   map_type: costmap
   rolling_window: false 
   width: 10.0
   height: 10.0
-  origin_x: 5.0
-  origin_y: 5.0
+  origin_x: -4.0
+  origin_y: -3.0
  
 #  static_map:
 #    map_topic: /PETIT/map
@@ -29,9 +29,9 @@ NESTOR_costmap:
     track_unknown_space: false
 
   inflater:
-    robot_radius: 0.30
+    robot_radius: 0.31
     inflation_radius: 0.34
-    cost_scaling_factor: 2.0
+    cost_scaling_factor: 20.0
 
   plugins:
     - 

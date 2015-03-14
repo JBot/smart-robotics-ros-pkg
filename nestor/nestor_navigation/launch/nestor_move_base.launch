@@ -30,8 +30,8 @@
 
     <param name="nb_step_skip" type="int" value="4" />
     <param name="max_dist_skip" type="double" value="0.13" />
-    <param name="max_speed_ang" type="double" value="0.25" />
-    <param name="max_speed_lin" type="double" value="0.13" />
+    <param name="max_speed_ang" type="double" value="0.20" />
+    <param name="max_speed_lin" type="double" value="0.20" />
 
        <remap from="/ROBOT/plan" to="/NESTOR/plan" />
         <remap from="/ROBOT/get_robot_pose" to="/NESTOR/get_robot_pose" />
