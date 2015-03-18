@@ -31,6 +31,8 @@
 #define BED_TIME 	1
 #define WEATHER 	2
 #define LUNCH_TIME 	5
+#define LEAVING 	6
+#define SHOWER	 	7
 
 
 
@@ -84,20 +86,20 @@ commandManager::commandManager()
         ///nh.param("calendar_name", name, std::string(""));
     //command_pub = nh.advertise < std_msgs::Int32 > ("/calendar/command", 3);
 
-	command_sub_ = nh.subscribe < std_msgs::Int32 > ("/nestor/command", 5, &commandManager::commandCallback, this);
+	command_sub_ = nh.subscribe < std_msgs::Int32 > ("/NESTOR/command", 5, &commandManager::commandCallback, this);
 	picture_sub_ = nh.subscribe < sensor_msgs::Image > ("camera/rgb/image_rect_color", 5, &commandManager::pictureCallback, this);
 	map_sub_ = nh.subscribe < sensor_msgs::Image > ("map_image/full", 5, &commandManager::mapCallback, this);
 
-    	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
-    	weather_pub = nh.advertise < std_msgs::Empty > ("/nestor/weather", 3);
-    	light1ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light1ON", 3);
-    	light2ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light2ON", 3);
-    	light3ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light3ON", 3);
-    	light4ON_pub = nh.advertise < std_msgs::Empty > ("/milight/light4ON", 3);
-    	light1OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light1OFF", 3);
-    	light2OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light2OFF", 3);
-    	light3OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light3OFF", 3);
-    	light4OFF_pub = nh.advertise < std_msgs::Empty > ("/milight/light4OFF", 3);
+    	french_pub = nh.advertise < std_msgs::String > ("/NESTOR/french_voice", 3);
+    	weather_pub = nh.advertise < std_msgs::Empty > ("/NESTOR/weather", 3);
+    	light1ON_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light1ON", 3);
+    	light2ON_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light2ON", 3);
+    	light3ON_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light3ON", 3);
+    	light4ON_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light4ON", 3);
+    	light1OFF_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light1OFF", 3);
+    	light2OFF_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light2OFF", 3);
+    	light3OFF_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light3OFF", 3);
+    	light4OFF_pub = nh.advertise < std_msgs::Empty > ("/MILIGHT/light4OFF", 3);
 
 	shower_pub = nh.advertise < std_msgs::Empty > ("/HOME/go_shower", 3);
         leaving_pub = nh.advertise < std_msgs::Empty > ("/HOME/leaving_home", 3);
@@ -136,6 +138,8 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 				mode = WAKE_TIME;	
 				system("/home/jbot/ROS/smart-robotics-ros-pkg/nestor/nestor_command/light_wakeup.sh &");
 				ROS_INFO("Send wake command.");	
+
+				wake_pub.publish(empty_to_send);
 			}
 			break;
 		case BED_TIME :
@@ -146,12 +150,14 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 			{
 				starting_time = ros::Time::now();
 				mode = BED_TIME;	
-				to_send.data = "Il est l'heure d'aller dormir";
-                        	french_pub.publish(to_send);
-				light1ON_pub.publish(empty_to_send);
-				usleep(50000);
-				light3ON_pub.publish(empty_to_send);
+				//to_send.data = "Il est l'heure d'aller dormir";
+                        	//french_pub.publish(to_send);
+				//light1ON_pub.publish(empty_to_send);
+				//usleep(50000);
+				//light3ON_pub.publish(empty_to_send);
 				ROS_INFO("Send sleep command.");
+
+				sleep_pub.publish(empty_to_send);
 			}
 			break;
 		case WEATHER :
@@ -164,6 +170,14 @@ void commandManager::commandCallback(const std_msgs::Int32::ConstPtr & feedback)
 			to_send.data = "Il est l'heure de se mettre à table";
                         french_pub.publish(to_send);
 			ROS_INFO("Send lunch command.");		
+
+			eat_pub.publish(empty_to_send);
+			break;
+		case LEAVING :
+			leaving_pub.publish(empty_to_send);
+			break;
+		case SHOWER :
+			shower_pub.publish(empty_to_send);
 			break;
 		default:
 			ROS_INFO("Unknown command.");
@@ -190,9 +204,9 @@ void commandManager::loop(void)
 			}
 			else
 			{
-				light2ON_pub.publish(empty_to_send);
-                        	to_send.data = "Il est l'heure de se lever. Debout les feignants.";
-                        	french_pub.publish(to_send);
+				//light2ON_pub.publish(empty_to_send);
+                        	//to_send.data = "Il est l'heure de se lever. Debout les feignants.";
+                        	//french_pub.publish(to_send);
 				mode = NOTHING;
 			}
                         break;
@@ -202,10 +216,10 @@ void commandManager::loop(void)
                         } 
                         else
                         {	
-				light1OFF_pub.publish(empty_to_send);
-				light2OFF_pub.publish(empty_to_send);
-				light3OFF_pub.publish(empty_to_send);
-				light4OFF_pub.publish(empty_to_send);
+				//light1OFF_pub.publish(empty_to_send);
+				//light2OFF_pub.publish(empty_to_send);
+				//light3OFF_pub.publish(empty_to_send);
+				//light4OFF_pub.publish(empty_to_send);
 				mode = NOTHING;
 			}
                         break;

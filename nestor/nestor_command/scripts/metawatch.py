@@ -508,10 +508,13 @@ def talker():
 	#hello_str = "hello world %s" % rospy.get_time()
         #rospy.loginfo(hello_str)
         rate.sleep()
+    time.sleep(1)
     mw.close();
 
 if __name__ == '__main__':
     try:
+        time.sleep(1)
         talker()
     except rospy.ROSInterruptException:
+        time.sleep(1)
         pass

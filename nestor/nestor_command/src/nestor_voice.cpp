@@ -39,8 +39,8 @@ nestorVoice::nestorVoice()
         ///nh.param("calendar_name", name, std::string(""));
     //command_pub = nh.advertise < std_msgs::Int32 > ("/calendar/command", 3);
 
-	 french_sub_ = nh.subscribe < std_msgs::String > ("/nestor/french_voice", 5, &nestorVoice::frenchCallback, this);
-	 english_sub_ = nh.subscribe < std_msgs::String > ("/nestor/english_voice", 5, &nestorVoice::englishCallback, this);
+	 french_sub_ = nh.subscribe < std_msgs::String > ("/NESTOR/french_voice", 5, &nestorVoice::frenchCallback, this);
+	 english_sub_ = nh.subscribe < std_msgs::String > ("/NESTOR/english_voice", 5, &nestorVoice::englishCallback, this);
 }
 
 

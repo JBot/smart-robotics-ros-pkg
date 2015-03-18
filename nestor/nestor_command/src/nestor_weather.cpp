@@ -37,10 +37,10 @@ class nestorWeather {
 /* Constructor */
 nestorWeather::nestorWeather()
 {
-	english_pub = nh.advertise < std_msgs::String > ("/nestor/english_voice", 3);
-	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
+	english_pub = nh.advertise < std_msgs::String > ("/NESTOR/english_voice", 3);
+	french_pub = nh.advertise < std_msgs::String > ("/NESTOR/french_voice", 3);
 
-	weather_sub_ = nh.subscribe < std_msgs::Empty > ("/nestor/weather", 2, &nestorWeather::weatherCallback, this);
+	weather_sub_ = nh.subscribe < std_msgs::Empty > ("/NESTOR/weather", 2, &nestorWeather::weatherCallback, this);
 }
 
 

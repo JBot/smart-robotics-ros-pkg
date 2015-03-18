@@ -82,7 +82,7 @@ void nestorRadio::radioMetalCallback(const std_msgs::Empty::ConstPtr & feedback)
 	switch(radioStatus)
 	{
 		case RADIO_OFF:
-			sprintf(my_buff, "mpg123 -C -f %d http://77.74.192.50:8005 &", radioVolume);
+			sprintf(my_buff, "mpg123 -C -f %d http://91.121.75.155:8000 &", radioVolume);
 			std::cout << my_buff << std::endl;
 			system(my_buff);
 			radioStatus = RADIO_METAL;
@@ -94,7 +94,7 @@ void nestorRadio::radioMetalCallback(const std_msgs::Empty::ConstPtr & feedback)
 			system("killall mpg123");
 			radioStatus = RADIO_METAL;
 			usleep(100000);
-			sprintf(my_buff, "mpg123 -C -f %d http://77.74.192.50:8005 &", radioVolume);
+			sprintf(my_buff, "mpg123 -C -f %d http://91.121.75.155:8000 &", radioVolume);
 			std::cout << my_buff << std::endl;
 			system(my_buff);
 			break;
@@ -108,7 +108,7 @@ void nestorRadio::radioJapCallback(const std_msgs::Empty::ConstPtr & feedback)
         switch(radioStatus)
         {
                 case RADIO_OFF:
-			sprintf(my_buff, "mpg123 -C -f %d http://178.62.198.225:8080 &", radioVolume);
+			sprintf(my_buff, "mpg123 -C -f %d http://198.27.80.17:8000 &", radioVolume);
 			std::cout << my_buff << std::endl;
 			system(my_buff);
                         radioStatus = RADIO_JAP;
@@ -120,7 +120,7 @@ void nestorRadio::radioJapCallback(const std_msgs::Empty::ConstPtr & feedback)
                         system("killall mpg123");
                         radioStatus = RADIO_JAP;
                         usleep(100000);
-			sprintf(my_buff, "mpg123 -C -f %d http://178.62.198.225:8080 &", radioVolume);
+			sprintf(my_buff, "mpg123 -C -f %d http://198.27.80.17:8000 &", radioVolume);
 			std::cout << my_buff << std::endl;
 			system(my_buff);
                         break;

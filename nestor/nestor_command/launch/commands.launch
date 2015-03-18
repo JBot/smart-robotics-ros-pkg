@@ -4,7 +4,7 @@
   <master auto="start"/>
 
   <!-- NESTOR robot -->
-  <node pkg="nestor_command" type="nestor_voice" respawn="false" name="NESTOR_voice" output="screen">
+  <node pkg="nestor_command" type="nestor_voice" respawn="true" name="NESTOR_voice" output="screen">
   </node>
 
   <!-- NESTOR robot -->
@@ -24,8 +24,11 @@
   </node>
 
   <!-- NESTOR robot -->
-  <node pkg="nestor_command" type="light_manager" respawn="false" name="NESTOR_light_manager" output="screen">
+  <node pkg="nestor_command" type="light_manager" respawn="true" name="NESTOR_light_manager" output="screen">
   </node>
 
+  <!-- NESTOR robot -->
+  <node pkg="nestor_command" type="heat_manager" respawn="true" name="NESTOR_showerheat_manager" output="screen">
+  </node>
 
 </launch>

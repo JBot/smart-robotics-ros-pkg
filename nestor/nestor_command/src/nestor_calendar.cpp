@@ -34,9 +34,9 @@ class nestorCalendar {
 /* Constructor */
 nestorCalendar::nestorCalendar()
 {
-	english_pub = nh.advertise < std_msgs::String > ("/nestor/english_voice", 3);
-	french_pub = nh.advertise < std_msgs::String > ("/nestor/french_voice", 3);
-	command_pub = nh.advertise < std_msgs::Int32 > ("/nestor/command", 3);
+	english_pub = nh.advertise < std_msgs::String > ("/NESTOR/english_voice", 3);
+	french_pub = nh.advertise < std_msgs::String > ("/NESTOR/french_voice", 3);
+	command_pub = nh.advertise < std_msgs::Int32 > ("/NESTOR/command", 3);
 }
 
 

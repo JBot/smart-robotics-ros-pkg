@@ -5,8 +5,8 @@
   <node pkg="hokuyo_node" type="hokuyo_node" name="laser_publisher" output="screen">
     <param name="port" value="/dev/ttyHOKUYO" />
     <param name="frame_id" value="hokuyo_laser" />
-    <param name="min_ang" value="-2.28" />
-    <param name="max_ang" value="2.28" /> 
+    <param name="min_ang" value="-2.25" />
+    <param name="max_ang" value="2.25" /> 
 
     <remap from="/scan" to="/NESTOR/hokuyo" />
   </node>
