@@ -31,8 +31,8 @@ ros::NodeHandle  nh;
 //geometry_msgs::TransformStamped t;
 //tf::TransformBroadcaster broadcaster;
 
-char child_link[] = "/base_link";
-char parent_link[] = "/odom";
+char child_link[] = "/arm_shoulder_pitch";
+char parent_link[] = "/arm_shoulder_yaw";
 
 volatile double shoulder_des = 0;
 volatile double elbow_des = 0;
@@ -42,9 +42,9 @@ volatile double error_prev_elbow = 0;
 volatile double error_sum_elbow = 0;
 volatile double PID_shoulder = 0;
 volatile double PID_elbow = 0;
-volatile int sensorValuePosShoulder = 0;
+volatile double sensorValuePosShoulder = 0;
 volatile int sensorValuePosElbow = 0;
-const int analogInPinShoulder = A15;  // Analog input pin that the potentiometer is attached to
+const int analogInPinShoulder = A5;  // Analog input pin that the potentiometer is attached to
 const int analogInPinElbow = A14;  // Analog input pin that the potentiometer is attached to
 
 char *as[] = {"shoulder_pitch_joint", "elbow_pitch_joint"};
@@ -112,7 +112,9 @@ geometry_msgs::Quaternion createQuaternion(double yaw, double pitch, double roll
 */
 void read_positions(void)
 {
-  sensorValuePosShoulder = analogRead(analogInPinShoulder);
+  sensorValuePosShoulder = (analogRead(analogInPinShoulder)  - 232) / 3.3111;
+  sensorValuePosShoulder = (sensorValuePosShoulder + (analogRead(analogInPinShoulder)  - 232) / 3.3111)/2;
+  //sensorValuePosShoulder = analogRead(analogInPinShoulder);
   sensorValuePosElbow = analogRead(analogInPinElbow);
 }
 
@@ -124,7 +126,7 @@ double convert_adc(int value)
 void compute_PIDs(double shoulder, double elbow)
 {
   
-  double errorShoulder =  convert_adc(sensorValuePosShoulder) - shoulder;
+  double errorShoulder =  sensorValuePosShoulder - shoulder;
   double errorElbow =  convert_adc(sensorValuePosElbow) - elbow;
   
   error_sum_shoulder += errorShoulder;
@@ -139,16 +141,16 @@ void compute_PIDs(double shoulder, double elbow)
   if(error_sum_elbow < (-50* ADCVALUE))
     error_sum_elbow = -50* ADCVALUE;
   
-  PID_shoulder = 5000 * errorShoulder + 600 * error_prev_shoulder + 50 * error_sum_shoulder; // un peu mou
+  PID_shoulder = 150 * errorShoulder + 200 * (errorShoulder - error_prev_shoulder) + 0 * error_sum_shoulder; // un peu mou
   PID_elbow = 10000 * errorElbow + 1000 * error_prev_elbow + 200 * error_sum_elbow;
  
   error_prev_shoulder = errorShoulder; 
   error_prev_elbow = errorElbow; 
   
-  if(PID_shoulder > 400) 
-    PID_shoulder = 400;
-  if(PID_shoulder < -400)
-    PID_shoulder = -400;
+  if(PID_shoulder > 800) 
+    PID_shoulder = 800;
+  if(PID_shoulder < -800)
+    PID_shoulder = -800;
   if(PID_elbow > 400) 
     PID_elbow = 400;
   if(PID_elbow < -400)
@@ -184,7 +186,7 @@ void move_motors(void)
 void setup()
 {
   md.init();
-  analogReference(EXTERNAL);
+  //analogReference(EXTERNAL);
   
   nh.initNode();
   //broadcaster.init(nh);
@@ -229,7 +231,7 @@ void loop()
   joint_state_publisher.publish( &joints );
  */ 
 
-  shoulder_feedback.data = convert_adc(sensorValuePosShoulder);
+  shoulder_feedback.data = sensorValuePosShoulder;
   elbow_feedback.data = convert_adc(sensorValuePosElbow);  
   
   pub_shoulder.publish( &shoulder_feedback );
