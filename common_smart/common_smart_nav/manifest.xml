@@ -14,6 +14,8 @@
   <depend package="visualization_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="tf"/>
+  <depend package="cv_bridge"/>
+  <depend package="image_transport"/>
   <depend package="actionlib"/>
   <depend package="actionlib_msgs"/>
   <depend package="move_base"/>
@@ -22,6 +24,7 @@
   <depend package="nav_core"/>
   <depend package="costmap_2d"/>
   <depend package="navfn"/>
+  <depend package="hector_map_tools"/>
 
 </package>
 

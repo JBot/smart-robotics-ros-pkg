@@ -43,9 +43,9 @@ volatile double error_sum_elbow = 0;
 volatile double PID_shoulder = 0;
 volatile double PID_elbow = 0;
 volatile double sensorValuePosShoulder = 0;
-volatile int sensorValuePosElbow = 0;
+volatile double sensorValuePosElbow = 0;
 const int analogInPinShoulder = A5;  // Analog input pin that the potentiometer is attached to
-const int analogInPinElbow = A14;  // Analog input pin that the potentiometer is attached to
+const int analogInPinElbow = A15;  // Analog input pin that the potentiometer is attached to
 
 char *as[] = {"shoulder_pitch_joint", "elbow_pitch_joint"};
 float positions_tab[2];
@@ -110,12 +110,20 @@ geometry_msgs::Quaternion createQuaternion(double yaw, double pitch, double roll
   //return q;
 }
 */
+#define SHOULDER_ZERO    263.0
+#define SHOULDER_RATIO   3.10
+#define ELBOW_ZER0       607.0
+#define ELBOW_RATIO      3.44
+
 void read_positions(void)
 {
-  sensorValuePosShoulder = (analogRead(analogInPinShoulder)  - 232) / 3.3111;
-  sensorValuePosShoulder = (sensorValuePosShoulder + (analogRead(analogInPinShoulder)  - 232) / 3.3111)/2;
+  sensorValuePosShoulder = (analogRead(analogInPinShoulder)  - SHOULDER_ZERO) / SHOULDER_RATIO;
+  sensorValuePosShoulder = (sensorValuePosShoulder + (analogRead(analogInPinShoulder)  - SHOULDER_ZERO) / SHOULDER_RATIO);
+  sensorValuePosShoulder = (sensorValuePosShoulder + (analogRead(analogInPinShoulder)  - SHOULDER_ZERO) / SHOULDER_RATIO)/3.0;
   //sensorValuePosShoulder = analogRead(analogInPinShoulder);
-  sensorValuePosElbow = analogRead(analogInPinElbow);
+  sensorValuePosElbow = (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO;
+  sensorValuePosElbow = (sensorValuePosElbow + (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO);
+  sensorValuePosElbow = (sensorValuePosElbow + (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO)/3.0;
 }
 
 double convert_adc(int value)
@@ -127,7 +135,7 @@ void compute_PIDs(double shoulder, double elbow)
 {
   
   double errorShoulder =  sensorValuePosShoulder - shoulder;
-  double errorElbow =  convert_adc(sensorValuePosElbow) - elbow;
+  double errorElbow =  sensorValuePosElbow - elbow;
   
   error_sum_shoulder += errorShoulder;
   error_sum_elbow += errorElbow;
@@ -141,8 +149,8 @@ void compute_PIDs(double shoulder, double elbow)
   if(error_sum_elbow < (-50* ADCVALUE))
     error_sum_elbow = -50* ADCVALUE;
   
-  PID_shoulder = 150 * errorShoulder + 200 * (errorShoulder - error_prev_shoulder) + 0 * error_sum_shoulder; // un peu mou
-  PID_elbow = 10000 * errorElbow + 1000 * error_prev_elbow + 200 * error_sum_elbow;
+  PID_shoulder = 150 * errorShoulder + 200 * (errorShoulder - error_prev_shoulder) + 0 * error_sum_shoulder; 
+  PID_elbow = 5 * errorElbow + 5 * (errorElbow - error_prev_elbow) + 0 * error_sum_elbow;
  
   error_prev_shoulder = errorShoulder; 
   error_prev_elbow = errorElbow; 
@@ -151,10 +159,29 @@ void compute_PIDs(double shoulder, double elbow)
     PID_shoulder = 800;
   if(PID_shoulder < -800)
     PID_shoulder = -800;
-  if(PID_elbow > 400) 
-    PID_elbow = 400;
-  if(PID_elbow < -400)
-    PID_elbow = -400;
+  if(PID_elbow > 33) 
+    PID_elbow = 33;
+  if(PID_elbow < -33)
+    PID_elbow = -33;
+    
+  if(fabs(PID_shoulder) < 100)
+    PID_shoulder = 0.0;
+    
+    
+  if(PID_elbow < -12) 
+    PID_elbow = PID_elbow - 15;
+  if(PID_elbow > 12) 
+    PID_elbow = PID_elbow + 15;
+  
+  if(fabs(PID_elbow) < 27)
+    PID_elbow = 0.0;
+    
+  int sensor = analogRead(analogInPinElbow);
+  if(sensor > 1000 || sensor < 50)
+    PID_elbow = 0.0;
+    
+    
+    
  /*
   Serial.print("PID : ");
   Serial.print(PID);
@@ -173,6 +200,8 @@ void compute_PIDs(double shoulder, double elbow)
 void move_motors(void)
 {
   md.setM1Speed(PID_shoulder);
+  stopIfFault();
+  md.setM2Speed(-PID_elbow);
   stopIfFault();
   /*
   md.setM1M2Speed(PID_shoulder, PID_elbow);
@@ -232,7 +261,7 @@ void loop()
  */ 
 
   shoulder_feedback.data = sensorValuePosShoulder;
-  elbow_feedback.data = convert_adc(sensorValuePosElbow);  
+  elbow_feedback.data = sensorValuePosElbow;  
   
   pub_shoulder.publish( &shoulder_feedback );
   pub_elbow.publish( &elbow_feedback );

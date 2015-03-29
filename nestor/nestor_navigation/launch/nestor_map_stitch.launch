@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!--  -->
+  <node pkg="common_smart_nav" type="map_stitch" respawn="false" name="NESTOR_map_stitch" output="screen">>
+  </node>
+
+  <!--  -->
+  <node pkg="hector_compressed_map_transport" type="map_to_image_node" respawn="false" name="HOME_map_image_node" output="screen">
+        <remap from="/map" to="/HOME/map" />
+        <remap from="/pose" to="/slam_out_pose" />
+        <remap from="/map_image/full" to="/HOME/image_map" />
+  </node>
+
+  <!--  -->
+  <!--<node pkg="hector_compressed_map_transport" type="map_to_image_node" respawn="false" name="NESTOR_map_image_node" output="screen">-->
+  <node pkg="common_smart_nav" type="compressed_map_transport" respawn="false" name="NESTOR_map_image_node" output="screen">
+        <param name="tiled_map_size" type="int" value="400" />
+	<remap from="/map" to="/NESTOR/map" />
+        <remap from="/pose" to="/slam_out_pose" />
+        <remap from="/map_image/tile" to="/NESTOR/image_map" />
+  </node>
+
+  <!--  -->
+  <node pkg="map_server" type="map_server" respawn="false" name="HOME_map_node" output="screen" args="$(find nestor_navigation)/map.yaml">>
+        <param name="frame_id" type="str" value="world" />
+	<remap from="/map" to="/HOME/map" />
+        <remap from="/map_metadata" to="/HOME/map_metadata" />
+  </node>
+ 
+  <!--  
+  <node pkg="map_server" type="map_server" respawn="false" name="HOME_map_node2" output="screen" args="$(find nestor_navigation)/map.yaml">>
+        <param name="frame_id" type="str" value="world" />
+        <remap from="/map" to="/NESTOR/map2" />
+        <remap from="/map_metadata" to="/NESTOR/map2_metadata" />
+  </node>
+-->
+
+ 
+</launch>

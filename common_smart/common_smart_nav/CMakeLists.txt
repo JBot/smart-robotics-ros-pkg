@@ -37,5 +37,7 @@ rosbuild_add_executable(pathwrapper src/pathwrapper.cpp)
 rosbuild_add_executable(arduino_pathwrapper src/arduino_pathwrapper.cpp)
 #rosbuild_add_executable(trajectory_wrapper src/trajectory_wrapper.cpp)
 rosbuild_add_executable(pathplanner src/pathplanner.cpp)
+rosbuild_add_executable(map_stitch src/map_stitch.cpp)
+rosbuild_add_executable(compressed_map_transport src/compressed_map_transport.cpp)
 
 rosbuild_add_executable(test_action_client src/test_action_client.cpp)
