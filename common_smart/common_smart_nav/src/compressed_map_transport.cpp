@@ -37,6 +37,15 @@
 #include <image_transport/image_transport.h>
 #include <Eigen/Geometry>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/video/tracking.hpp>
+//#include <opencv2/nonfree/features2d.hpp>
+#include <opencv2/calib3d/calib3d.hpp> // for homography
+
+
 #include <hector_map_tools/HectorMapTools.h>
 
 using namespace std;
@@ -81,6 +90,25 @@ public:
   {
     delete image_transport_;
   }
+
+  double getHeadingFromQuat(geometry_msgs::Quaternion pose)
+{
+        double tmp = 0.0;
+        tmp = asin(2*pose.x*pose.y + 2*pose.z*pose.w);
+        //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z));
+        //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, asin(2*pose.x*pose.y + 2*pose.z*pose.w));
+        //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.x*pose.w-2*pose.y*pose.z , 1 - 2*pose.x*pose.x - 2*pose.z*pose.z));
+        if( fabs(atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z)) < 0.1) {
+                return tmp;
+        }
+        else {  
+                if(tmp >= 0)
+                        return 3.1415926 - tmp;
+                else
+                        return -3.1415926 - tmp;
+        }
+
+}
 
   //We assume the robot position is available as a PoseStamped here (querying tf would be the more general option)
   void poseCallback(const geometry_msgs::PoseStampedConstPtr& pose)
@@ -153,7 +181,7 @@ public:
 
       Eigen::Vector2i rob_position_mapi (rob_position_map.cast<int>());
 
-      Eigen::Vector2i tile_size_lower_halfi (p_size_tiled_map_image_x_ / 2, p_size_tiled_map_image_y_ / 2);
+      Eigen::Vector2i tile_size_lower_halfi (p_size_tiled_map_image_x_ , p_size_tiled_map_image_y_ );
 
       Eigen::Vector2i min_coords_map (rob_position_mapi - tile_size_lower_halfi);
 
@@ -166,7 +194,7 @@ public:
         min_coords_map[1] = 0;
       }
 
-      Eigen::Vector2i max_coords_map (min_coords_map + Eigen::Vector2i(p_size_tiled_map_image_x_,p_size_tiled_map_image_y_));
+      Eigen::Vector2i max_coords_map (min_coords_map + Eigen::Vector2i(p_size_tiled_map_image_x_*2,p_size_tiled_map_image_y_*2));
 
       //Clamp to upper map coords
       if (max_coords_map[0] > size_x){
@@ -235,6 +263,28 @@ public:
           }
         }        
       }
+
+
+	ROS_INFO("orientation %lf", getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159);
+
+	cv::Point center = cv::Point( cv_img_tile_.image.cols/2, cv_img_tile_.image.rows/2 );
+        cv::Mat rot_mat( 2, 3, CV_32FC1 );
+        cv::Mat warp_rotate_dst;
+        //double angle = -1.0;
+        double scale = 1.0;
+
+        /// Get the rotation matrix with the specifications above
+        rot_mat = cv::getRotationMatrix2D( center, -getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159, scale );
+
+        /// Rotate the warped image
+        cv::warpAffine( cv_img_tile_.image, warp_rotate_dst, rot_mat, cv_img_tile_.image.size() );
+
+	cv::Rect myROI(p_size_tiled_map_image_x_/2, p_size_tiled_map_image_y_/2, p_size_tiled_map_image_x_, p_size_tiled_map_image_y_);
+	cv::Mat croppedImage = warp_rotate_dst(myROI);
+
+	cv_img_tile_.image = croppedImage;
+
+
       image_transport_publisher_tile_.publish(cv_img_tile_.toImageMsg());
     }
   }
