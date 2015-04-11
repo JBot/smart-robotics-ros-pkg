@@ -5,7 +5,7 @@
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
        xmlns:xacro="http://ros.org/wiki/xacro" 
-	   name="indomptable">
+	   name="NESTOR">
 
 	<!--
 	<include filename="$(find pi_robot_description)/urdf/sensors/hokuyo_laser_gazebo.xacro" />
@@ -579,7 +579,7 @@
         <dynamics damping="0.0"/>
         </joint>
 
-        <joint name="wrist_pitch_joint" type="fixed">
+        <joint name="wrist_pitch_joint" type="revolute">
         <parent link="elbow_pitch_link" />
         <child link="wrist_pitch_link" />
         <origin xyz="0.2 0.0 0.0" rpy="0 0 0" />
@@ -1042,7 +1042,7 @@
     	<origin xyz="0 0 -0.064" rpy="0 0 0" />
 	</joint>
 	-->
-	<gazebo reference="indomptable">
+	<gazebo reference="NESTOR">
   	</gazebo>
 </robot>
 
