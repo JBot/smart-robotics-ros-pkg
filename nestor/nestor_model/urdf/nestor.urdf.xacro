@@ -275,6 +275,29 @@
 		<xacro:grey2 />
 	</xacro:my_cylinder>
 	
+ 	<!-- ============================   Arms   ============================ -->
+	<xacro:my_box name="arm_base_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+	<xacro:my_box name="shoulder_yaw_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+	<xacro:my_box name="shoulder_pitch_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+	<xacro:my_box name="elbow_pitch_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+	<xacro:my_box name="wrist_pitch_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+	<xacro:my_box name="wrist_yaw_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+	<xacro:my_box name="wrist_roll_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
+		<xacro:bracket_color />
+	</xacro:my_box>
+
  	<!--
 	<xacro:my_box name="base_laser_bottom" lwh="0.05 0.05 0.041" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/FlatBlack">
 		<xacro:black1 />
@@ -520,13 +543,20 @@
         </joint>
 
 
+	<!-- ARM -->
 
-<!--
+	<joint name="arm_base_joint" type="fixed">
+        <parent link="level1_link" />
+        <child link="arm_base_link" />
+        <origin xyz="0.065 0.0 0.165" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
         <joint name="shoulder_yaw_joint" type="revolute">
-        <parent link="level2_link" />
+        <parent link="arm_base_link" />
         <child link="shoulder_yaw_link" />
-        <origin xyz="0.085 0.0 0.025" rpy="0 0 0" />
-        <limit lower="-1.57" upper="1.57" effort="10" velocity="3" />
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+        <limit lower="-1.3" upper="1.3" effort="10" velocity="3" />
         <axis xyz="0 0 1" />
         <dynamics damping="0.0"/>
         </joint>
@@ -534,8 +564,8 @@
         <joint name="shoulder_pitch_joint" type="revolute">
         <parent link="shoulder_yaw_link" />
         <child link="shoulder_pitch_link" />
-        <origin xyz="0.0 0.0 0.08" rpy="0 0 0" />
-        <limit lower="-0.625" upper="0.625" effort="10" velocity="3" />
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+        <limit lower="-0.5" upper="1.4" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
         </joint>
@@ -543,46 +573,40 @@
         <joint name="elbow_pitch_joint" type="revolute">
         <parent link="shoulder_pitch_link" />
         <child link="elbow_pitch_link" />
-        <origin xyz="0.4 0.0 0" rpy="0 0 0" />
-        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <origin xyz="0.3 0.0 0" rpy="0 0 0" />
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
         </joint>
 
-        <joint name="wrist_fixed_joint" type="fixed">
+        <joint name="wrist_pitch_joint" type="fixed">
         <parent link="elbow_pitch_link" />
         <child link="wrist_pitch_link" />
-        <origin xyz="0.3 -0.04 0.0" rpy="0 0 0" />
-        <axis xyz="1 0 0" />
+        <origin xyz="0.2 0.0 0.0" rpy="0 0 0" />
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="3" />
+        <axis xyz="0 1 0" />
         </joint>
         
-        <joint name="wrist_pitch_joint" type="revolute">
+        <joint name="wrist_yaw_joint" type="revolute">
         <parent link="wrist_pitch_link" />
         <child link="wrist_yaw_link" />
-        <origin xyz="0.0 0.04 0" rpy="0 0 0" />
-        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
-        <axis xyz="0 1 0" />
-        <dynamics damping="0.0"/>
-        </joint>
-
-        <joint name="wrist_yaw_joint" type="revolute">
-        <parent link="wrist_yaw_link" />
-        <child link="wrist_roll_link" />
-        <origin xyz="0.0 0.0 -0.065" rpy="0 0 0" />
-        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <origin xyz="0.05 0.0 0" rpy="0 0 0" />
+        <limit lower="-1.53" upper="1.53" effort="10" velocity="3" />
         <axis xyz="0 0 1" />
         <dynamics damping="0.0"/>
         </joint>
 
         <joint name="wrist_roll_joint" type="revolute">
-        <parent link="wrist_roll_link" />
-        <child link="claw_link" />
-        <origin xyz="0.08 0.0 0.0" rpy="0 0 0" />
-        <limit lower="-2.53" upper="2.53" effort="10" velocity="3" />
+        <parent link="wrist_yaw_link" />
+        <child link="wrist_roll_link" />
+        <origin xyz="0.05 0.0 0.0" rpy="0 0 0" />
+        <limit lower="-1.53" upper="1.53" effort="10" velocity="3" />
         <axis xyz="1 0 0" />
         <dynamics damping="0.0"/>
         </joint>
--->
+
+
+
 <!-- Finger joint -->
 
 

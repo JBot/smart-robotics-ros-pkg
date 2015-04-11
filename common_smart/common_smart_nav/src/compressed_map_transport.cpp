@@ -56,269 +56,426 @@ using namespace std;
  */
 class MapAsImageProvider
 {
-public:
-  MapAsImageProvider()
-    : pn_("~")
-  {
-
-    ros::NodeHandle nhp("~");
-
-    image_transport_ = new image_transport::ImageTransport(n_);
-    image_transport_publisher_full_ = image_transport_->advertise("map_image/full", 1);
-    image_transport_publisher_tile_ = image_transport_->advertise("map_image/tile", 1);
-
-    pose_sub_ = n_.subscribe("pose", 1, &MapAsImageProvider::poseCallback, this);
-    map_sub_ = n_.subscribe("map", 1, &MapAsImageProvider::mapCallback, this);
-
-    //Which frame_id makes sense?
-    cv_img_full_.header.frame_id = "map_image";
-    cv_img_full_.encoding = sensor_msgs::image_encodings::MONO8;
-
-    cv_img_tile_.header.frame_id = "map_image";
-    cv_img_tile_.encoding = sensor_msgs::image_encodings::MONO8;
-
-    //Fixed cell width for tile based image, use dynamic_reconfigure for this later
-    int tiled_map_size;   
-    nhp.param<int>("tiled_map_size", tiled_map_size, 64);
-    p_size_tiled_map_image_x_ = tiled_map_size;
-    p_size_tiled_map_image_y_ = tiled_map_size;
-
-    ROS_INFO("Map to Image node started.");
-  }
-
-  ~MapAsImageProvider()
-  {
-    delete image_transport_;
-  }
-
-  double getHeadingFromQuat(geometry_msgs::Quaternion pose)
-{
-        double tmp = 0.0;
-        tmp = asin(2*pose.x*pose.y + 2*pose.z*pose.w);
-        //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z));
-        //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, asin(2*pose.x*pose.y + 2*pose.z*pose.w));
-        //ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.x*pose.w-2*pose.y*pose.z , 1 - 2*pose.x*pose.x - 2*pose.z*pose.z));
-        if( fabs(atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z)) < 0.1) {
-                return tmp;
-        }
-        else {  
-                if(tmp >= 0)
-                        return 3.1415926 - tmp;
-                else
-                        return -3.1415926 - tmp;
-        }
+	public:
+		MapAsImageProvider()
+			: pn_("~")
+		{
 
-}
+			ros::NodeHandle nhp("~");
 
-  //We assume the robot position is available as a PoseStamped here (querying tf would be the more general option)
-  void poseCallback(const geometry_msgs::PoseStampedConstPtr& pose)
-  {
-    pose_ptr_ = pose;
-  }
+			image_transport_ = new image_transport::ImageTransport(n_);
+			image_transport_publisher_full_ = image_transport_->advertise("map_image/full", 1);
+			image_transport_publisher_tile_ = image_transport_->advertise("map_image/tile", 1);
 
-  //The map->image conversion runs every time a new map is received at the moment
-  void mapCallback(const nav_msgs::OccupancyGridConstPtr& map)
-  {
-    int size_x = map->info.width;
-    int size_y = map->info.height;
+			pose_sub_ = n_.subscribe("pose", 1, &MapAsImageProvider::poseCallback, this);
+			map_sub_ = n_.subscribe("map", 1, &MapAsImageProvider::mapCallback, this);
+			pose_pub = n_.advertise< geometry_msgs::PoseStamped >("out_pose", 1);
 
-    if ((size_x < 3) || (size_y < 3) ){
-      ROS_INFO("Map size is only x: %d,  y: %d . Not running map to image conversion", size_x, size_y);
-      return;
-    }
+			//Which frame_id makes sense?
+			cv_img_full_.header.frame_id = "map_image";
+			cv_img_full_.encoding = sensor_msgs::image_encodings::MONO8;
 
-    // Only if someone is subscribed to it, do work and publish full map image
-    if (image_transport_publisher_full_.getNumSubscribers() > 0){
-      cv::Mat* map_mat  = &cv_img_full_.image;
+			cv_img_tile_.header.frame_id = "map_image";
+			cv_img_tile_.encoding = sensor_msgs::image_encodings::MONO8;
 
-      // resize cv image if it doesn't have the same dimensions as the map
-      if ( (map_mat->rows != size_y) && (map_mat->cols != size_x)){
-        *map_mat = cv::Mat(size_y, size_x, CV_8U);
-      }
+			//Fixed cell width for tile based image, use dynamic_reconfigure for this later
+			int tiled_map_size;   
+			nhp.param<int>("tiled_map_size", tiled_map_size, 64);
+			p_size_tiled_map_image_x_ = tiled_map_size;
+			p_size_tiled_map_image_y_ = tiled_map_size;
 
-      const std::vector<int8_t>& map_data (map->data);
+			last_time_pub = ros::Time::now();
 
-      unsigned char *map_mat_data_p=(unsigned char*) map_mat->data;
+			ROS_INFO("Map to Image node started.");
+		}
 
-      //We have to flip around the y axis, y for image starts at the top and y for map at the bottom
-      int size_y_rev = size_y-1;
+		~MapAsImageProvider()
+		{
+			delete image_transport_;
+		}
 
-      for (int y = size_y_rev; y >= 0; --y){
+		double getHeadingFromQuat(geometry_msgs::Quaternion pose)
+		{
+			double tmp = 0.0;
+			tmp = asin(2*pose.x*pose.y + 2*pose.z*pose.w);
+			//ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z));
+			//ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, asin(2*pose.x*pose.y + 2*pose.z*pose.w));
+			//ROS_ERROR("%f %f %f %f / %f", pose.x, pose.y, pose.z, pose.w, atan2(2*pose.x*pose.w-2*pose.y*pose.z , 1 - 2*pose.x*pose.x - 2*pose.z*pose.z));
+			if( fabs(atan2(2*pose.y*pose.w-2*pose.x*pose.z , 1 - 2*pose.y*pose.y - 2*pose.z*pose.z)) < 0.1) {
+				return tmp;
+			}
+			else {  
+				if(tmp >= 0)
+					return 3.1415926 - tmp;
+				else
+					return -3.1415926 - tmp;
+			}
 
-        int idx_map_y = size_x * (size_y -y);
-        int idx_img_y = size_x * y;
+		}
 
-        for (int x = 0; x < size_x; ++x){
+		void loop(void)
+		{
+			if( (ros::Time::now() - last_time_pub).toSec() > 2 )
+			{
 
-          int idx = idx_img_y + x;
 
-          switch (map_data[idx_map_y + x])
-          {
-          case -1:
-            map_mat_data_p[idx] = 127;
-            break;
+				// Only if someone is subscribed to it, do work and publish tile-based map image Also check if pose_ptr_ is valid
+				if ((image_transport_publisher_tile_.getNumSubscribers() > 0) && (pose_ptr_)){
 
-          case 0:
-            map_mat_data_p[idx] = 255;
-            break;
+					int size_x = saved_map.info.width;
+                        		int size_y = saved_map.info.height;
 
-          case 100:
-            map_mat_data_p[idx] = 0;
-            break;
-          }
-        }
-      }
-      image_transport_publisher_full_.publish(cv_img_full_.toImageMsg());
-    }
 
-    // Only if someone is subscribed to it, do work and publish tile-based map image Also check if pose_ptr_ is valid
-    if ((image_transport_publisher_tile_.getNumSubscribers() > 0) && (pose_ptr_)){
+					world_map_transformer_.setTransforms(saved_map);
 
-      world_map_transformer_.setTransforms(*map);
+					Eigen::Vector2f rob_position_world (pose_ptr_->pose.position.x, pose_ptr_->pose.position.y);
+					Eigen::Vector2f rob_position_map (world_map_transformer_.getC2Coords(rob_position_world));
 
-      Eigen::Vector2f rob_position_world (pose_ptr_->pose.position.x, pose_ptr_->pose.position.y);
-      Eigen::Vector2f rob_position_map (world_map_transformer_.getC2Coords(rob_position_world));
+					Eigen::Vector2i rob_position_mapi (rob_position_map.cast<int>());
 
-      Eigen::Vector2i rob_position_mapi (rob_position_map.cast<int>());
+					Eigen::Vector2i tile_size_lower_halfi (p_size_tiled_map_image_x_ , p_size_tiled_map_image_y_ );
 
-      Eigen::Vector2i tile_size_lower_halfi (p_size_tiled_map_image_x_ , p_size_tiled_map_image_y_ );
+					Eigen::Vector2i min_coords_map (rob_position_mapi - tile_size_lower_halfi);
 
-      Eigen::Vector2i min_coords_map (rob_position_mapi - tile_size_lower_halfi);
+					//ROS_INFO("pose_ptr_->pose.position %lf %lf %d %d", pose_ptr_->pose.position.x, pose_ptr_->pose.position.y,
+					//						rob_position_mapi[0], rob_position_mapi[1]);
 
-      //Clamp to lower map coords
-      if (min_coords_map[0] < 0){
-        min_coords_map[0] = 0;
-      }
+					//Clamp to lower map coords
+					if (min_coords_map[0] < 0){
+						min_coords_map[0] = 0;
+					}
 
-      if (min_coords_map[1] < 0){
-        min_coords_map[1] = 0;
-      }
+					if (min_coords_map[1] < 0){
+						min_coords_map[1] = 0;
+					}
 
-      Eigen::Vector2i max_coords_map (min_coords_map + Eigen::Vector2i(p_size_tiled_map_image_x_*2,p_size_tiled_map_image_y_*2));
+					Eigen::Vector2i max_coords_map (min_coords_map + Eigen::Vector2i(p_size_tiled_map_image_x_*2,p_size_tiled_map_image_y_*2));
 
-      //Clamp to upper map coords
-      if (max_coords_map[0] > size_x){
+					//Clamp to upper map coords
+					if (max_coords_map[0] > size_x){
 
-        int diff = max_coords_map[0] - size_x;
-        min_coords_map[0] -= diff;
+						int diff = max_coords_map[0] - size_x;
+						min_coords_map[0] -= diff;
 
-        max_coords_map[0] = size_x;
-      }
+						max_coords_map[0] = size_x;
+					}
 
-      if (max_coords_map[1] > size_y){
+					if (max_coords_map[1] > size_y){
 
-        int diff = max_coords_map[1] - size_y;
-        min_coords_map[1] -= diff;
+						int diff = max_coords_map[1] - size_y;
+						min_coords_map[1] -= diff;
 
-        max_coords_map[1] = size_y;
-      }
+						max_coords_map[1] = size_y;
+					}
 
-      //Clamp lower again (in case the map is smaller than the selected visualization window)
-      if (min_coords_map[0] < 0){
-        min_coords_map[0] = 0;
-      }
+					//Clamp lower again (in case the map is smaller than the selected visualization window)
+					if (min_coords_map[0] < 0){
+						min_coords_map[0] = 0;
+					}
 
-      if (min_coords_map[1] < 0){
-        min_coords_map[1] = 0;
-      }
+					if (min_coords_map[1] < 0){
+						min_coords_map[1] = 0;
+					}
 
-      Eigen::Vector2i actual_map_dimensions(max_coords_map - min_coords_map);
+					Eigen::Vector2i actual_map_dimensions(max_coords_map - min_coords_map);
 
-      cv::Mat* map_mat  = &cv_img_tile_.image;
+					cv::Mat* map_mat  = &cv_img_tile_.image;
 
-      // resize cv image if it doesn't have the same dimensions as the selected visualization window
-      if ( (map_mat->rows != actual_map_dimensions[0]) || (map_mat->cols != actual_map_dimensions[1])){
-        *map_mat = cv::Mat(actual_map_dimensions[0], actual_map_dimensions[1], CV_8U);
-      }
+					// resize cv image if it doesn't have the same dimensions as the selected visualization window
+					if ( (map_mat->rows != actual_map_dimensions[0]) || (map_mat->cols != actual_map_dimensions[1])){
+						*map_mat = cv::Mat(actual_map_dimensions[0], actual_map_dimensions[1], CV_8U);
+					}
 
-      const std::vector<int8_t>& map_data (map->data);
+					const std::vector<int8_t>& map_data (saved_map.data);
 
-      unsigned char *map_mat_data_p=(unsigned char*) map_mat->data;
+					unsigned char *map_mat_data_p=(unsigned char*) map_mat->data;
 
-      //We have to flip around the y axis, y for image starts at the top and y for map at the bottom
-      int y_img = max_coords_map[1]-1;
+					//We have to flip around the y axis, y for image starts at the top and y for map at the bottom
+					int y_img = max_coords_map[1]-1;
 
-      for (int y = min_coords_map[1]; y < max_coords_map[1];++y){
+					for (int y = min_coords_map[1]; y < max_coords_map[1];++y){
 
-        int idx_map_y = y_img-- * size_x;
-        int idx_img_y = (y-min_coords_map[1]) * actual_map_dimensions.x();
+						int idx_map_y = y_img-- * size_x;
+						int idx_img_y = (y-min_coords_map[1]) * actual_map_dimensions.x();
 
-        for (int x = min_coords_map[0]; x < max_coords_map[0];++x){
+						for (int x = min_coords_map[0]; x < max_coords_map[0];++x){
 
-          int img_index = idx_img_y + (x-min_coords_map[0]);
+							int img_index = idx_img_y + (x-min_coords_map[0]);
 
-          switch (map_data[idx_map_y+x])
-          {
-          case 0:
-            map_mat_data_p[img_index] = 255;
-            break;
+							switch (map_data[idx_map_y+x])
+							{
+								case 0:
+									map_mat_data_p[img_index] = 255;
+									break;
 
-          case -1:
-            map_mat_data_p[img_index] = 127;
-            break;
+								case -1:
+									map_mat_data_p[img_index] = 127;
+									break;
 
-          case 100:
-            map_mat_data_p[img_index] = 0;
-            break;
-          }
-        }        
-      }
+								case 100:
+									map_mat_data_p[img_index] = 0;
+									break;
+							}
+						}
+					} 
+					//ROS_INFO("orientation %lf", getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159);
 
+					cv::Point center = cv::Point( cv_img_tile_.image.cols/2, cv_img_tile_.image.rows/2 );
+					cv::Mat rot_mat( 2, 3, CV_32FC1 );
+					cv::Mat warp_rotate_dst;
+					//double angle = -1.0;
+					double scale = 1.0;
 
-	ROS_INFO("orientation %lf", getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159);
+					/// Get the rotation matrix with the specifications above
+					rot_mat = cv::getRotationMatrix2D( center, -getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159, scale );
 
-	cv::Point center = cv::Point( cv_img_tile_.image.cols/2, cv_img_tile_.image.rows/2 );
-        cv::Mat rot_mat( 2, 3, CV_32FC1 );
-        cv::Mat warp_rotate_dst;
-        //double angle = -1.0;
-        double scale = 1.0;
+					/// Rotate the warped image
+					cv::warpAffine( cv_img_tile_.image, warp_rotate_dst, rot_mat, cv_img_tile_.image.size() );
 
-        /// Get the rotation matrix with the specifications above
-        rot_mat = cv::getRotationMatrix2D( center, -getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159, scale );
+					cv::Rect myROI(p_size_tiled_map_image_x_/2, p_size_tiled_map_image_y_/2, p_size_tiled_map_image_x_, p_size_tiled_map_image_y_);
+					cv::Mat croppedImage = warp_rotate_dst(myROI);
 
-        /// Rotate the warped image
-        cv::warpAffine( cv_img_tile_.image, warp_rotate_dst, rot_mat, cv_img_tile_.image.size() );
+					cv_img_tile_.image = croppedImage;
 
-	cv::Rect myROI(p_size_tiled_map_image_x_/2, p_size_tiled_map_image_y_/2, p_size_tiled_map_image_x_, p_size_tiled_map_image_y_);
-	cv::Mat croppedImage = warp_rotate_dst(myROI);
 
-	cv_img_tile_.image = croppedImage;
+					image_transport_publisher_tile_.publish(cv_img_tile_.toImageMsg());
+					pose_pub.publish(*pose_ptr_);
+					last_time_pub = ros::Time::now();
+				}
 
 
-      image_transport_publisher_tile_.publish(cv_img_tile_.toImageMsg());
-    }
-  }
+			}	
+		}
 
-  ros::Subscriber map_sub_;
-  ros::Subscriber pose_sub_;
+		//We assume the robot position is available as a PoseStamped here (querying tf would be the more general option)
+		void poseCallback(const geometry_msgs::PoseStampedConstPtr& pose)
+		{
+			pose_ptr_ = pose;
+		}
 
-  image_transport::Publisher image_transport_publisher_full_;
-  image_transport::Publisher image_transport_publisher_tile_;
+		//The map->image conversion runs every time a new map is received at the moment
+		void mapCallback(const nav_msgs::OccupancyGridConstPtr& map)
+		{
 
-  image_transport::ImageTransport* image_transport_;
+			saved_map = *map;
 
-  geometry_msgs::PoseStampedConstPtr pose_ptr_;
+			int size_x = map->info.width;
+			int size_y = map->info.height;
 
-  cv_bridge::CvImage cv_img_full_;
-  cv_bridge::CvImage cv_img_tile_;
+			if ((size_x < 3) || (size_y < 3) ){
+				ROS_INFO("Map size is only x: %d,  y: %d . Not running map to image conversion", size_x, size_y);
+				return;
+			}
 
-  ros::NodeHandle n_;
-  ros::NodeHandle pn_;
+			// Only if someone is subscribed to it, do work and publish full map image
+			if (image_transport_publisher_full_.getNumSubscribers() > 0){
+				cv::Mat* map_mat  = &cv_img_full_.image;
 
-  int p_size_tiled_map_image_x_;
-  int p_size_tiled_map_image_y_;
+				// resize cv image if it doesn't have the same dimensions as the map
+				if ( (map_mat->rows != size_y) && (map_mat->cols != size_x)){
+					*map_mat = cv::Mat(size_y, size_x, CV_8U);
+				}
 
-  HectorMapTools::CoordinateTransformer<float> world_map_transformer_;
+				const std::vector<int8_t>& map_data (map->data);
 
+				unsigned char *map_mat_data_p=(unsigned char*) map_mat->data;
+
+				//We have to flip around the y axis, y for image starts at the top and y for map at the bottom
+				int size_y_rev = size_y-1;
+
+				for (int y = size_y_rev; y >= 0; --y){
+
+					int idx_map_y = size_x * (size_y -y);
+					int idx_img_y = size_x * y;
+
+					for (int x = 0; x < size_x; ++x){
+
+						int idx = idx_img_y + x;
+
+						switch (map_data[idx_map_y + x])
+						{
+							case -1:
+								map_mat_data_p[idx] = 127;
+								break;
+
+							case 0:
+								map_mat_data_p[idx] = 255;
+								break;
+
+							case 100:
+								map_mat_data_p[idx] = 0;
+								break;
+						}
+					}
+				}
+				image_transport_publisher_full_.publish(cv_img_full_.toImageMsg());
+			}
+
+			// Only if someone is subscribed to it, do work and publish tile-based map image Also check if pose_ptr_ is valid
+			if ((image_transport_publisher_tile_.getNumSubscribers() > 0) && (pose_ptr_)){
+
+				world_map_transformer_.setTransforms(*map);
+
+				Eigen::Vector2f rob_position_world (pose_ptr_->pose.position.x, pose_ptr_->pose.position.y);
+				Eigen::Vector2f rob_position_map (world_map_transformer_.getC2Coords(rob_position_world));
+
+				Eigen::Vector2i rob_position_mapi (rob_position_map.cast<int>());
+
+				Eigen::Vector2i tile_size_lower_halfi (p_size_tiled_map_image_x_ , p_size_tiled_map_image_y_ );
+
+				Eigen::Vector2i min_coords_map (rob_position_mapi - tile_size_lower_halfi);
+
+				//Clamp to lower map coords
+				if (min_coords_map[0] < 0){
+					min_coords_map[0] = 0;
+				}
+
+				if (min_coords_map[1] < 0){
+					min_coords_map[1] = 0;
+				}
+
+				Eigen::Vector2i max_coords_map (min_coords_map + Eigen::Vector2i(p_size_tiled_map_image_x_*2,p_size_tiled_map_image_y_*2));
+
+				//Clamp to upper map coords
+				if (max_coords_map[0] > size_x){
+
+					int diff = max_coords_map[0] - size_x;
+					min_coords_map[0] -= diff;
+
+					max_coords_map[0] = size_x;
+				}
+
+				if (max_coords_map[1] > size_y){
+
+					int diff = max_coords_map[1] - size_y;
+					min_coords_map[1] -= diff;
+
+					max_coords_map[1] = size_y;
+				}
+
+				//Clamp lower again (in case the map is smaller than the selected visualization window)
+				if (min_coords_map[0] < 0){
+					min_coords_map[0] = 0;
+				}
+
+				if (min_coords_map[1] < 0){
+					min_coords_map[1] = 0;
+				}
+
+				Eigen::Vector2i actual_map_dimensions(max_coords_map - min_coords_map);
+
+				cv::Mat* map_mat  = &cv_img_tile_.image;
+
+				// resize cv image if it doesn't have the same dimensions as the selected visualization window
+				if ( (map_mat->rows != actual_map_dimensions[0]) || (map_mat->cols != actual_map_dimensions[1])){
+					*map_mat = cv::Mat(actual_map_dimensions[0], actual_map_dimensions[1], CV_8U);
+				}
+
+				const std::vector<int8_t>& map_data (map->data);
+
+				unsigned char *map_mat_data_p=(unsigned char*) map_mat->data;
+
+				//We have to flip around the y axis, y for image starts at the top and y for map at the bottom
+				int y_img = max_coords_map[1]-1;
+
+				for (int y = min_coords_map[1]; y < max_coords_map[1];++y){
+
+					int idx_map_y = y_img-- * size_x;
+					int idx_img_y = (y-min_coords_map[1]) * actual_map_dimensions.x();
+
+					for (int x = min_coords_map[0]; x < max_coords_map[0];++x){
+
+						int img_index = idx_img_y + (x-min_coords_map[0]);
+
+						switch (map_data[idx_map_y+x])
+						{
+							case 0:
+								map_mat_data_p[img_index] = 255;
+								break;
+
+							case -1:
+								map_mat_data_p[img_index] = 127;
+								break;
+
+							case 100:
+								map_mat_data_p[img_index] = 0;
+								break;
+						}
+					}        
+				}
+
+
+				//ROS_INFO("orientation %lf", getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159);
+
+				cv::Point center = cv::Point( cv_img_tile_.image.cols/2, cv_img_tile_.image.rows/2 );
+				cv::Mat rot_mat( 2, 3, CV_32FC1 );
+				cv::Mat warp_rotate_dst;
+				//double angle = -1.0;
+				double scale = 1.0;
+
+				/// Get the rotation matrix with the specifications above
+				rot_mat = cv::getRotationMatrix2D( center, -getHeadingFromQuat(pose_ptr_->pose.orientation)*180.0/3.14159, scale );
+
+				/// Rotate the warped image
+				cv::warpAffine( cv_img_tile_.image, warp_rotate_dst, rot_mat, cv_img_tile_.image.size() );
+
+				cv::Rect myROI(p_size_tiled_map_image_x_/2, p_size_tiled_map_image_y_/2, p_size_tiled_map_image_x_, p_size_tiled_map_image_y_);
+				cv::Mat croppedImage = warp_rotate_dst(myROI);
+
+				cv_img_tile_.image = croppedImage;
+
+
+				image_transport_publisher_tile_.publish(cv_img_tile_.toImageMsg());
+				pose_pub.publish(*pose_ptr_);
+
+				last_time_pub = ros::Time::now();
+			}
+		}
+
+		ros::Subscriber map_sub_;
+		ros::Subscriber pose_sub_;
+		ros::Publisher pose_pub;
+
+		image_transport::Publisher image_transport_publisher_full_;
+		image_transport::Publisher image_transport_publisher_tile_;
+
+		image_transport::ImageTransport* image_transport_;
+
+		geometry_msgs::PoseStampedConstPtr pose_ptr_;
+
+		cv_bridge::CvImage cv_img_full_;
+		cv_bridge::CvImage cv_img_tile_;
+
+		ros::NodeHandle n_;
+		ros::NodeHandle pn_;
+
+		int p_size_tiled_map_image_x_;
+		int p_size_tiled_map_image_y_;
+
+		HectorMapTools::CoordinateTransformer<float> world_map_transformer_;
+
+		nav_msgs::OccupancyGrid saved_map;
+		ros::Time last_time_pub;
 };
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "map_to_image_node");
+	ros::init(argc, argv, "map_to_image_node");
 
-  MapAsImageProvider map_image_provider;
+	MapAsImageProvider map_image_provider;
 
-  ros::spin();
+	// Refresh rate
+	ros::Rate loop_rate(20); /* 5 min */
+	while (ros::ok())
+	{
+		map_image_provider.loop();
+		ros::spinOnce();
+		loop_rate.sleep();
+	}
+	ros::Duration(2.0).sleep();
 
-  return 0;
+
+	//ros::spin();
+
+	return 0;
 }

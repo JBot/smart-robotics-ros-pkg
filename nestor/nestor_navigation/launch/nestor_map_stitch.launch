@@ -7,10 +7,14 @@
   </node>
 
   <!--  -->
-  <node pkg="hector_compressed_map_transport" type="map_to_image_node" respawn="false" name="HOME_map_image_node" output="screen">
+  <!--<node pkg="hector_compressed_map_transport" type="map_to_image_node" respawn="false" name="HOME_map_image_node" output="screen">-->
+  <node pkg="common_smart_nav" type="compressed_map_transport" respawn="false" name="HOME_map_image_node" output="screen">
+        <param name="tiled_map_size" type="int" value="600" />
         <remap from="/map" to="/HOME/map" />
-        <remap from="/pose" to="/slam_out_pose" />
-        <remap from="/map_image/full" to="/HOME/image_map" />
+        <remap from="/pose" to="/NESTOR/init_pose" />
+        <remap from="/out_pose" to="/HOME/INIT/init_pose" />
+        <remap from="/map_image/full" to="/HOME/full_image_map" />
+        <remap from="/map_image/tile" to="/HOME/image_map" />
   </node>
 
   <!--  -->
@@ -19,6 +23,8 @@
         <param name="tiled_map_size" type="int" value="400" />
 	<remap from="/map" to="/NESTOR/map" />
         <remap from="/pose" to="/slam_out_pose" />
+        <remap from="/out_pose" to="/NESTOR/INIT/actual_pose" />
+        <remap from="/map_image/full" to="/NESTOR/full_image_map" />
         <remap from="/map_image/tile" to="/NESTOR/image_map" />
   </node>
 
