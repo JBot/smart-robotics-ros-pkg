@@ -265,13 +265,13 @@
 	<xacro:my_box name="head_base_link" lwh="0.21 0.28 0.002" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_box>
-	<xacro:my_cylinder name="head_tube1_link" l="0.650" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+	<xacro:my_cylinder name="head_tube1_link" l="0.456" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_cylinder>
-	<xacro:my_cylinder name="head_tube2_link" l="0.650" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+	<xacro:my_cylinder name="head_tube2_link" l="0.456" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_cylinder>
-	<xacro:my_cylinder name="head_tube3_link" l="0.650" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+	<xacro:my_cylinder name="head_tube3_link" l="0.456" r="0.006" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
 		<xacro:grey2 />
 	</xacro:my_cylinder>
 	
@@ -513,32 +513,32 @@
         <joint name="level2_joint" type="fixed">
         <parent link="level1_link" />
         <child link="level2_link" />
-        <origin xyz="0.0 0.0 0.1" rpy="0 0 0" />
+        <origin xyz="0.0 0.0 0.301" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
 
         <joint name="head_base_joint" type="fixed">
         <parent link="level2_link" />
         <child link="head_base_link" />
-        <origin xyz="0.0 0.0 0.65" rpy="0 0 0" />
+        <origin xyz="0.0 0.0 0.456" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
         <joint name="head_tube1_joint" type="fixed">
         <parent link="level2_link" />
         <child link="head_tube1_link" />
-        <origin xyz="0.035 0.125 0.326" rpy="0 0 0" />
+        <origin xyz="0.035 0.125 0.228" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
         <joint name="head_tube2_joint" type="fixed">
         <parent link="level2_link" />
         <child link="head_tube2_link" />
-        <origin xyz="0.035 -0.125 0.326" rpy="0 0 0" />
+        <origin xyz="0.035 -0.125 0.228" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
         <joint name="head_tube3_joint" type="fixed">
         <parent link="level2_link" />
         <child link="head_tube3_link" />
-        <origin xyz="-0.065 0.0 0.326" rpy="0 0 0" />
+        <origin xyz="-0.065 0.0 0.228" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
 
@@ -565,7 +565,7 @@
         <parent link="shoulder_yaw_link" />
         <child link="shoulder_pitch_link" />
         <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-        <limit lower="-0.5" upper="1.4" effort="10" velocity="3" />
+        <limit lower="-1.5" upper="0.5" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
         </joint>
@@ -574,7 +574,7 @@
         <parent link="shoulder_pitch_link" />
         <child link="elbow_pitch_link" />
         <origin xyz="0.3 0.0 0" rpy="0 0 0" />
-        <limit lower="-1.57" upper="1.57" effort="10" velocity="3" />
+        <limit lower="-2.0" upper="2.0" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         <dynamics damping="0.0"/>
         </joint>
@@ -583,7 +583,7 @@
         <parent link="elbow_pitch_link" />
         <child link="wrist_pitch_link" />
         <origin xyz="0.2 0.0 0.0" rpy="0 0 0" />
-        <limit lower="-1.57" upper="1.57" effort="10" velocity="3" />
+        <limit lower="-2.0" upper="2.0" effort="10" velocity="3" />
         <axis xyz="0 1 0" />
         </joint>
         
@@ -591,7 +591,7 @@
         <parent link="wrist_pitch_link" />
         <child link="wrist_yaw_link" />
         <origin xyz="0.05 0.0 0" rpy="0 0 0" />
-        <limit lower="-1.53" upper="1.53" effort="10" velocity="3" />
+        <limit lower="-2.0" upper="2.0" effort="10" velocity="3" />
         <axis xyz="0 0 1" />
         <dynamics damping="0.0"/>
         </joint>
@@ -600,7 +600,7 @@
         <parent link="wrist_yaw_link" />
         <child link="wrist_roll_link" />
         <origin xyz="0.05 0.0 0.0" rpy="0 0 0" />
-        <limit lower="-1.53" upper="1.53" effort="10" velocity="3" />
+        <limit lower="-2.0" upper="2.0" effort="10" velocity="3" />
         <axis xyz="1 0 0" />
         <dynamics damping="0.0"/>
         </joint>
