@@ -1,0 +1,24 @@
+<package>
+  <description brief="carry_navigation">
+
+     carry_navigation
+
+  </description>
+  <author>odroid</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/carry_navigation</url>
+  <depend package="roscpp"/>
+  <depend package="move_base"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="move_base_msgs"/>
+  <depend package="actionlib"/>
+  <depend package="common_smart_nav"/>
+
+</package>
+
+

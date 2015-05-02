@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Path planner / Costmap -->
+  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
+    <param name="costmap_name" type="str" value="PETIT_costmap" />
+    <param name="planner_name" type="str" value="PETIT_planner" />
+    <param name="map_name" type="str" value="petit_map" />
+
+    <rosparam file="$(find eurobot2015_petit_nav)/launch/nav_params.yaml" command="load" />
+
+        <remap from="/ROBOT/goal" to="/PETIT/goal" />
+        <remap from="/ROBOT/plan" to="/PETIT/plan" />
+        <remap from="/ROBOT/path_done" to="/PETIT/path_done" />
+        <remap from="/ROBOT/compute_path" to="/PETIT/compute_path" />
+        <remap from="/ROBOT/pause" to="/PETIT/stop_planner" />
+        <remap from="/ROBOT/resume" to="/PETIT/pause_planner" />
+
+        <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
+        <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
+  </node>
+
+  <!-- Path wrapper = Path follower -->
+  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
+    <param name="map_name" type="str" value="petit_map" />
+    <param name="base_name" type="str" value="petit_base_link" /> 
+
+    <param name="nb_step_skip" type="int" value="4" />
+    <param name="max_dist_skip" type="double" value="0.13" />
+    <param name="max_speed_ang" type="double" value="0.25" />
+    <param name="max_speed_lin" type="double" value="0.13" />
+
+       <remap from="/ROBOT/plan" to="/PETIT/plan" />
+        <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
+        <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
+        <remap from="/resume_nav" to="/PETIT/resume_pathwrapper" />
+        <remap from="/pause_nav" to="/PETIT/pause_pathwrapper" />
+        <remap from="/path_done" to="/PETIT/path_done" />
+        <remap from="/pause_planner" to="/PETIT/pause_planner" />
+  </node>
+
+  
+</launch>

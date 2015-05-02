@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Static transform from world to the map of the PETIT robot -->
+  <node pkg="tf" type="static_transform_publisher" name="world2carry_broadcaster" args="0 0 0 0 0 0 /world /carry_map 100"/>
+
+  <!-- IMU for PETIT robot 
+  <node pkg="um6" type="um6_driver" respawn="false" name="PETIT_imu_driver" output="screen">
+        <param name="port" type="str" value="/dev/ttyUM6" />
+  </node>-->
+
+  <!-- Fake odom from IMU 
+  <node pkg="eurobot2015_petit_nav" type="petit_odom" respawn="false" name="PETIT_fake_odom_IMU" output="screen">
+  </node>-->
+
+  <!-- Map server for PETIT robot -->
+  <node pkg="map_server" type="map_server" respawn="false" name="PETIT_map_server" output="screen" args="$(find eurobot2014_models)/map2014.yaml">
+        <param name="frame_id" type="str" value="/carry_map" />
+        <remap from="/map" to="/CARRY/map" />
+  </node>
+
+  <!-- LASER NODE -->
+  <node pkg="hokuyo_node" type="hokuyo_node" name="CARRY_hokuyo" output="screen">
+    <param name="port" value="/dev/ttyHOKUYO" />
+    <param name="frame_id" value="carry_laser_nav_link" />
+    <param name="min_ang" value="-2.086214" />
+    <param name="max_ang" value="2.092350" />
+    <param name="skip" value="0" />
+    <param name="cluster" value="2" />
+
+    <remap from="/scan" to="/CARRY/laser_nav" />
+  </node>
+
+  <!-- FILTER LASER NODE 
+  <node pkg="test_pcl" type="laser_test" name="Filter_laser" output="screen">
+  </node>-->
+
+  <!-- Low level motor driver => RoboClaw -->
+  <node pkg="carry_navigation" type="carry_drive_roboclaw" respawn="false" name="CARRY_RoboClawDriver" output="screen">
+        <remap from="/cmd_vel" to="/CARRY/cmd_vel" />
+  </node>
+
+
+
+</launch>

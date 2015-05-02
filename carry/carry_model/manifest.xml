@@ -1,0 +1,20 @@
+<package>
+  <description brief="carry_model">
+
+     carry_model
+
+  </description>
+  <author>odroid</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/carry_model</url>
+  <depend package="roscpp"/>
+  <depend package="robot_state_publisher"/>
+  <depend package="joint_state_publisher"/>
+  <depend package="tf"/>
+  <depend package="std_msgs"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+

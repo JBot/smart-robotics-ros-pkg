@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!-- Load the URDF/Xacro model of our robot -->
+    <param name="carry_description" command="$(find xacro)/xacro.py '$(find carry_model)/urdf/carry.urdf.xacro'" />
+
+    <!-- Publish the robot state -->
+    <node name="carry_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <param name="publish_frequency" value="20.0"/>
+	<remap from="robot_description" to="carry_description" />
+    </node>
+
+
+</launch>
+
