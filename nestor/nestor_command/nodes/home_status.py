@@ -41,8 +41,8 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal, MoveBaseActionFeedb
 class PreparingShower(State):
     def __init__(self):
         State.__init__(self, outcomes=['succeeded','aborted','preempted'])
-        self.heat_pub = rospy.Publisher('/HOME/heat_shower', Empty)
-        self.french_pub = rospy.Publisher('/nestor/french_voice', String)
+        self.heat_pub = rospy.Publisher('/HOME/showerHeatON', Empty)
+        self.french_pub = rospy.Publisher('/NESTOR/french_voice', String)
 	pass
 
     def execute(self, userdata):
@@ -57,7 +57,7 @@ class PreparingShower(State):
 class GoShower(State):
     def __init__(self):
         State.__init__(self, outcomes=['succeeded','aborted','preempted'])
-        self.french_pub = rospy.Publisher('/nestor/french_voice', String, 1)
+        self.french_pub = rospy.Publisher('/NESTOR/french_voice', String)
         pass
 
     def execute(self, userdata):
@@ -71,8 +71,8 @@ class GoShower(State):
 class StopShower(State):
     def __init__(self):
         State.__init__(self, outcomes=['succeeded','aborted','preempted'])
-        self.heat_pub = rospy.Publisher('/HOME/stop_heat_shower', Empty)
-        self.french_pub = rospy.Publisher('/nestor/french_voice', String)
+        self.heat_pub = rospy.Publisher('/HOME/showerHeatOFF', Empty)
+        self.french_pub = rospy.Publisher('/NESTOR/french_voice', String)
         pass
 
     def execute(self, userdata):
@@ -149,7 +149,7 @@ class WakingUp(State):
 	my_string.data="Il est l'heure de se lever. Debout les feignants."
 	self.french_pub.publish(my_string)
 
-        rospy.sleep(180)
+        rospy.sleep(480)
 	self.ON2_pub.publish(Empty())
 
         rospy.sleep(120)
