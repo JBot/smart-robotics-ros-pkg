@@ -275,6 +275,10 @@
 		<xacro:grey2 />
 	</xacro:my_cylinder>
 	
+	<xacro:my_box name="head_kinect_link" lwh="0.05 0.05 0.05" xyz="0 0 0" rpy="0 0 0" mass="0.1" material="Gazebo/Grey">
+                <xacro:grey2 />
+        </xacro:my_box>
+
  	<!-- ============================   Arms   ============================ -->
 	<xacro:my_box name="arm_base_link" lwh="0.05 0.05 0.05" xyz="0.0 0.0 0.0" rpy="0 0 0" mass="0.055" material="Gazebo/WhiteEmissive">
 		<xacro:bracket_color />
@@ -541,6 +545,14 @@
         <origin xyz="-0.065 0.0 0.228" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         </joint>
+
+	<joint name="head_kinect_joint" type="fixed">
+        <parent link="head_base_link" />
+        <child link="head_kinect_link" />
+        <origin xyz="0.0 0.0 0.06" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        </joint>
+
 
 
 	<!-- ARM -->

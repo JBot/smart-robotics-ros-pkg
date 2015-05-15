@@ -41,6 +41,9 @@ case "$cond" in
 'Sunny')
     echo "Ensoleillé\c"
 ;;
+'Partly Sunny')
+    echo "Partiellement ensoleillé\c"
+;;
 'T-Storms')
     echo "Orageux\c"
 ;;
