@@ -141,10 +141,11 @@ DriveRoboClaw::DriveRoboClaw()
 
 	//write_RoboClaw_PID_M1(128, 16384, 65536, 32768, 44000);
 	//write_RoboClaw_PID_M2(128, 0x00004000, 0x00010000, 0x00008000, 44000);
-	write_RoboClaw_PID_M1(128, 90384, 170536, 100768, 80000); // 94000 // 120000
-	write_RoboClaw_PID_M2(128, 90384, 170536, 100768, 80000);
+	write_RoboClaw_PID_M1(128, 100384, 1005, 6076, 44000); // 94000 // 120000
+	write_RoboClaw_PID_M2(128, 100384, 1005, 6076, 44000);
 
-	write_RoboClaw_PID_M1(129, 90384, 170536, 100768, 80000);
+	write_RoboClaw_PID_M1(129, 100384, 1005, 6076, 44000);
+	//write_RoboClaw_PID_M1(129, 90384, 170536, 100768, 80000);
 
 }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find carry_model)/launch/carry_model.launch">
+  </include>
+
+  <include file="$(find carry_navigation)/launch/sensors.launch">
+  </include>
+
+  <include file="$(find carry_navigation)/launch/hector.launch">
+  </include>
+
+  <include file="$(find carry_navigation)/launch/amcl.launch">
+  </include>
+
+
+
+</launch>
+

@@ -1,0 +1,17 @@
+<package>
+  <description brief="carry_launch">
+
+     carry_launch
+
+  </description>
+  <author>odroid</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/carry_launch</url>
+  <depend package="roscpp"/>
+  <depend package="carry_navigation"/>
+  <depend package="carry_model"/>
+
+</package>
+
+
