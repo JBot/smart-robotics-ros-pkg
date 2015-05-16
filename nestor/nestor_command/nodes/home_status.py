@@ -302,7 +302,7 @@ class Pause(State):
 
 class SMACHAI():
     def __init__(self):
-        rospy.init_node('petit_smach_ai', anonymous=False)
+        rospy.init_node('HOME_automation_smach', anonymous=False)
         
         # Set the shutdown function (stop the robot)
         rospy.on_shutdown(self.shutdown)
