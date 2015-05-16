@@ -4,42 +4,45 @@
   <master auto="start"/>
 
   <!-- Path planner / Costmap -->
-  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="PETIT_pathplanner" output="screen">
-    <param name="costmap_name" type="str" value="PETIT_costmap" />
-    <param name="planner_name" type="str" value="PETIT_planner" />
-    <param name="map_name" type="str" value="petit_map" />
+  <node pkg="common_smart_nav" type="pathplanner" respawn="false" name="CARRY_pathplanner" output="screen">
+    <param name="costmap_name" type="str" value="CARRY_costmap" />
+    <param name="planner_name" type="str" value="CARRY_planner" />
+    <param name="map_name" type="str" value="world" />
 
-    <rosparam file="$(find eurobot2015_petit_nav)/launch/nav_params.yaml" command="load" />
+    <rosparam file="$(find carry_navigation)/launch/nav_params.yaml" command="load" />
 
-        <remap from="/ROBOT/goal" to="/PETIT/goal" />
-        <remap from="/ROBOT/plan" to="/PETIT/plan" />
-        <remap from="/ROBOT/path_done" to="/PETIT/path_done" />
-        <remap from="/ROBOT/compute_path" to="/PETIT/compute_path" />
-        <remap from="/ROBOT/pause" to="/PETIT/stop_planner" />
-        <remap from="/ROBOT/resume" to="/PETIT/pause_planner" />
+        <remap from="/ROBOT/goal" to="/CARRY/goal" />
+        <remap from="/ROBOT/plan" to="/CARRY/plan" />
+        <remap from="/ROBOT/path_done" to="/CARRY/path_done" />
+        <remap from="/ROBOT/compute_path" to="/CARRY/compute_path" />
+        <remap from="/ROBOT/pause" to="/CARRY/stop_planner" />
+        <remap from="/ROBOT/resume" to="/CARRY/pause_planner" />
 
-        <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
-        <remap from="/ROBOT/get_distance" to="/PETIT/get_distance" />
-        <remap from="/ROBOT/get_path" to="/PETIT/get_path" />
+        <remap from="/ROBOT/get_robot_pose" to="/CARRY/get_robot_pose" />
+        <remap from="/ROBOT/get_distance" to="/CARRY/get_distance" />
+        <remap from="/ROBOT/get_path" to="/CARRY/get_path" />
   </node>
 
   <!-- Path wrapper = Path follower -->
-  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="PETIT_pathwrapper" output="screen">
-    <param name="map_name" type="str" value="petit_map" />
-    <param name="base_name" type="str" value="petit_base_link" /> 
+  <node pkg="common_smart_nav" type="pathwrapper" respawn="false" name="CARRY_pathwrapper" output="screen">
+    <param name="map_name" type="str" value="world" />
+    <param name="base_name" type="str" value="carry_base_link" /> 
 
     <param name="nb_step_skip" type="int" value="4" />
     <param name="max_dist_skip" type="double" value="0.13" />
-    <param name="max_speed_ang" type="double" value="0.25" />
-    <param name="max_speed_lin" type="double" value="0.13" />
+    <param name="max_speed_ang" type="double" value="0.10" />
+    <param name="max_speed_lin" type="double" value="0.15" />
+    <param name="Px" type="double" value="1.8" />
+    <param name="Py" type="double" value="1.3" />
+    <param name="Pz" type="double" value="1.5" />
 
-       <remap from="/ROBOT/plan" to="/PETIT/plan" />
-        <remap from="/ROBOT/get_robot_pose" to="/PETIT/get_robot_pose" />
-        <remap from="/cmd_vel" to="/PETIT/cmd_vel" />
-        <remap from="/resume_nav" to="/PETIT/resume_pathwrapper" />
-        <remap from="/pause_nav" to="/PETIT/pause_pathwrapper" />
-        <remap from="/path_done" to="/PETIT/path_done" />
-        <remap from="/pause_planner" to="/PETIT/pause_planner" />
+       <remap from="/ROBOT/plan" to="/CARRY/plan" />
+        <remap from="/ROBOT/get_robot_pose" to="/CARRY/get_robot_pose" />
+        <remap from="/cmd_vel" to="/CARRY/cmd_vel" />
+        <remap from="/resume_nav" to="/CARRY/resume_pathwrapper" />
+        <remap from="/pause_nav" to="/CARRY/pause_pathwrapper" />
+        <remap from="/path_done" to="/CARRY/path_done" />
+        <remap from="/pause_planner" to="/CARRY/pause_planner" />
   </node>
 
   

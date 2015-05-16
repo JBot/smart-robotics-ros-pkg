@@ -7,6 +7,7 @@
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Twist.h>
 
+#define USE_BOOST
 
 #include <cstring>
 #include <iostream>
@@ -34,7 +35,7 @@
 #define theta1 (3.14159265359 - 2.09439510239)
 #define theta2 (3.14159265359)
 #define theta3 (3.14159265359 + 2.09439510239)
-#define R (0.09)
+#define R (0.3)//(0.09)
 #define RAYON (0.03)
 
 
@@ -89,12 +90,12 @@ DriveRoboClaw::DriveRoboClaw()
 
 #ifdef USE_BOOST
 	port_="/dev/ttyUSB0";
-	baud_rate_=115200;
+	baud_rate_=38400;
 
     	try {
         	//boost::asio::serial_port serial_(io, port_);
 		serial_ = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io, port_));
-        	//serial_.set_option(boost::asio::serial_port_base::baud_rate(baud_rate_));
+        	serial_->set_option(boost::asio::serial_port_base::baud_rate(baud_rate_));
 		//boost::asio::write(serial_,boost::asio::buffer(sendThis,1));
 		serial_->set_option(boost::asio::serial_port_base::character_size(8));
 		serial_->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
@@ -113,7 +114,7 @@ DriveRoboClaw::DriveRoboClaw()
 	if(fd == -1) // if open is unsucessful
 	{
 		//perror("open_port: Unable to open /dev/ttyS0 - ");
-		printf("open_port: Unable to open /dev/ttyROBOCLAW. \n");
+		printf("open_port: Unable to open /dev/ttyUSB0. \n");
 	}
 	else
 	{
@@ -141,10 +142,10 @@ DriveRoboClaw::DriveRoboClaw()
 
 	//write_RoboClaw_PID_M1(128, 16384, 65536, 32768, 44000);
 	//write_RoboClaw_PID_M2(128, 0x00004000, 0x00010000, 0x00008000, 44000);
-	write_RoboClaw_PID_M1(128, 100384, 1005, 6076, 44000); // 94000 // 120000
-	write_RoboClaw_PID_M2(128, 100384, 1005, 6076, 44000);
+	write_RoboClaw_PID_M1(128, 150384, 80005, 60076, 44000); // 94000 // 120000
+	write_RoboClaw_PID_M2(128, 150384, 80005, 60076, 44000);
 
-	write_RoboClaw_PID_M1(129, 100384, 1005, 6076, 44000);
+	write_RoboClaw_PID_M1(129, 150384, 80005, 60076, 44000);
 	//write_RoboClaw_PID_M1(129, 90384, 170536, 100768, 80000);
 
 }

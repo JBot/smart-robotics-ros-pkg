@@ -53,7 +53,8 @@ class Nav2Waypoint(State):
         self.goal.target_pose.header.frame_id = 'world'
 
     def execute(self, userdata):
-        self.goal.target_pose = self.my_goal 
+        self.goal.target_pose.pose = self.my_goal 
+        self.goal.target_pose.header.frame_id = 'world'
 
         rospy.loginfo("waypoint_in: " + str(self.goal.target_pose))
 
@@ -111,7 +112,7 @@ class Pause(State):
 
 class SMACHAI():
     def __init__(self):
-        rospy.init_node('petit_smach_ai', anonymous=False)
+        rospy.init_node('carry_smach_move', anonymous=False)
         
         # Set the shutdown function (stop the robot)
         rospy.on_shutdown(self.shutdown)
@@ -134,18 +135,18 @@ class SMACHAI():
 
         # Append each of the four waypoints to the list.  Each waypoint
         # is a pose consisting of a position and orientation in the map frame.
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[0]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[1]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[2]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[3]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[4]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[5]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[6]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[7]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[8]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[9]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[10]))
-        self.waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[11]))
+        self.waypoints.append(Pose(Point(0.0, -3.0, 0.0), quaternions[0]))
+        self.waypoints.append(Pose(Point(2.0, -2.0, 0.0), quaternions[1]))
+        self.waypoints.append(Pose(Point(2.9, 1.0, 0.0), quaternions[2]))
+        self.waypoints.append(Pose(Point(3.0, 1.2, 0.0), quaternions[3]))
+        self.waypoints.append(Pose(Point(4.23, 1.1, 0.0), quaternions[4]))
+        self.waypoints.append(Pose(Point(4.23, 1.1, 0.0), quaternions[5]))
+        self.waypoints.append(Pose(Point(4.4, -0.6, 0.0), quaternions[6]))
+        self.waypoints.append(Pose(Point(2.3, 1.7, 0.0), quaternions[7]))
+        self.waypoints.append(Pose(Point(2.3, 1.7, 0.0), quaternions[8]))
+        self.waypoints.append(Pose(Point(-1.3, 0.7, 0.0), quaternions[9]))
+        self.waypoints.append(Pose(Point(-1.3, 0.7, 0.0), quaternions[10]))
+        self.waypoints.append(Pose(Point(-1.6, 0.1, 0.0), quaternions[11]))
 
 
 
@@ -169,9 +170,7 @@ class SMACHAI():
 	    Concurrence.add('GO_TO_KITCHEN', MonitorState("/CARRY/go_kitchen", Empty, self.empty_cb))
 	    Concurrence.add('GO_TO_BEDROOM', MonitorState("/CARRY/go_bedroom", Empty, self.empty_cb))
 	    Concurrence.add('GO_TO_SLEEP', MonitorState("/CARRY/go_sleep", Empty, self.empty_cb))
-	    Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[1]))
-            #                 transitions={'succeeded':'succeeded',
-            #                              'aborted':'aborted'})
+	    #Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[1]))
 
 
         # Concurrent State machine 
@@ -185,7 +184,7 @@ class SMACHAI():
             Concurrence.add('GO_TO_KITCHEN', MonitorState("/CARRY/go_kitchen", Empty, self.empty_cb))
             Concurrence.add('GO_TO_BEDROOM', MonitorState("/CARRY/go_bedroom", Empty, self.empty_cb))
             Concurrence.add('GO_TO_MAIN_ROOM', MonitorState("/CARRY/go_main_room", Empty, self.empty_cb))
-            Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[0]))
+            #Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[0]))
 
 	# Concurrent State machine 
         self.sm_in_kitchen = Concurrence(outcomes=['succeeded','aborted','preempted','go_main_room','go_bedroom','go_sleep'],
@@ -198,7 +197,7 @@ class SMACHAI():
             Concurrence.add('GO_TO_MAIN_ROOM', MonitorState("/CARRY/go_main_room", Empty, self.empty_cb))
             Concurrence.add('GO_TO_BEDROOM', MonitorState("/CARRY/go_bedroom", Empty, self.empty_cb))
             Concurrence.add('GO_TO_SLEEP', MonitorState("/CARRY/go_sleep", Empty, self.empty_cb))
-            Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[6]))
+            #Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[6]))
 
         # Concurrent State machine 
         self.sm_in_bedroom = Concurrence(outcomes=['succeeded','aborted','preempted','go_main_room','go_kitchen','go_sleep'],
@@ -211,7 +210,7 @@ class SMACHAI():
             Concurrence.add('GO_TO_MAIN_ROOM', MonitorState("/CARRY/go_main_room", Empty, self.empty_cb))
             Concurrence.add('GO_TO_KITCHEN', MonitorState("/CARRY/go_kitchen", Empty, self.empty_cb))
             Concurrence.add('GO_TO_SLEEP', MonitorState("/CARRY/go_sleep", Empty, self.empty_cb))
-            Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[11]))
+            #Concurrence.add('GO_TO_POINT', Nav2Waypoint(self.waypoints[11]))
 
 
 
@@ -221,7 +220,7 @@ class SMACHAI():
 
         # Add nav_patrol, sm_recharge and a Stop() machine to sm_top
         with self.sm_top:
-            StateMachine.add('IN_MAIN_ROOM', self.sm_in_main_room, transitions={'succeeded':'succeeded', 
+            StateMachine.add('IN_MAIN_ROOM', self.sm_in_main_room, transitions={'succeeded':'IN_MAIN_ROOM', 
 										'go_kitchen':'NAV_M2K_M',
 										'go_sleep':'IN_SLEEP',
 										'go_bedroom':'NAV_M2B_M'})
@@ -238,9 +237,12 @@ class SMACHAI():
                                                                                 'go_main_room':'IN_MAIN_ROOM',
                                                                                 'go_bedroom':'NAV_S2B_M'})
 	    StateMachine.add('NAV_M2K_M', Nav2Waypoint(self.waypoints[2]),
-                             transitions={'succeeded':'NAV_M2K_E',
+                             transitions={'succeeded':'NAV_M2K_K',
                                           'aborted':'aborted'})
-            StateMachine.add('NAV_M2K_E', Nav2Waypoint(self.waypoints[5]),
+            StateMachine.add('NAV_M2K_K', Nav2Waypoint(self.waypoints[5]),
+                             transitions={'succeeded':'NAV_M2K_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_M2K_END', Nav2Waypoint(self.waypoints[6]),
                              transitions={'succeeded':'IN_KITCHEN',
                                           'aborted':'aborted'})
 
@@ -248,6 +250,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_K2M_M',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_K2M_M', Nav2Waypoint(self.waypoints[3]),
+                             transitions={'succeeded':'NAV_K2M_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_K2M_END', Nav2Waypoint(self.waypoints[1]),
                              transitions={'succeeded':'IN_MAIN_ROOM',
                                           'aborted':'aborted'})
 
@@ -258,6 +263,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_M2B_B',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_M2B_B', Nav2Waypoint(self.waypoints[10]),
+                             transitions={'succeeded':'NAV_M2B_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_M2B_END', Nav2Waypoint(self.waypoints[11]),
                              transitions={'succeeded':'IN_BEDROOM',
                                           'aborted':'aborted'})
 
@@ -265,6 +273,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_K2S_M',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_K2S_M', Nav2Waypoint(self.waypoints[3]),
+                             transitions={'succeeded':'NAV_K2S_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_K2S_END', Nav2Waypoint(self.waypoints[0]),
                              transitions={'succeeded':'IN_SLEEP',
                                           'aborted':'aborted'})
 
@@ -275,6 +286,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_K2B_B',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_K2B_B', Nav2Waypoint(self.waypoints[10]),
+                             transitions={'succeeded':'NAV_K2B_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_K2B_END', Nav2Waypoint(self.waypoints[11]),
                              transitions={'succeeded':'IN_BEDROOM',
                                           'aborted':'aborted'})
 
@@ -285,6 +299,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_B2K_K',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_B2K_K', Nav2Waypoint(self.waypoints[5]),
+                             transitions={'succeeded':'NAV_B2K_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_B2K_END', Nav2Waypoint(self.waypoints[6]),
                              transitions={'succeeded':'IN_KITCHEN',
                                           'aborted':'aborted'})
 
@@ -295,6 +312,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_B2S_M',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_B2S_M', Nav2Waypoint(self.waypoints[3]),
+                             transitions={'succeeded':'NAV_B2S_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_B2S_END', Nav2Waypoint(self.waypoints[0]),
                              transitions={'succeeded':'IN_SLEEP',
                                           'aborted':'aborted'})
 
@@ -305,6 +325,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_B2M_M',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_B2M_M', Nav2Waypoint(self.waypoints[3]),
+                             transitions={'succeeded':'NAV_B2M_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_B2M_END', Nav2Waypoint(self.waypoints[1]),
                              transitions={'succeeded':'IN_MAIN_ROOM',
                                           'aborted':'aborted'})
 
@@ -315,6 +338,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_S2B_B',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_S2B_B', Nav2Waypoint(self.waypoints[10]),
+                             transitions={'succeeded':'NAV_S2B_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_S2B_END', Nav2Waypoint(self.waypoints[11]),
                              transitions={'succeeded':'IN_BEDROOM',
                                           'aborted':'aborted'})
 
@@ -322,6 +348,9 @@ class SMACHAI():
                              transitions={'succeeded':'NAV_S2K_K',
                                           'aborted':'aborted'})
             StateMachine.add('NAV_S2K_K', Nav2Waypoint(self.waypoints[5]),
+                             transitions={'succeeded':'NAV_S2K_END',
+                                          'aborted':'aborted'})
+            StateMachine.add('NAV_S2K_END', Nav2Waypoint(self.waypoints[6]),
                              transitions={'succeeded':'IN_KITCHEN',
                                           'aborted':'aborted'})
 

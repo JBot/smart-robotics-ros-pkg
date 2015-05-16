@@ -85,6 +85,8 @@ class Pathwrapper {
 
 		double MAX_SPEED_LIN;
 		double MAX_SPEED_ANG;
+
+		double Px, Py, Pz;
 };
 
 Pathwrapper::Pathwrapper()
@@ -98,6 +100,9 @@ Pathwrapper::Pathwrapper()
 	nhp.param<double>("max_dist_skip", MAX_DIST_SKIP, 0.10);
 	nhp.param<double>("max_speed_ang", MAX_SPEED_ANG, 0.05);
 	nhp.param<double>("max_speed_lin", MAX_SPEED_LIN, 0.16);
+	nhp.param<double>("Px", Px, 2.0);
+	nhp.param<double>("Py", Py, 1.5);
+	nhp.param<double>("Pz", Pz, 3.0);
 
 	// Goal suscriber
 	goal_sub_ = nh.subscribe < geometry_msgs::PoseStamped > ("/move_base_test/goal", 20, &Pathwrapper::goalCallback, this);
@@ -323,7 +328,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 						{
 							double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
-							double max_speed_lin = my_pose_stamped.pose.position.x * 2;
+							double max_speed_lin = my_pose_stamped.pose.position.x * Px;
 							if(max_speed_lin > MAX_SPEED_LIN)
 								max_speed_lin = MAX_SPEED_LIN;
 							if(max_speed_lin < -MAX_SPEED_LIN)
@@ -335,7 +340,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 						else 
 						{       
 							double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
-							double max_speed_lin = my_pose_stamped.pose.position.y * 1.5;
+							double max_speed_lin = my_pose_stamped.pose.position.y * Py;
 							if(max_speed_lin > MAX_SPEED_LIN)
 								max_speed_lin = MAX_SPEED_LIN;
 							if(max_speed_lin < -MAX_SPEED_LIN)
@@ -348,7 +353,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 						// find Vtheta
 
-						final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 3.0; // RAD ?
+						final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * Pz; // RAD ?
 						if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
 							final_cmd_vel.angular.z = MAX_SPEED_ANG;
 						if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
@@ -407,7 +412,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 							{
 								double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
-								double max_speed_lin = my_pose_stamped.pose.position.x * 1.3; //2
+								double max_speed_lin = my_pose_stamped.pose.position.x * Px; //2
 								if(max_speed_lin > MAX_SPEED_LIN)
 									max_speed_lin = MAX_SPEED_LIN;
 								if(max_speed_lin < -MAX_SPEED_LIN)
@@ -419,7 +424,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 							else
 							{
 								double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
-								double max_speed_lin = my_pose_stamped.pose.position.y * 1.2; //2
+								double max_speed_lin = my_pose_stamped.pose.position.y * Py; //2
 								if(max_speed_lin > MAX_SPEED_LIN)
 									max_speed_lin = MAX_SPEED_LIN;
 								if(max_speed_lin < -MAX_SPEED_LIN)
@@ -431,7 +436,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 							// find Vtheta
-							final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 4.0; // RAD ?
+							final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * Pz; // RAD ?
 							if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
 								final_cmd_vel.angular.z = MAX_SPEED_ANG;
 							if(final_cmd_vel.angular.z < -MAX_SPEED_ANG)
@@ -488,7 +493,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 				if( fabs(my_pose_stamped.pose.position.x) > fabs(my_pose_stamped.pose.position.y))
 				{
 					double speed_ratio = my_pose_stamped.pose.position.x / my_pose_stamped.pose.position.y;
-					double max_speed_lin = my_pose_stamped.pose.position.x * 2.0; //2
+					double max_speed_lin = my_pose_stamped.pose.position.x * Px; //2
 					if(max_speed_lin > MAX_SPEED_LIN)
 						max_speed_lin = MAX_SPEED_LIN;
 					if(max_speed_lin < -MAX_SPEED_LIN)
@@ -500,7 +505,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 				else
 				{
 					double speed_ratio = my_pose_stamped.pose.position.y / my_pose_stamped.pose.position.x;
-					double max_speed_lin = my_pose_stamped.pose.position.y * 1.5; // 2
+					double max_speed_lin = my_pose_stamped.pose.position.y * Py; // 2
 					if(max_speed_lin > MAX_SPEED_LIN)
 						max_speed_lin = MAX_SPEED_LIN;
 					if(max_speed_lin < -MAX_SPEED_LIN)
@@ -512,7 +517,7 @@ void Pathwrapper::compute_next_pathpoint(tf::TransformListener& listener) {
 
 
 				// find Vtheta
-				final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * 3.5; // RAD ?
+				final_cmd_vel.angular.z = getHeadingFromQuat(my_pose_stamped.pose.orientation) * Pz; // RAD ?
 				ROS_INFO("linear %f %f angular %f", final_cmd_vel.linear.x, final_cmd_vel.linear.y, final_cmd_vel.angular.z);
 				if(final_cmd_vel.angular.z > MAX_SPEED_ANG)
 					final_cmd_vel.angular.z = MAX_SPEED_ANG;
