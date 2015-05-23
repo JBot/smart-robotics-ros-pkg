@@ -37,8 +37,8 @@
 
 // SERVO OFFSET
 #define SERVO_OFFSET0   23
-#define SERVO_OFFSET1   94
-#define SERVO_OFFSET2   405
+#define SERVO_OFFSET1   164
+#define SERVO_OFFSET2   315
 #define SERVO_OFFSET3   0
 #define SERVO_OFFSET4   107
 #define SERVO_OFFSET5   85
@@ -46,7 +46,7 @@
 #define SERVO_OFFSET7   0
 #define SERVO_OFFSET8   -24
 #define SERVO_OFFSET9 	113
-#define SERVO_OFFSET10  382
+#define SERVO_OFFSET10  202
 #define SERVO_OFFSET11  0
 #define SERVO_OFFSET12  0
 #define SERVO_OFFSET13  0
@@ -54,15 +54,15 @@
 #define SERVO_OFFSET15  0
 #define SERVO_OFFSET16  -40
 #define SERVO_OFFSET17  -32
-#define SERVO_OFFSET18  -40
+#define SERVO_OFFSET18  -120
 #define SERVO_OFFSET19  0
 #define SERVO_OFFSET20  27
 #define SERVO_OFFSET21  47
-#define SERVO_OFFSET22  -152
+#define SERVO_OFFSET22  -22
 #define SERVO_OFFSET23  0
 #define SERVO_OFFSET24  101
 #define SERVO_OFFSET25  -95
-#define SERVO_OFFSET26  -182
+#define SERVO_OFFSET26  -122
 #define SERVO_OFFSET27  0
 #define SERVO_OFFSET28  0
 #define SERVO_OFFSET29  0
@@ -218,7 +218,7 @@ void SSC32Driver::test(void)
         if ( fd )
         {
                 write(fd, &Serout, sizeof(Serout));
-//                printf("Writing.\n%s\n", Serout);
+                printf("Writing.\n%s\n", Serout);
         }
 
 
@@ -267,7 +267,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "SSC32_Driver");
 	SSC32Driver drive;
 	// Refresh rate
-	ros::Rate loop_rate(20);                                // 35 with bluetooth
+	ros::Rate loop_rate(2);                                // 35 with bluetooth
 
 
 	while (ros::ok()) {
