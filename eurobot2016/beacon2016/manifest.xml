@@ -1,0 +1,22 @@
+<package>
+  <description brief="beacon2016">
+
+     beacon2016
+
+  </description>
+  <author>ODROID</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/beacon2016</url>
+  <depend package="roscpp"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="pcl_ros"/>
+  <depend package="pcl_conversions"/>
+  <depend package="laser_geometry"/>
+
+</package>
+
+

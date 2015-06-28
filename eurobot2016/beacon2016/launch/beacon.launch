@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- Beacon TF -->
+  <node pkg="tf" type="static_transform_publisher" name="world2beacon_broadcaster" args="1.55 1.0 0 3.1415 0 0 /world /beacon_link 100"/>
+<!--  <node pkg="tf" type="static_transform_publisher" name="beacon2laser_broadcaster" args="0 0.01 0 0 0 0 /beacon_link /beacon_laser_link 100"/>
+-->
+  <!-- LASER NODE -->
+  <node pkg="hokuyo_node" type="hokuyo_node" name="test_laser_publisher" output="screen">
+    <param name="port" value="/dev/ttyHOKUYO" />
+    <param name="frame_id" value="beacon_laser_link" />
+    <param name="min_ang" value="-1.7" />
+    <param name="max_ang" value="1.7" />
+
+    <remap from="/scan" to="/BEACON/laser" />
+  </node>
+
+  <!-- Filter -->
+  <node pkg="beacon2016" type="laser_filter" name="beacon_laser_filter_field" output="screen">
+    <remap from="/BEACON/laser" to="/BEACON/laser" />
+    <remap from="/BEACON/filtered_pcl" to="/BEACON/filtered_pcl" />
+  </node>
+
+  <!-- Position initialization -->
+
+  <!-- Robots detector -->
+
+
+
+</launch>
