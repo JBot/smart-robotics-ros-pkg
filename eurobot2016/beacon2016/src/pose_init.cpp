@@ -49,6 +49,7 @@ class My_Filter {
 	double x, y, yaw;
 
 	int state;
+	int cpt;
 
 };
 
@@ -61,6 +62,7 @@ My_Filter::My_Filter(){
 	yaw = 0.0;
 
 	state = STATE_1;
+	cpt = 0;
 
 }
 
@@ -68,6 +70,7 @@ void My_Filter::pclCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){
     pcl::PCLPointCloud2::Ptr pcl_pc(new pcl::PCLPointCloud2 ());
     pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr final (new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr final2 (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PCLPointCloud2::Ptr cloud_out (new pcl::PCLPointCloud2 ());
     sensor_msgs::PointCloud2 pc2;
     std::vector<int> inliers;
@@ -86,35 +89,130 @@ void My_Filter::pclCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){
   pcl::PassThrough<pcl::PointXYZ> pass;
   pass.setInputCloud (pcl_cloud);
   pass.setFilterFieldName ("x");
-  pass.setFilterLimits (-1.5, -1.3);
+  pass.setFilterLimits (-0.2, 0.2);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*final);
 
   pass.setInputCloud (final);
   pass.setFilterFieldName ("y");
-  pass.setFilterLimits (0.0, 0.2);
+  pass.setFilterLimits (0.2, 0.6);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*final);
 
 
+  ////////////////////////
+  // PassThrough filter //
+  ////////////////////////
+  pass.setInputCloud (pcl_cloud);
+  pass.setFilterFieldName ("x");
+  pass.setFilterLimits (-0.2, 0.2);
+  //pass.setFilterLimitsNegative (true);
+  pass.filter (*final2);
+
+  pass.setInputCloud (final2);
+  pass.setFilterFieldName ("y");
+  pass.setFilterLimits (1.4, 1.8);
+  //pass.setFilterLimitsNegative (true); 
+  pass.filter (*final2);
+
+
     double mean = 0.0;
+    double mean2 = 0.0;
     int i = 0;
 
 
     switch(state) {
 	case STATE_1 : 
 		// Check if X is equal between both clusters : change YAW
-		state = STATE_2;
 		
+                if(final->size() > 0)
+                {
+                        for(i = 0; i < final->size(); i++)
+                        {
+                                mean += final->at(i).x;
+                        }
+                        mean = mean / final->size();
+
+
+			if(final2->size() > 0)
+                	{ 
+                        	for(i = 0; i < final2->size(); i++)
+                        	{
+                                	mean2 += final2->at(i).x;
+                        	}
+                        	mean2 = mean2 / final2->size();
+			
+				yaw += (mean2 - mean)/10;
+				cpt++;
+
+			}
+			else {
+
+			}
+
+                }   
+                else
+                {
+                        // DO nothing
+                }
+
+
+		if(cpt > 40)
+		{
+			cpt = 0;
+			state = STATE_2;
+		}
+
+
+
 	break;
 	case STATE_2 : 
 		// Check if Y are at a correct position : change Y
-		state = STATE_3;
+
+		if(final->size() > 0)
+                { 
+                        for(i = 0; i < final->size(); i++)
+                        {
+                                mean += final->at(i).y;
+                        }
+                        mean = mean / final->size();
+
+
+                        if(final2->size() > 0)
+                        {
+                                for(i = 0; i < final2->size(); i++)
+                                {
+                                        mean2 += final2->at(i).y;
+                                }
+                                mean2 = mean2 / final2->size();
+
+				y += -(0.4 - mean)/4;
+                                cpt++; 
+
+                        }
+                        else {
+
+                        }
+
+                }
+                else
+                {
+                        // DO nothing
+                }
+
+
+                if(cpt > 40)
+                {
+                        cpt = 0;
+                        state = STATE_3;
+                }
+
+
 	break;
 	case STATE_3 : 
 		// Check if X are at a correct position : change X
 		
-		//-1.4
+		//-1.4 // 0.0
 		if(final->size() > 0)
 		{
 			for(i = 0;i < final->size(); i++)
@@ -123,12 +221,20 @@ void My_Filter::pclCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){
 			}
 			mean = mean / final->size();
 
-			x += -(-1.4 - mean)/4;
+			x += -(0.0 - mean)/4;
+			cpt++;
 		}
 		else
 		{
 			// DO nothing
 		}
+
+		if(cpt > 40)
+                {
+                        cpt = 0;
+                        state = STATE_4;
+                }
+
 
 	break;
 	case STATE_4 : 
