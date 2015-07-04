@@ -121,9 +121,12 @@ void read_positions(void)
   sensorValuePosShoulder = (sensorValuePosShoulder + (analogRead(analogInPinShoulder)  - SHOULDER_ZERO) / SHOULDER_RATIO);
   sensorValuePosShoulder = (sensorValuePosShoulder + (analogRead(analogInPinShoulder)  - SHOULDER_ZERO) / SHOULDER_RATIO)/3.0;
   //sensorValuePosShoulder = analogRead(analogInPinShoulder);
-  sensorValuePosElbow = (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO;
+  
+  sensorValuePosElbow = analogRead(analogInPinElbow);
+  /*sensorValuePosElbow = (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO;
   sensorValuePosElbow = (sensorValuePosElbow + (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO);
   sensorValuePosElbow = (sensorValuePosElbow + (analogRead(analogInPinElbow)  - ELBOW_ZER0) / ELBOW_RATIO)/3.0;
+*/
 }
 
 double convert_adc(int value)
@@ -135,7 +138,8 @@ void compute_PIDs(double shoulder, double elbow)
 {
   
   double errorShoulder =  sensorValuePosShoulder - shoulder;
-  double errorElbow =  sensorValuePosElbow - elbow;
+  //double errorElbow =  sensorValuePosElbow - elbow;
+  double errorElbow = 0.0;
   
   error_sum_shoulder += errorShoulder;
   error_sum_elbow += errorElbow;
