@@ -1,0 +1,16 @@
+<package>
+  <description brief="common_smart_dashboard">
+
+     common_smart_dashboard
+
+  </description>
+  <author>jbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/common_smart_dashboard</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+
+</package>
+
+

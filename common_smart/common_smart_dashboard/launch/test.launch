@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Code to test dashboard datas -->
+  <node pkg="common_smart_dashboard" type="float_dashboard" respawn="false" name="TEST_dash_synergie" output="screen">
+    <param name="address" type="str" value="192.168.0.16" />
+    <param name="port" type="str" value="3030" />
+    <param name="type" type="str" value="value" />
+    <param name="dash_topic" type="str" value="synergy" />
+    
+    <remap from="/DASHBOARD/test" to="/DASHBOARD/test" />
+  </node>
+
+  <!-- Code to test dashboard datas -->
+  <node pkg="common_smart_dashboard" type="string_dashboard" respawn="false" name="TEST_dash_welcome" output="screen">
+    <param name="address" type="str" value="192.168.0.16" />
+    <param name="port" type="str" value="3030" />
+    <param name="type" type="str" value="text" />
+    <param name="dash_topic" type="str" value="welcome" />
+
+    <remap from="/DASHBOARD/stringtest" to="/DASHBOARD/stringtest" />
+  </node>
+  
+</launch>
