@@ -2,7 +2,7 @@
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 #include <laser_geometry/laser_geometry.h>
-#include <geometry_msgs/Pose2D.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <pcl/point_types.h>
 #include <pcl/io/io.h>
@@ -12,6 +12,7 @@
 #include <pcl_ros/transforms.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+#include <pcl/filters/conditional_removal.h>
 
 #include <stdlib.h>
 
@@ -30,6 +31,7 @@
 #include <sstream>
 #include <math.h>
 #include <vector>
+#include <list>
 
 #define DETECTION_DISTANCE	0.07
 
@@ -48,7 +50,7 @@ class My_Filter {
 		tf::StampedTransform t;
 		tf::TransformBroadcaster broadcaster;
 
-		std::vector<geometry_msgs::Pose2D> robots;
+		std::list<geometry_msgs::PoseStamped> robots;
 
 };
 
@@ -56,14 +58,24 @@ My_Filter::My_Filter(){
 	point_cloud_sub_ = node_.subscribe<sensor_msgs::PointCloud2> ("/BEACON/filtered_pcl", 10, &My_Filter::pclCallback, this);
 	point_cloud_publisher_ = node_.advertise<sensor_msgs::PointCloud2> ("/BEACON/pcl_debug2", 10, false);
 
-	geometry_msgs::Pose2D tmp;
-	tmp.x = 0.0;
-	tmp.y = 0.4;
-	tmp.theta = 0.0;
+	geometry_msgs::PoseStamped tmp;
+	tmp.header.frame_id = "0";
+	tmp.pose.position.x = 0.0;
+	tmp.pose.position.y = 0.4;
+	tmp.pose.position.z = 0.0;
+	tmp.pose.orientation.x = 0.0;
+	tmp.pose.orientation.y = 0.0;
+	tmp.pose.orientation.z = 1.0;
+	tmp.pose.orientation.w = 0.0;
 	robots.push_back(tmp);
-	tmp.x = 0.0;
-	tmp.y = 1.6;
-	tmp.theta = 0.0;
+	tmp.header.frame_id = "1";
+	tmp.pose.position.x = 0.0;
+	tmp.pose.position.y = 1.6;
+	tmp.pose.position.z = 0.0;
+	tmp.pose.orientation.x = 0.0;
+	tmp.pose.orientation.y = 0.0;
+	tmp.pose.orientation.z = 1.0;
+	tmp.pose.orientation.w = 0.0;
 	robots.push_back(tmp);
 
 }
@@ -84,29 +96,83 @@ void My_Filter::pclCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){
 	// Transformation into PCL type PointCloud<pcl::PointXYZRGB>
 	pcl::fromPCLPointCloud2(*(pcl_pc), *(pcl_cloud));
 
-
+	std::list<geometry_msgs::PoseStamped> tmp_list;
 	int robot_counter = 0;
-	for (std::vector<geometry_msgs::Pose2D>::iterator it = robots.begin() ; it != robots.end(); ++it)
+	for (std::list<geometry_msgs::PoseStamped>::iterator it = robots.begin() ; it != robots.end(); ++it)
 	{ 
 
-		////////////////////////
-		// PassThrough filter //
-		////////////////////////
-		pcl::PassThrough<pcl::PointXYZ> pass;
-		pass.setInputCloud (pcl_cloud);
-		pass.setFilterFieldName ("x");
-		pass.setFilterLimits (it->x-DETECTION_DISTANCE, it->x+DETECTION_DISTANCE);
-		//pass.setFilterLimitsNegative (true);
-		pass.filter (*final2);
 
-		pass.setInputCloud (final2);
-		pass.setFilterFieldName ("y");
-		pass.setFilterLimits (it->y-DETECTION_DISTANCE, it->y+DETECTION_DISTANCE);
-		//pass.setFilterLimitsNegative (true); 
-		pass.filter (*final2);
+		if(it->pose.orientation.x > 0.001)
+		{ // Robot currently not seen
+
+			////////////////////////
+			// PassThrough filter //
+			////////////////////////
+			pcl::PassThrough<pcl::PointXYZ> pass;
+			pass.setInputCloud (pcl_cloud);
+			pass.setFilterFieldName ("x");
+			pass.setFilterLimits (it->pose.position.x-DETECTION_DISTANCE-it->pose.orientation.x*0.002, 
+						it->pose.position.x+DETECTION_DISTANCE+it->pose.orientation.x*0.002);
+			//pass.setFilterLimitsNegative (true);
+			pass.filter (*final2);
+
+			pass.setInputCloud (final2);
+			pass.setFilterFieldName ("y");
+			pass.setFilterLimits (it->pose.position.y-DETECTION_DISTANCE-it->pose.orientation.x*0.002, 
+						it->pose.position.y+DETECTION_DISTANCE+it->pose.orientation.x*0.002);
+			//pass.setFilterLimitsNegative (true); 
+			pass.filter (*final2);
+
+
+		}
+		else
+		{ // Robot seen
+
+			////////////////////////
+			// PassThrough filter //
+			////////////////////////
+			pcl::PassThrough<pcl::PointXYZ> pass;
+			pass.setInputCloud (pcl_cloud);
+			pass.setFilterFieldName ("x");
+			pass.setFilterLimits (it->pose.position.x-DETECTION_DISTANCE, it->pose.position.x+DETECTION_DISTANCE);
+			//pass.setFilterLimitsNegative (true);
+			pass.filter (*final2);
+
+			pass.setInputCloud (final2);
+			pass.setFilterFieldName ("y");
+			pass.setFilterLimits (it->pose.position.y-DETECTION_DISTANCE, it->pose.position.y+DETECTION_DISTANCE);
+			//pass.setFilterLimitsNegative (true); 
+			pass.filter (*final2);
+
+
+			pcl::ConditionOr<pcl::PointXYZ>::Ptr range_cond (new pcl::ConditionOr<pcl::PointXYZ> ());
+    
+			range_cond->addComparison (pcl::FieldComparison<pcl::PointXYZ>::ConstPtr (new
+      				pcl::FieldComparison<pcl::PointXYZ> ("x", pcl::ComparisonOps::GT, it->pose.position.x+DETECTION_DISTANCE)));
+    
+			range_cond->addComparison (pcl::FieldComparison<pcl::PointXYZ>::ConstPtr (new
+      				pcl::FieldComparison<pcl::PointXYZ> ("x", pcl::ComparisonOps::LT, it->pose.position.x-DETECTION_DISTANCE)));
+    
+                        range_cond->addComparison (pcl::FieldComparison<pcl::PointXYZ>::ConstPtr (new
+                                pcl::FieldComparison<pcl::PointXYZ> ("y", pcl::ComparisonOps::GT, it->pose.position.y+DETECTION_DISTANCE)));
+    
+                        range_cond->addComparison (pcl::FieldComparison<pcl::PointXYZ>::ConstPtr (new
+                                pcl::FieldComparison<pcl::PointXYZ> ("y", pcl::ComparisonOps::LT, it->pose.position.y-DETECTION_DISTANCE)));
+
+
+			// build the filter
+    			pcl::ConditionalRemoval<pcl::PointXYZ> condrem (range_cond);
+    			condrem.setInputCloud (pcl_cloud);
+    			condrem.setKeepOrganized(true);
+    			// apply filter
+    			condrem.filter (*pcl_cloud);
+
+
+		}
+
 
 		if(final2->size() > 2)
-		{
+		{ // Something in the box
 
 			double meanX = 0.0;
 			double meanY = 0.0;
@@ -118,11 +184,13 @@ void My_Filter::pclCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){
 			meanX = meanX / final2->size();
 			meanY = meanY / final2->size();
 
-			robots.at(robot_counter).x = meanX;
-			robots.at(robot_counter).y = meanY;
+			//robots.at(robot_counter).pose.position.x = meanX;
+			//robots.at(robot_counter).pose.position.y = meanY;
+			it->pose.position.x = meanX;
+			it->pose.position.y = meanY;
 
 			char numstr[50];
-			sprintf(numstr, "/robot_%d_link", robot_counter);
+			sprintf(numstr, "/robot_%s_link", it->header.frame_id.c_str());
 
 			t = tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(0.0), tf::Vector3(meanX, meanY, 0.0)),
 					ros::Time::now(), "/world", numstr);
@@ -130,11 +198,33 @@ void My_Filter::pclCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){
 			t.stamp_ = ros::Time::now();
 			broadcaster.sendTransform(t);
 
+			it->pose.orientation.x = 0.0;
+			
+			tmp_list.push_front(*it);
+			
 			//std::cout << "size : " << final2->size() << std::endl;
+		}
+		else 
+		{ // Nothing found in the box
+			it->pose.orientation.x += 1.0;
+			if(it->pose.orientation.x > 100.0)
+			{
+				it->pose.orientation.x = 100.0;
+			}
+			//std::cout << "coef : " << it->pose.orientation.x << std::endl;
+			geometry_msgs::PoseStamped tmp = *it;
+			//robots.push_back(*it);
+			//robots.erase(it);
+			//robots.push_back(tmp);
+
+			tmp_list.push_back(*it);
+
 		}
 		robot_counter++;
 	}
 
+
+	robots = tmp_list;
 
 	/////////////////////////////////
 	// Statistical Outlier Removal //
