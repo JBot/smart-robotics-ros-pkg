@@ -88,13 +88,13 @@ void My_Filter::scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan){
   pcl::PassThrough<pcl::PointXYZ> pass;
   pass.setInputCloud (pcl_cloud);
   pass.setFilterFieldName ("x");
-  pass.setFilterLimits (-1.6, 1.6);
+  pass.setFilterLimits (-1.5, 1.5);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*final);
 
   pass.setInputCloud (final);
   pass.setFilterFieldName ("y");
-  pass.setFilterLimits (-0.1, 2.1);
+  pass.setFilterLimits (0.0, 2.0);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*final);
 
