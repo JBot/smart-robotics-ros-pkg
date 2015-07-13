@@ -54,7 +54,7 @@ void nestorWeather::weatherCallback(const std_msgs::Empty::ConstPtr & feedback)
 
 	/* Current weather */	
 	/* Open the command for reading. */
-  	fp = popen("/home/jbot/ROS/smart-robotics-ros-pkg/nestor/nestor_command/current.sh \"EUR|FR|FR|Paris\"", "r");
+  	fp = popen("/home/jbot/ROS/smart-robotics-ros-pkg/nestor/nestor_command/current.sh \"EUR|FR|FR|Brunoy\"", "r");
   	if (fp == NULL) {
     		printf("Failed to run command\n" );
     		exit;
@@ -94,7 +94,7 @@ void nestorWeather::weatherCallback(const std_msgs::Empty::ConstPtr & feedback)
 
         /* Forecast weather */   
         /* Open the command for reading. */
-        fp = popen("/home/jbot/ROS/smart-robotics-ros-pkg/nestor/nestor_command/forecast.sh \"EUR|FR|FR|Paris\"", "r");
+        fp = popen("/home/jbot/ROS/smart-robotics-ros-pkg/nestor/nestor_command/forecast.sh \"EUR|FR|FR|Brunoy\"", "r");
         if (fp == NULL) {
                 printf("Failed to run command\n" );
                 exit;
