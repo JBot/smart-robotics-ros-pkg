@@ -189,7 +189,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "Pose_Simulator");
 	PoseSimulator posesimulator;
 	// Refresh rate
-	ros::Rate loop_rate(40);                                // 35 with bluetooth
+	ros::Rate loop_rate(70);                                // 35 with bluetooth
 	float rotation = 0.0;
 	while (ros::ok()) {
 		posesimulator.publish_all();
