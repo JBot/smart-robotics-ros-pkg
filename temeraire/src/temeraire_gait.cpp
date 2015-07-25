@@ -1408,9 +1408,9 @@ void TemeraireGait::GaitSeq(void) {
 
 void TemeraireGait::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
 {
-        TravelLengthX = vel->linear.y * 200;
-        TravelLengthZ = vel->linear.x * 200;
-        TravelRotationY = vel->angular.z * 100;
+        TravelLengthX = vel->linear.y * 200 / 0.14;
+        TravelLengthZ = vel->linear.x * 200 / 0.14;
+        TravelRotationY = vel->angular.z * 100 / 0.58;
 }
 
 void TemeraireGait::poseCallback(const geometry_msgs::Twist::ConstPtr& pose)
