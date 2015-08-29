@@ -1,7 +1,7 @@
 <launch>
 
     <node pkg="common_smart_nav" type="fake_odom" name="TEMERAIRE_fake_odom" output="screen">
-	<param name="map_name" value="base_footprint"/>
+	<param name="map_name" value="odom"/>
 	<param name="base_name" value="odom_fake1"/>
 
     	<remap from="/ROBOT/cmd_vel" to="/TEMERAIRE/cmd_vel" />

@@ -21,9 +21,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-rosbuild_genmsg()
+#rosbuild_genmsg()
 #uncomment if you have defined services
-rosbuild_gensrv()
+#rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
@@ -33,10 +33,10 @@ rosbuild_gensrv()
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 #rosbuild_add_executable(compute_pose src/compute_pose.cpp)
-rosbuild_add_executable(pathwrapper src/pathwrapper.cpp)
+#rosbuild_add_executable(pathwrapper src/pathwrapper.cpp)
 #rosbuild_add_executable(arduino_pathwrapper src/arduino_pathwrapper.cpp)
 #rosbuild_add_executable(trajectory_wrapper src/trajectory_wrapper.cpp)
-rosbuild_add_executable(pathplanner src/pathplanner.cpp)
+#rosbuild_add_executable(pathplanner src/pathplanner.cpp)
 #rosbuild_add_executable(map_stitch src/map_stitch.cpp)
 #rosbuild_add_executable(compressed_map_transport src/compressed_map_transport.cpp)
 rosbuild_add_executable(fake_odom src/fake_odom.cpp)

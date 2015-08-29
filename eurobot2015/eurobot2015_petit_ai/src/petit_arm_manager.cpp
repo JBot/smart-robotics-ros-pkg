@@ -119,19 +119,25 @@ void ARMManager::setsideCallback(const std_msgs::Int32::ConstPtr & my_int)
 				case FRONT:
 					break;
 				case REAR:
+					output.data = 2;
+					servo_speed.publish(output);
 					// TODO
-					output.data = 1;
+					output.data = 170;
 					servo3.publish(output);
-					output.data = 95;
+					output.data = 150;
 					servo4.publish(output);
-					output.data = 1;
+					output.data = 20;
 					servo5.publish(output);
-					output.data = 5;
+					usleep(500000);
+
+					output.data = 170;
 					servo6.publish(output);
-					output.data = 95;
+					output.data = 100;
 					servo7.publish(output);
 					output.data = 20;
 					servo8.publish(output);
+
+					usleep(500000);
 					break;
 				case RIGHT:
 					break;
@@ -146,18 +152,24 @@ void ARMManager::setsideCallback(const std_msgs::Int32::ConstPtr & my_int)
 			servo4.publish(output);
 			output.data = 1;
 			servo5.publish(output);
+
 			output.data = 5;
 			servo6.publish(output);
 			output.data = 95;
 			servo7.publish(output);
 			output.data = 20;
 			servo8.publish(output);
+			usleep(500000);
 			side = FRONT;
+			output.data = 1;
+			servo_speed.publish(output);
 			break;
 		case REAR:
 			switch(side)
 			{
 				case FRONT:
+					output.data = 2;
+					servo_speed.publish(output);
 					output.data = 1;
 					servo3.publish(output);
 					output.data = 150;
@@ -190,7 +202,7 @@ void ARMManager::setsideCallback(const std_msgs::Int32::ConstPtr & my_int)
 			servo3.publish(output);
 			output.data = 97;
 			servo4.publish(output);
-			output.data = 1;
+			output.data = 150;
 			servo5.publish(output);
 			output.data = 170;
 			servo6.publish(output);
@@ -198,7 +210,10 @@ void ARMManager::setsideCallback(const std_msgs::Int32::ConstPtr & my_int)
 			servo7.publish(output);
 			output.data = 150;
 			servo8.publish(output);
+			usleep(500000);
 			side = REAR;
+			output.data = 1;
+			servo_speed.publish(output);
 			break;
 		case RIGHT:
 			switch(side)
@@ -243,9 +258,9 @@ void ARMManager::colorCallback(const std_msgs::Int32::ConstPtr & my_int)
 	// OK
 	std_msgs::UInt16 output;
 
-	output.data = 90;
+	output.data = 95;
 	servo1.publish(output);
-	output.data = 90;
+	output.data = 110;
 	servo2.publish(output);
 	output.data = 1;
 	servo3.publish(output);
@@ -267,11 +282,11 @@ void ARMManager::grabCallback(const std_msgs::Int32::ConstPtr & my_int)
 	std_msgs::UInt16 output;
 	if(my_int->data == 1) // Front
 	{
-		output.data = 60; // TODO
+		output.data = 50;
 		servo2.publish(output);
 	}
 	else {
-		output.data = 60;
+		output.data = 40;
 		servo1.publish(output);
 	}
 
@@ -283,11 +298,11 @@ void ARMManager::releaseCallback(const std_msgs::Int32::ConstPtr & my_int)
 	std_msgs::UInt16 output;
 	if(my_int->data == 1) // Front
 	{
-		output.data = 90;
+		output.data = 110;
 		servo2.publish(output);
 	}
 	else {
-		output.data = 90;
+		output.data = 95;
 		servo1.publish(output);
 	}
 
@@ -302,9 +317,9 @@ void ARMManager::startCallback(const std_msgs::Empty::ConstPtr &value)
 	enable_servo.publish(out_enable);
 	usleep(10000);
 
-	output.data = 90;
+	output.data = 95;
 	servo1.publish(output);
-	output.data = 90;
+	output.data = 110;
 	servo2.publish(output);
 	output.data = 1;
 	servo3.publish(output);

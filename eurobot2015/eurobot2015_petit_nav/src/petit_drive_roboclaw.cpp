@@ -165,10 +165,10 @@ void DriveRoboClaw::compute_motor_speed(double x, double y, double z)
 {
 	//speed_motor1 = x * 6 - z * 3;
 	//speed_motor2 = x * 6 + z * 3;
-	speed_motor1 = x * 6 - y * 6 + z * 3;
-	speed_motor2 = x * 6 + y * 6 + z * 3;
-	speed_motor3 = x * 6 - y * 6 - z * 3;
-	speed_motor4 = x * 6 + y * 6 - z * 3;
+	speed_motor1 = x * 20 - y * 20 + z * 10;
+	speed_motor2 = x * 20 + y * 20 + z * 10;
+	speed_motor3 = x * 20 - y * 20 - z * 10;
+	speed_motor4 = x * 20 + y * 20 - z * 10;
 
 	printf("speed_motor1 : %f speed_motor2 : %f speed_motor3 : %f speed_motor4 : %f \n", speed_motor1, speed_motor2, speed_motor3, speed_motor4);
 }
