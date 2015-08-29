@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<launch>
+    <node name="map_balise_server" pkg="map_server" type="map_server" args="$(find temeraire)/map_balise.yaml">
+	<remap from="/map" to="/TEMERAIRE/map" />
+    </node>
+</launch>
+

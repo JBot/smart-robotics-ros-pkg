@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- Beacon TF -->
+  <node pkg="tf" type="static_transform_publisher" name="temeraire2laser_broadcaster" args="0.0 0.0 0.0 0 0 0 /base_footprint /temeraire_laser_link 20"/>
+<!--  <node pkg="tf" type="static_transform_publisher" name="beacon2laser_broadcaster" args="0 0.01 0 0 0 0 /beacon_link /beacon_laser_link 100"/>
+-->
+  <!-- LASER NODE -->
+  <node pkg="hokuyo_node" type="hokuyo_node" name="test_laser_publisher" output="screen">
+    <param name="port" value="/dev/ttyHOKUYO" />
+    <param name="frame_id" value="temeraire_laser_link" />
+    <param name="min_ang" value="-2.2" />
+    <param name="max_ang" value="2.2" />
+
+    <remap from="/scan" to="/TEMERAIRE/laser_nav" />
+  </node>
+
+</launch>
