@@ -15,7 +15,7 @@
 
 #define PIXELS_PIN 6
 #define RELAY_PIN 5
-#define VOLTAGE_PIN 0
+#define VOLTAGE_PIN A0
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -41,6 +41,29 @@ void messageCb( const std_msgs::Empty& toggle_msg){
 }
 ros::Subscriber<std_msgs::Empty> sub("recharge_battery", messageCb );
 
+void messageTwistCb( const geometry_msgs::Twist& msg){
+  if(msg.linear.x > 0.01)
+  {
+    for(uint16_t i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, strip.Color(0, 0, 255)); // blue
+    }
+  }
+  else if(msg.linear.x < -0.01)
+  {
+    for(uint16_t i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, strip.Color(255, 0, 0)); // red
+    }
+  }
+  else
+  {
+    for(uint16_t i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, 0);
+    }
+  }
+  strip.show();
+}
+ros::Subscriber<geometry_msgs::Twist> subTwist("cmd_vel", messageTwistCb );
+
 std_msgs::Float32 float_msg;
 ros::Publisher battery_pub("battery_level", &float_msg);
 
@@ -49,6 +72,7 @@ void setup()
 {
   pinMode(13, OUTPUT);
   pinMode(RELAY_PIN, OUTPUT);
+  analogReference(DEFAULT);
   recharge_state = 0;
   
   last_time_sensing= millis();
@@ -59,6 +83,10 @@ void setup()
   nh.initNode();
   nh.advertise(battery_pub);
   nh.subscribe(sub);
+  nh.subscribe(subTwist);
+
+  //colorWipe(strip.Color(255, 0, 0), 50); // Red
+
 }
 
 void loop()
@@ -106,5 +134,14 @@ void loop()
     default :
       recharge_state = 0;
       break;
+  }
+}
+
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
   }
 }
