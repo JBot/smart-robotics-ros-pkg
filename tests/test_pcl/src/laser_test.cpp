@@ -35,10 +35,21 @@ class FireFinder {
 
 	sensor_msgs::LaserScan save_opp_laser;
 	int cpt;
+
+        int number_remove;
+        double range_min;
 };
 
 FireFinder::FireFinder()
 {
+    ros::NodeHandle nhp("~");
+
+    number_remove = 5;
+    range_min = 0.1;
+
+    nhp.getParam("number_remove", number_remove);
+    nhp.getParam("range_min", range_min);
+
     laser_opponent_sub_ = nh.subscribe < sensor_msgs::LaserScan > ("/CARRY/laser_nav", 1, &FireFinder::laserOppCallback, this);
     laser_opp_pub = nh.advertise < sensor_msgs::LaserScan > ("/CARRY/laser_nav2", 5);
 
@@ -50,12 +61,12 @@ void FireFinder::laserOppCallback(const sensor_msgs::LaserScan::ConstPtr & laser
 	save_opp_laser = *laser;
 
 	int i = 0;
-	for(i = ( (save_opp_laser.ranges).size()/2 -5); i < ( (save_opp_laser.ranges).size()/2 +5); i++) {
+	for(i = ( (save_opp_laser.ranges).size()/2 -number_remove); i < ( (save_opp_laser.ranges).size()/2 +number_remove); i++) {
 		save_opp_laser.ranges[i] = 0.001;
 	}
 
 	//save_opp_laser = *laser;
-	save_opp_laser.range_min = 0.4;
+	save_opp_laser.range_min = range_min;
 
 	laser_opp_pub.publish(save_opp_laser);
 
